@@ -10,218 +10,249 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- RESET GLOBALE --- */
-        /* Fondamentale: box-sizing border-box su TUTTO */
-        *, *::before, *::after { 
-            box-sizing: border-box; 
-            -webkit-box-sizing: border-box; 
+        /* --- RESET & VARIABILI --- */
+        :root {
+            --primary: #2563eb;       
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;     
+            --success: #10b981;       
+            --danger: #ef4444;        
+            --bg-body: #f1f5f9;       
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-radius: 8px; /* Raggio ridotto per look più compatto */
+            --shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08);
         }
+
+        *, *::before, *::after { box-sizing: border-box; -webkit-box-sizing: border-box; }
         
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            background-color: #f1f5f9; 
-            color: #1e293b; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
             margin: 0; 
-            padding: 20px 10px; 
-            line-height: 1.5;
+            padding: 10px; /* Padding esterno ridotto */
+            line-height: 1.4;
             -webkit-font-smoothing: antialiased;
+            font-size: 14px; /* Base font ridotta leggermente */
         }
 
         .container { 
             max-width: 900px; 
             margin: 0 auto; 
-            background: #ffffff; 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+            background: var(--bg-card); 
+            padding: 20px; /* Padding interno ridotto */
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
         }
 
-        h2, h3 { color: #1e293b; font-weight: 700; margin-top: 0; }
-        h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-        h3 { color: #64748b; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; margin-top: 30px;}
+        h2, h3 { color: var(--text-main); font-weight: 700; margin-top: 0; }
+        h2 { font-size: 1.25rem; margin-bottom: 0.5rem; } /* Titoli più compatti */
+        h3 { color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; margin-top: 20px; margin-bottom: 10px;}
 
-        /* --- INPUT & SELECT FIX --- */
+        /* --- INPUT & SELECT --- */
         input, select { 
-            display: block; /* Assicura che prendano la riga */
+            display: block; 
             width: 100%; 
-            max-width: 100%; /* Impedisce sbordamento */
-            padding: 12px 16px; 
-            margin: 8px 0; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 10px; 
-            font-size: 16px; /* 16px evita lo zoom automatico su iOS */
+            max-width: 100%; 
+            padding: 8px 12px; /* Input più sottili */
+            margin: 4px 0; /* Meno margine verticale */
+            border: 1px solid #cbd5e1; 
+            border-radius: 6px; 
+            font-size: 14px; /* Font input compatto */
             font-family: inherit;
             background-color: #f8fafc;
-            color: #1e293b;
-            
-            /* Reset stili nativi iOS */
-            -webkit-appearance: none;
-            appearance: none;
-            min-width: 0; /* Fix per Flexbox */
+            color: var(--text-main);
+            -webkit-appearance: none; appearance: none; min-width: 0;
         }
         
-        /* Fix specifico per input data/ora su iOS */
         input[type="date"], input[type="time"] {
             -webkit-appearance: none;
-            min-height: 45px; /* Altezza minima tattile */
+            min-height: 38px; /* Altezza minima ridotta ma usabile */
             background-color: #f8fafc;
         }
 
         input:focus, select:focus { 
-            border-color: #2563eb; 
+            border-color: var(--primary); 
             background-color: #fff;
             outline: none; 
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); 
         }
         
-        label { font-size: 0.85rem; font-weight: 600; color: #64748b; margin-left: 4px; display: block; }
+        label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-left: 2px; display: block; margin-top: 4px; }
 
         /* --- BOTTONI --- */
         button { 
             width: 100%; 
-            padding: 14px; 
-            margin-top: 15px; 
+            padding: 10px; /* Bottone più sottile */
+            margin-top: 10px; 
             border: none; 
-            border-radius: 50px; 
-            font-size: 15px; 
+            border-radius: 6px; 
+            font-size: 14px; 
             font-weight: 600; 
             cursor: pointer; 
             font-family: inherit;
             transition: all 0.2s;
         }
 
-        .btn-primary { background-color: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
         .btn-primary:active { transform: scale(0.98); }
         
-        .logout-btn { background-color: transparent; color: #ef4444; border: 2px solid #fecaca; margin-top: 40px; }
-        .export-btn { background-color: #10b981; color: white; margin-top: 0; width: auto !important; padding: 10px 20px; font-size: 0.9rem; }
-        .toggle-pwd-btn { background-color: #f1f5f9; color: #64748b; width: auto; font-size: 0.9em; padding: 10px 20px; }
+        .logout-btn { background-color: transparent; color: var(--danger); border: 1px solid #fecaca; margin-top: 25px; padding: 8px; font-size: 13px;}
+        .export-btn { background-color: #10b981; color: white; margin-top: 0; width: auto !important; padding: 8px 15px; font-size: 0.85rem; }
+        .toggle-pwd-btn { background-color: #f1f5f9; color: var(--text-muted); width: auto; font-size: 0.85em; padding: 8px 15px; }
 
         /* --- LAYOUT --- */
         .form-box {
             background: #f8fafc; 
-            padding: 25px; 
-            border-radius: 16px; 
-            margin-bottom: 30px; 
+            padding: 15px; /* Box inserimento più compatto */
+            border-radius: 10px; 
+            margin-bottom: 20px; 
             border: 1px solid #e2e8f0;
         }
 
-        .time-row { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-        }
-        /* I figli flex devono potersi restringere */
+        .time-row { display: flex; gap: 10px; margin-bottom: 5px; } /* Meno gap */
         .time-row > div { flex: 1; min-width: 0; } 
 
-        /* Admin & Stats */
-        #admin-panel-tools { display: none; background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
-        #stats-box { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; margin-top: 30px; color: #1e3a8a; overflow-x: auto; white-space: nowrap; }
-        .stat-item { display: inline-block; margin-right: 20px; font-weight: 600; font-size: 0.95rem; background: rgba(255,255,255,0.6); padding: 5px 10px; border-radius: 8px; }
+        #admin-panel-tools { display: none; background: #fffbeb; border: 1px solid #fcd34d; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        
+        #stats-box { 
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-top: 20px; 
+            color: #1e3a8a; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            font-size: 13px;
+        }
+        .stat-item { display: inline-block; margin-right: 15px; font-weight: 600; background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 4px; }
 
-        /* --- TABELLA --- */
-        .table-container { overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
-        th { background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 15px 10px; border-bottom: 2px solid #e2e8f0; text-align: left; }
-        td { padding: 15px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        .totale-box { margin-top: 20px; text-align: right; font-size: 1.5rem; font-weight: 700; color: #2563eb; }
-        .admin-badge { background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: none; }
+        /* --- TABELLA (Desktop) --- */
+        .table-container { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; } /* Font tabella ridotto */
+        
+        th { 
+            background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; 
+            font-size: 0.7rem; padding: 10px 8px; border-bottom: 2px solid #e2e8f0; text-align: left; 
+        }
+        td { 
+            padding: 8px 8px; /* Celle più compatte */
+            border-bottom: 1px solid #f1f5f9; 
+            vertical-align: middle; 
+            color: var(--text-main);
+        }
+        
+        td strong { font-weight: 600; color: #0f172a; }
+        .note-cell { color: var(--text-muted); font-style: italic; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85em; }
+
+        .totale-box { margin-top: 15px; text-align: right; font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        .admin-badge { background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; display: none; margin-left: 8px;}
 
         /* Azioni */
-        .action-btn-group { display: flex; gap: 8px; justify-content: flex-end; }
-        .action-icon { background: #f1f5f9; border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; }
-        .save-btn, .cancel-btn { width: auto; padding: 5px 12px; font-size: 0.8rem; margin: 0; color: white; border-radius: 4px; }
+        .action-btn-group { display: flex; gap: 5px; justify-content: flex-end; }
+        .action-icon { 
+            background: #f1f5f9; border: none; border-radius: 6px; width: 28px; height: 28px; /* Icone più piccole */
+            display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; 
+        }
+        .save-btn, .cancel-btn { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; margin: 0; color: white; width: auto; }
         .save-btn { background: #10b981; } .cancel-btn { background: #64748b; }
 
         /* Filtri */
-        .filter-bar { display: flex; gap: 10px; align-items: flex-end; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
+        .filter-bar { 
+            display: flex; gap: 8px; align-items: flex-end; background: #f8fafc; 
+            padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1; 
+        }
         .filter-bar .input-group { flex: 1; }
-        .filter-bar button { margin: 0; padding: 12px 20px; height: 46px; border-radius: 10px;}
+        .filter-bar button { margin: 0; padding: 8px 15px; height: 38px; border-radius: 6px; font-size: 13px;}
 
 
         /* ================================================= */
-        /* MEDIA QUERY: MOBILE FIX (MAX 600px)               */
+        /* MEDIA QUERY: MOBILE COMPACT (MAX 600px)           */
         /* ================================================= */
         @media only screen and (max-width: 600px) {
-            body { padding: 10px 5px; background-color: #f8fafc; }
+            body { padding: 5px; font-size: 13px; }
             
             .container { 
-                padding: 15px; /* Padding ridotto per dare spazio ai lati */
+                padding: 12px; /* Padding minimo su mobile */
                 box-shadow: none; 
                 background: transparent; 
             }
 
-            /* Fix per il box grigio del form */
-            .form-box {
-                padding: 15px; /* Meno padding interno = più spazio per gli input */
-            }
+            h2 { font-size: 1.2rem; }
 
-            /* Layout a colonna per gli input */
-            .time-row { 
-                flex-direction: column; 
-                gap: 10px; 
-                margin-bottom: 15px;
-            }
-            
-            .time-row > div { 
-                width: 100%; 
-            }
+            .form-box { padding: 12px; margin-bottom: 20px; }
+
+            /* Input in colonna, ma compatti */
+            .time-row { flex-direction: column; gap: 8px; margin-bottom: 12px; }
+            .time-row > div { width: 100%; }
 
             /* Filtri impilati */
-            .filter-bar { flex-direction: column; align-items: stretch; background: white; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-            .filter-bar .export-btn { margin-top: 10px; }
+            .filter-bar { flex-direction: column; align-items: stretch; background: white; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+            .filter-bar .export-btn { margin-top: 5px; }
 
-            /* TABELLA A CARD */
             thead { display: none; }
             
+            /* CARD PIÙ COMPATTA */
             tr { 
                 display: block;
                 background: white;
-                margin-bottom: 15px;
-                border-radius: 16px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-                padding: 15px;
-                border: 1px solid #f1f5f9;
+                margin-bottom: 10px; /* Meno spazio tra le card */
+                border-radius: 8px; /* Angoli meno rotondi */
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                padding: 10px; /* Padding interno card ridotto */
+                border: 1px solid #e2e8f0;
             }
 
             td { 
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 10px 0;
-                border-bottom: 1px solid #f8fafc;
+                padding: 6px 0; /* Righe interne molto più vicine */
+                border-bottom: 1px solid #f1f5f9;
                 text-align: right;
+                min-height: 25px;
             }
             
-            td:last-child { border-bottom: none; justify-content: flex-end; margin-top: 5px; padding-top: 0;}
+            td:last-child { border-bottom: none; margin-top: 5px; padding-top: 0;}
 
             td::before {
                 content: attr(data-label);
                 font-weight: 600;
-                color: #64748b;
-                font-size: 0.85rem;
+                color: #94a3b8; /* Colore più leggero per le label */
+                font-size: 0.75rem;
                 text-transform: uppercase;
-                margin-right: 15px;
+                margin-right: 10px;
                 text-align: left;
             }
+            
+            /* Testo valori più evidente */
+            td strong { font-size: 0.95rem; color: #0f172a; }
 
-            /* Input durante l'editing su mobile */
-            .table-input { text-align: right; width: 60% !important; }
+            /* Note */
+            td.note-cell { white-space: normal; text-align: right; max-width: 180px; line-height: 1.2; font-size: 0.8rem; }
+            
+            .table-input { text-align: right; width: 65% !important; padding: 6px; }
+            
+            /* Totale più piccolo su mobile */
+            .totale-box { font-size: 1.1rem; margin-top: 10px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
         <h2 id="welcome-msg">Benvenuto</h2>
         <span id="admin-indicator" class="admin-badge">ADMIN</span>
     </div>
 
-    <div id="login-panel" style="max-width: 400px; margin: 40px auto; text-align: center;">
-        <div style="margin-bottom: 30px;">
-            <h2 style="font-size: 1.8rem;">Accesso Team</h2>
-            <p style="color: #64748b;">Inserisci le tue credenziali per continuare.</p>
+    <div id="login-panel" style="max-width: 350px; margin: 30px auto; text-align: center;">
+        <div style="margin-bottom: 20px;">
+            <h2 style="font-size: 1.5rem;">Accesso Team</h2>
+            <p style="color: #64748b; font-size: 0.9rem;">Inserisci le tue credenziali</p>
         </div>
         <div style="text-align: left;">
             <label>Email</label>
@@ -235,16 +266,16 @@
     <div id="app-panel">
 
         <div id="admin-panel-tools">
-            <h3 style="margin-top:0; color: #b45309;">🛠️ Gestione Anagrafica</h3>
+            <h3 style="margin-top:0; color: #b45309;">🛠️ Anagrafica</h3>
             <div class="time-row" style="margin-bottom:0;">
-                <div><input type="email" id="new-user-email" placeholder="Email Collaboratore"></div>
-                <div><input type="text" id="new-user-name" placeholder="Nome Cognome"></div>
+                <div><input type="email" id="new-user-email" placeholder="Email"></div>
+                <div><input type="text" id="new-user-name" placeholder="Nome"></div>
             </div>
-            <button onclick="salvaAnagrafica()" class="btn-primary" style="background-color: #f59e0b; box-shadow: none; color: black; margin-top: 10px;">Salva in Rubrica</button>
+            <button onclick="salvaAnagrafica()" class="btn-primary" style="background-color: #f59e0b; color: black; margin-top: 8px;">Salva</button>
         </div>
 
         <div class="form-box">
-            <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Nuovo Turno</h2>
+            <h2 style="font-size: 1.1rem; margin-bottom: 15px;">Nuovo Turno</h2>
             
             <div class="time-row">
                 <div>
@@ -274,20 +305,20 @@
                     <input type="time" id="ora-fine" onchange="calcolaDifferenza()">
                 </div>
                 <div>
-                    <label>Ore Totali</label>
+                    <label>Ore</label>
                     <input type="number" id="ore" placeholder="0.0" step="0.5" style="font-weight: bold; color: #2563eb;">
                 </div>
             </div>
 
             <div>
-                <label>Note (Opzionale)</label>
-                <input type="text" id="note" placeholder="Es. Sostituzione, Pulizia extra...">
+                <label>Note</label>
+                <input type="text" id="note" placeholder="Opzionale...">
             </div>
             
-            <button onclick="salvaOre()" class="btn-primary">Registra Turno</button>
+            <button onclick="salvaOre()" class="btn-primary">Registra</button>
         </div>
 
-        <h3>Riepilogo Attività</h3>
+        <h3>Riepilogo</h3>
         <div class="filter-bar">
             <div class="input-group">
                 <select id="filtro-mese">
@@ -313,7 +344,7 @@
                     <option value="2026">2026</option>
                 </select>
             </div>
-            <button onclick="caricaDati()" style="background: #1e293b; color: white; width: auto; margin:0; padding: 0 20px;">Filtra</button>
+            <button onclick="caricaDati()" style="background: #1e293b; color: white; width: auto; margin:0; padding: 0 15px;">Filtra</button>
             <button onclick="scaricaExcel()" class="export-btn">📥 Excel</button>
         </div>
 
@@ -322,8 +353,8 @@
                 <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Collaboratore</th>
-                        <th>Mansione</th>
+                        <th>Chi</th>
+                        <th>Cosa</th>
                         <th>Orario</th>
                         <th>Ore</th>
                         <th>Note</th>
@@ -331,7 +362,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabella-ore">
-                    <tr><td colspan="7" style="text-align: center; color: #64748b;">Caricamento dati...</td></tr>
+                    <tr><td colspan="7" style="text-align: center; color: #64748b; padding: 20px;">Caricamento...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -344,13 +375,13 @@
             <div id="stats-content"></div>
         </div>
 
-        <div style="border-top: 1px solid #e2e8f0; margin-top: 40px; padding-top: 20px; text-align: center;">
-            <button class="toggle-pwd-btn" onclick="togglePasswordForm()">🔒 Gestisci Password</button>
+        <div style="border-top: 1px solid #e2e8f0; margin-top: 30px; padding-top: 15px; text-align: center;">
+            <button class="toggle-pwd-btn" onclick="togglePasswordForm()">🔒 Password</button>
             
-            <div id="form-cambio-password" style="display: none; margin-top: 15px; background: #f1f5f9; padding: 20px; border-radius: 12px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                <label style="text-align: left; display: block;">Nuova Password (min 6 car.)</label>
+            <div id="form-cambio-password" style="display: none; margin-top: 10px; background: #f1f5f9; padding: 15px; border-radius: 10px; max-width: 350px; margin-left: auto; margin-right: auto;">
+                <label style="text-align: left; display: block;">Nuova Password</label>
                 <input type="password" id="nuova-password" placeholder="••••••••">
-                <button onclick="salvaNuovaPassword()" class="btn-primary" style="margin-top: 10px;">Aggiorna</button>
+                <button onclick="salvaNuovaPassword()" class="btn-primary" style="margin-top: 8px;">Aggiorna</button>
             </div>
             
             <button class="logout-btn" onclick="logout()">Esci</button>
@@ -529,7 +560,7 @@
         row.cells[4].innerHTML = `<input type="number" id="edit-ore-${idDoc}" class="table-input" value="${oreAttuali}" step="0.5">`;
         row.cells[5].innerHTML = `<input type="text" id="edit-note-${idDoc}" class="table-input" value="${noteAttuali}">`;
         
-        row.cells[6].innerHTML = `<div class="action-btn-group"><button class="save-btn" onclick="salvaModifiche('${idDoc}')">Salva</button><button class="cancel-btn" onclick="caricaDati()">Annulla</button></div>`;
+        row.cells[6].innerHTML = `<div class="action-btn-group"><button class="save-btn" onclick="salvaModifiche('${idDoc}')">OK</button><button class="cancel-btn" onclick="caricaDati()">No</button></div>`;
 
         document.getElementById(`edit-inizio-${idDoc}`).onchange = () => calcolaModificaOre(idDoc);
         document.getElementById(`edit-fine-${idDoc}`).onchange = () => calcolaModificaOre(idDoc);
@@ -567,7 +598,7 @@
 
     window.caricaDati = async () => {
         const tbody = document.getElementById('tabella-ore');
-        tbody.innerHTML = "<tr><td colspan='7' style='text-align:center'>Caricamento...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px; color:#64748b;'>Caricamento...</td></tr>";
         
         let totale = 0;
         let htmlRighe = "";
@@ -605,15 +636,15 @@
 
                 htmlRighe += `<tr id="riga-${idDoc}">
                     <td data-label="Data" data-val="${row.data}">${dataFormat}</td>
-                    <td data-label="Collaboratore"><strong>${nomeCollaboratore}</strong></td>
-                    <td data-label="Mansione" data-val="${row.mansione}">${row.mansione}</td>
+                    <td data-label="Chi"><strong>${nomeCollaboratore}</strong></td>
+                    <td data-label="Cosa" data-val="${row.mansione}">${row.mansione}</td>
                     <td data-label="Orario" data-val="${row.oraInizio || ''} - ${row.oraFine || ''}">${orarioDisplay}</td>
                     <td data-label="Ore"><strong>${row.ore}</strong></td>
                     <td data-label="Note" class="note-cell" title="${noteTesto}">${noteTesto || '-'}</td>
                     <td data-label="" style="text-align:right">
                         <div class="action-btn-group">
-                            <button class="action-icon edit-btn-icon" onclick="modificaTurno('${idDoc}')" title="Modifica">✏️</button>
-                            <button class="action-icon delete-btn-icon" onclick="eliminaTurno('${idDoc}')" title="Elimina">🗑️</button>
+                            <button class="action-icon edit-btn-icon" onclick="modificaTurno('${idDoc}')">✏️</button>
+                            <button class="action-icon delete-btn-icon" onclick="eliminaTurno('${idDoc}')">🗑️</button>
                         </div>
                     </td>
                 </tr>`;
@@ -624,7 +655,7 @@
                 });
             });
 
-            if(htmlRighe === "") tbody.innerHTML = "<tr><td colspan='7' style='text-align:center'>Nessun dato trovato.</td></tr>";
+            if(htmlRighe === "") tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px; color:#64748b;'>Nessun dato.</td></tr>";
             else tbody.innerHTML = htmlRighe;
             
             document.getElementById('totale-ore').innerText = totale.toFixed(1);
