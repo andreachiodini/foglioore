@@ -10,27 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- RESET & VARIABILI --- */
-        :root {
-            --primary: #2563eb;       
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;     
-            --success: #10b981;       
-            --danger: #ef4444;        
-            --bg-body: #f1f5f9;       
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        /* --- RESET GLOBALE --- */
+        /* Fondamentale: box-sizing border-box su TUTTO */
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            -webkit-box-sizing: border-box; 
         }
-
-        * { box-sizing: border-box; }
         
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
+            background-color: #f1f5f9; 
+            color: #1e293b; 
             margin: 0; 
             padding: 20px 10px; 
             line-height: 1.5;
@@ -40,41 +30,51 @@
         .container { 
             max-width: 900px; 
             margin: 0 auto; 
-            background: var(--bg-card); 
+            background: #ffffff; 
             padding: 30px; 
             border-radius: 16px; 
-            box-shadow: var(--shadow); 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
         }
 
-        h2, h3 { color: var(--text-main); font-weight: 700; margin-top: 0; letter-spacing: -0.02em; }
+        h2, h3 { color: #1e293b; font-weight: 700; margin-top: 0; }
         h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-        h3 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; margin-top: 30px;}
+        h3 { color: #64748b; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; margin-top: 30px;}
 
-        /* --- INPUT & SELECT --- */
+        /* --- INPUT & SELECT FIX --- */
         input, select { 
+            display: block; /* Assicura che prendano la riga */
             width: 100%; 
+            max-width: 100%; /* Impedisce sbordamento */
             padding: 12px 16px; 
             margin: 8px 0; 
             border: 1px solid #e2e8f0; 
             border-radius: 10px; 
-            font-size: 15px; 
+            font-size: 16px; /* 16px evita lo zoom automatico su iOS */
             font-family: inherit;
             background-color: #f8fafc;
-            transition: all 0.2s ease;
-            color: var(--text-main);
-            /* FIX CRITICO PER MOBILE: impedisce all'input di superare il genitore */
-            max-width: 100%; 
-            min-width: 0;
+            color: #1e293b;
+            
+            /* Reset stili nativi iOS */
+            -webkit-appearance: none;
+            appearance: none;
+            min-width: 0; /* Fix per Flexbox */
         }
         
+        /* Fix specifico per input data/ora su iOS */
+        input[type="date"], input[type="time"] {
+            -webkit-appearance: none;
+            min-height: 45px; /* Altezza minima tattile */
+            background-color: #f8fafc;
+        }
+
         input:focus, select:focus { 
-            border-color: var(--primary); 
+            border-color: #2563eb; 
             background-color: #fff;
             outline: none; 
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
         }
         
-        label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-left: 4px; }
+        label { font-size: 0.85rem; font-weight: 600; color: #64748b; margin-left: 4px; display: block; }
 
         /* --- BOTTONI --- */
         button { 
@@ -86,116 +86,92 @@
             font-size: 15px; 
             font-weight: 600; 
             cursor: pointer; 
-            transition: transform 0.1s, background-color 0.2s;
             font-family: inherit;
+            transition: all 0.2s;
         }
 
-        button:active { transform: scale(0.98); }
-
-        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-primary { background-color: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .btn-primary:active { transform: scale(0.98); }
         
-        .logout-btn { background-color: transparent; color: var(--danger); border: 2px solid #fecaca; margin-top: 40px; }
-        .logout-btn:hover { background-color: #fef2f2; }
+        .logout-btn { background-color: transparent; color: #ef4444; border: 2px solid #fecaca; margin-top: 40px; }
+        .export-btn { background-color: #10b981; color: white; margin-top: 0; width: auto !important; padding: 10px 20px; font-size: 0.9rem; }
+        .toggle-pwd-btn { background-color: #f1f5f9; color: #64748b; width: auto; font-size: 0.9em; padding: 10px 20px; }
 
-        .export-btn { background-color: var(--success); color: white; margin-top: 0; width: auto !important; padding: 10px 20px; font-size: 0.9rem; }
-        .export-btn:hover { background-color: #059669; }
+        /* --- LAYOUT --- */
+        .form-box {
+            background: #f8fafc; 
+            padding: 25px; 
+            border-radius: 16px; 
+            margin-bottom: 30px; 
+            border: 1px solid #e2e8f0;
+        }
 
-        .toggle-pwd-btn { background-color: #f1f5f9; color: var(--text-muted); width: auto; font-size: 0.9em; padding: 10px 20px; }
-        .toggle-pwd-btn:hover { background-color: #e2e8f0; color: var(--text-main); }
-
-        /* --- GRIDS & LAYOUT --- */
-        .time-row { display: flex; gap: 15px; margin-bottom: 15px; }
-        /* FIX CRITICO: min-width: 0 permette ai flex child di restringersi se necessario */
+        .time-row { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 15px; 
+        }
+        /* I figli flex devono potersi restringere */
         .time-row > div { flex: 1; min-width: 0; } 
 
+        /* Admin & Stats */
         #admin-panel-tools { display: none; background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
-        
-        #stats-box { 
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
-            padding: 20px; 
-            border-radius: 12px; 
-            margin-top: 30px; 
-            color: #1e3a8a;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-        .stat-item { 
-            display: inline-block; 
-            margin-right: 20px; 
-            font-weight: 600; 
-            font-size: 0.95rem;
-            background: rgba(255,255,255,0.6);
-            padding: 5px 10px;
-            border-radius: 8px;
-        }
+        #stats-box { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; margin-top: 30px; color: #1e3a8a; overflow-x: auto; white-space: nowrap; }
+        .stat-item { display: inline-block; margin-right: 20px; font-weight: 600; font-size: 0.95rem; background: rgba(255,255,255,0.6); padding: 5px 10px; border-radius: 8px; }
 
-        /* --- TABELLA (Desktop) --- */
+        /* --- TABELLA --- */
         .table-container { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
-        
-        th { 
-            background-color: #f8fafc; 
-            color: var(--text-muted); 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            font-size: 0.75rem; 
-            letter-spacing: 0.05em; 
-            padding: 15px 10px;
-            border-bottom: 2px solid #e2e8f0;
-            text-align: left;
-        }
-        
-        td { 
-            padding: 15px 10px; 
-            border-bottom: 1px solid #f1f5f9; 
-            vertical-align: middle;
-            color: var(--text-main);
-        }
-        tr:last-child td { border-bottom: none; }
-        
-        td strong { font-weight: 600; }
-        .note-cell { color: var(--text-muted); font-style: italic; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9em; }
+        th { background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 15px 10px; border-bottom: 2px solid #e2e8f0; text-align: left; }
+        td { padding: 15px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .totale-box { margin-top: 20px; text-align: right; font-size: 1.5rem; font-weight: 700; color: #2563eb; }
+        .admin-badge { background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: none; }
 
-        .totale-box { margin-top: 20px; text-align: right; font-size: 1.5rem; font-weight: 700; color: var(--primary); letter-spacing: -0.03em; }
+        /* Azioni */
+        .action-btn-group { display: flex; gap: 8px; justify-content: flex-end; }
+        .action-icon { background: #f1f5f9; border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; }
+        .save-btn, .cancel-btn { width: auto; padding: 5px 12px; font-size: 0.8rem; margin: 0; color: white; border-radius: 4px; }
+        .save-btn { background: #10b981; } .cancel-btn { background: #64748b; }
 
-        .admin-badge { background: #fef3c7; color: #d97706; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; display: none; }
-
-        .action-btn-group { display: flex; gap: 8px; justify-content: flex-start; }
-        .action-icon {
-            background: #f1f5f9; border: none; border-radius: 8px; width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 1rem;
-        }
-        .edit-btn-icon:hover { background: #dbeafe; color: var(--primary); }
-        .delete-btn-icon:hover { background: #fee2e2; color: var(--danger); }
-        .save-btn { background: var(--success); color: white; width: auto; padding: 5px 12px; font-size: 0.8rem; margin: 0; }
-        .cancel-btn { background: var(--secondary); color: white; width: auto; padding: 5px 12px; font-size: 0.8rem; margin: 0; }
-
-        .filter-bar { 
-            display: flex; gap: 10px; align-items: flex-end; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1;
-        }
+        /* Filtri */
+        .filter-bar { display: flex; gap: 10px; align-items: flex-end; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; }
         .filter-bar .input-group { flex: 1; }
         .filter-bar button { margin: 0; padding: 12px 20px; height: 46px; border-radius: 10px;}
 
-        /* --- MOBILE (CARD VIEW) --- */
+
+        /* ================================================= */
+        /* MEDIA QUERY: MOBILE FIX (MAX 600px)               */
+        /* ================================================= */
         @media only screen and (max-width: 600px) {
             body { padding: 10px 5px; background-color: #f8fafc; }
-            .container { padding: 20px 15px; box-shadow: none; background: transparent; }
             
-            /* FIX PER LA DATA/ORA CHE ESCE DAL BOX */
-            .time-row { 
-                flex-direction: column; 
-                gap: 5px; 
-                margin-bottom: 20px; 
-                width: 100%; /* Forza larghezza contenitore */
-            }
-            .time-row > div {
-                width: 100%; /* Forza larghezza figli */
+            .container { 
+                padding: 15px; /* Padding ridotto per dare spazio ai lati */
+                box-shadow: none; 
+                background: transparent; 
             }
 
+            /* Fix per il box grigio del form */
+            .form-box {
+                padding: 15px; /* Meno padding interno = più spazio per gli input */
+            }
+
+            /* Layout a colonna per gli input */
+            .time-row { 
+                flex-direction: column; 
+                gap: 10px; 
+                margin-bottom: 15px;
+            }
+            
+            .time-row > div { 
+                width: 100%; 
+            }
+
+            /* Filtri impilati */
             .filter-bar { flex-direction: column; align-items: stretch; background: white; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
             .filter-bar .export-btn { margin-top: 10px; }
 
+            /* TABELLA A CARD */
             thead { display: none; }
             
             tr { 
@@ -203,7 +179,7 @@
                 background: white;
                 margin-bottom: 15px;
                 border-radius: 16px;
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                 padding: 15px;
                 border: 1px solid #f1f5f9;
             }
@@ -217,21 +193,20 @@
                 text-align: right;
             }
             
-            td:last-child { border-bottom: none; justify-content: flex-end; margin-top: 10px; padding-top: 0;}
+            td:last-child { border-bottom: none; justify-content: flex-end; margin-top: 5px; padding-top: 0;}
 
             td::before {
                 content: attr(data-label);
                 font-weight: 600;
-                color: var(--text-muted);
+                color: #64748b;
                 font-size: 0.85rem;
                 text-transform: uppercase;
                 margin-right: 15px;
+                text-align: left;
             }
 
-            td strong { color: var(--text-main); font-size: 1.05rem; }
-            td.note-cell { white-space: normal; text-align: right; max-width: 200px; }
-            
-            .table-input { text-align: right; background: #f8fafc; border: 1px solid #e2e8f0; width: 60%; }
+            /* Input durante l'editing su mobile */
+            .table-input { text-align: right; width: 60% !important; }
         }
     </style>
 </head>
@@ -246,7 +221,7 @@
     <div id="login-panel" style="max-width: 400px; margin: 40px auto; text-align: center;">
         <div style="margin-bottom: 30px;">
             <h2 style="font-size: 1.8rem;">Accesso Team</h2>
-            <p style="color: var(--text-muted);">Inserisci le tue credenziali per continuare.</p>
+            <p style="color: #64748b;">Inserisci le tue credenziali per continuare.</p>
         </div>
         <div style="text-align: left;">
             <label>Email</label>
@@ -268,7 +243,7 @@
             <button onclick="salvaAnagrafica()" class="btn-primary" style="background-color: #f59e0b; box-shadow: none; color: black; margin-top: 10px;">Salva in Rubrica</button>
         </div>
 
-        <div style="background: #f8fafc; padding: 25px; border-radius: 16px; margin-bottom: 30px; border: 1px solid #e2e8f0;">
+        <div class="form-box">
             <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Nuovo Turno</h2>
             
             <div class="time-row">
@@ -300,7 +275,7 @@
                 </div>
                 <div>
                     <label>Ore Totali</label>
-                    <input type="number" id="ore" placeholder="0.0" step="0.5" style="font-weight: bold; color: var(--primary);">
+                    <input type="number" id="ore" placeholder="0.0" step="0.5" style="font-weight: bold; color: #2563eb;">
                 </div>
             </div>
 
@@ -338,7 +313,7 @@
                     <option value="2026">2026</option>
                 </select>
             </div>
-            <button onclick="caricaDati()" style="background: var(--text-main); color: white; width: auto; margin:0; padding: 0 20px;">Filtra</button>
+            <button onclick="caricaDati()" style="background: #1e293b; color: white; width: auto; margin:0; padding: 0 20px;">Filtra</button>
             <button onclick="scaricaExcel()" class="export-btn">📥 Excel</button>
         </div>
 
@@ -356,7 +331,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabella-ore">
-                    <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Caricamento dati...</td></tr>
+                    <tr><td colspan="7" style="text-align: center; color: #64748b;">Caricamento dati...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -636,7 +611,7 @@
                     <td data-label="Ore"><strong>${row.ore}</strong></td>
                     <td data-label="Note" class="note-cell" title="${noteTesto}">${noteTesto || '-'}</td>
                     <td data-label="" style="text-align:right">
-                        <div class="action-btn-group" style="justify-content: flex-end;">
+                        <div class="action-btn-group">
                             <button class="action-icon edit-btn-icon" onclick="modificaTurno('${idDoc}')" title="Modifica">✏️</button>
                             <button class="action-icon delete-btn-icon" onclick="eliminaTurno('${idDoc}')" title="Elimina">🗑️</button>
                         </div>
