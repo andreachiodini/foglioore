@@ -211,7 +211,7 @@
                         <option value="Assistente bagnanti">Assistente bagnanti</option>
                         <option value="Istruttore">Istruttore</option>
                         <option value="Fitness">Fitness</option>
-                        <option value="Lezione individuale">Lezione individuale</option>
+                        <option value="Propaganda">Propaganda</option> <option value="Lezione individuale">Lezione individuale</option>
                         <option value="Segreteria">Segreteria</option>
                     </select>
                 </div>
@@ -250,7 +250,7 @@
                     <option value="Assistente bagnanti">Assistente bagnanti</option>
                     <option value="Istruttore">Istruttore</option>
                     <option value="Fitness">Fitness</option>
-                    <option value="Lezione individuale">Lezione individuale</option>
+                    <option value="Propaganda">Propaganda</option> <option value="Lezione individuale">Lezione individuale</option>
                     <option value="Segreteria">Segreteria</option>
                 </select>
             </div>
@@ -350,8 +350,9 @@
     
     let rubricaGlobale = {}; 
     let datiFiltratiPerExport = []; 
-    let totaliPerMansioneExport = {};
-    const Mansioni = ["Assistente bagnanti", "Istruttore", "Fitness", "Lezione individuale", "Segreteria"];
+    // Variabile per salvare i dati grezzi per l'export (necessario per il nuovo formato)
+    let turniRawExport = []; 
+    const Mansioni = ["Assistente bagnanti", "Istruttore", "Fitness", "Propaganda", "Lezione individuale", "Segreteria"];
 
     // DEFAULT DATE
     const oggi = new Date();
@@ -464,12 +465,10 @@
             if(isAdmin){
                 document.getElementById('admin-panel-tools').style.display = 'block';
                 document.getElementById('admin-indicator').style.display = 'inline-block';
-                // Mostra colonna CHI
                 document.getElementById('col-header-chi').style.display = 'table-cell';
             } else {
                 document.getElementById('admin-panel-tools').style.display = 'none';
                 document.getElementById('admin-indicator').style.display = 'none';
-                // Nascondi colonna CHI
                 document.getElementById('col-header-chi').style.display = 'none';
             }
             caricaDati(); 
@@ -518,9 +517,7 @@
         if (!row) return;
         const dataAtt = row.cells[0].getAttribute('data-val');
         
-        // Gestione indici colonne variabile (se Admin c'è CHI, se no non c'è)
         const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-        // Indici: 0=Data, (1=Chi se admin), Next=Mansione, Next=Orario, Next=Ore, Next=Note, Next=Azioni
         const idxMansione = isAdmin ? 2 : 1;
         const idxOrario = isAdmin ? 3 : 2;
         const idxOre = isAdmin ? 4 : 3;
@@ -583,12 +580,12 @@
         let totale = 0;
         let htmlRighe = "";
         datiFiltratiPerExport = []; 
-        totaliPerMansioneExport = {};
+        turniRawExport = []; // Reset raw data
         let statsPerMansione = {}; 
         
         const meseScelto = document.getElementById('filtro-mese').value;
         const annoScelto = document.getElementById('filtro-anno').value;
-        const mansioneScelta = document.getElementById('filtro-mansione').value; // NUOVO FILTRO
+        const mansioneScelta = document.getElementById('filtro-mansione').value;
 
         const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
@@ -606,14 +603,12 @@
                 const idDoc = docSnap.id;
                 const dataObj = new Date(row.data);
                 
-                // --- FILTRI ---
                 if (meseScelto !== "all") {
                     if ((dataObj.getMonth() + 1).toString() !== meseScelto || dataObj.getFullYear().toString() !== annoScelto) return;
                 }
                 if (mansioneScelta !== "all") {
                     if (row.mansione !== mansioneScelta) return;
                 }
-                // -------------
 
                 totale += row.ore;
                 if(!statsPerMansione[row.mansione]) statsPerMansione[row.mansione] = 0;
@@ -624,7 +619,6 @@
                 const noteTesto = row.note ? row.note : "";
                 let orarioDisplay = (row.oraInizio && row.oraFine) ? `${row.oraInizio} - ${row.oraFine}` : "-";
 
-                // Se ADMIN -> Mostra colonna CHI. Se COLLAB -> Nascondi.
                 const colonnaChi = isAdmin ? `<td data-label="Chi"><strong>${nomeCollaboratore}</strong></td>` : ``;
 
                 htmlRighe += `<tr id="riga-${idDoc}">
@@ -642,13 +636,15 @@
                     </td>
                 </tr>`;
                 
-                datiFiltratiPerExport.push({
-                    data: dataFormat, nome: nomeCollaboratore, mansione: row.mansione, orario: orarioDisplay !== "-" ? orarioDisplay : "",
-                    ore: row.ore.toString().replace(".", ","), note: (row.note || "").replace(/;/g, " ").replace(/\n/g, " ")
+                turniRawExport.push({
+                    data: row.data, 
+                    mansione: row.mansione,
+                    oraInizio: row.oraInizio,
+                    oraFine: row.oraFine,
+                    ore: row.ore,
+                    note: row.note
                 });
             });
-
-            totaliPerMansioneExport = statsPerMansione;
 
             if(htmlRighe === "") tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px; color:#64748b;'>Nessun dato.</td></tr>";
             else tbody.innerHTML = htmlRighe;
@@ -672,20 +668,78 @@
     }
 
     window.scaricaExcel = () => {
-        if (datiFiltratiPerExport.length === 0) return showModal("Info", "Nessun dato da scaricare.");
-        let csvContent = "Data;Collaboratore;Mansione;Orario;Ore;Note\n";
-        datiFiltratiPerExport.forEach(row => { csvContent += `${row.data};${row.nome};${row.mansione};${row.orario};${row.ore};${row.note}\n`; });
-        csvContent += "\n\nRIEPILOGO PER MANSIONE\n";
-        csvContent += "Mansione;Totale Ore\n";
-        for (const [mansione, ore] of Object.entries(totaliPerMansioneExport)) {
-            let oreFormat = ore.toString().replace(".", ",");
-            csvContent += `${mansione};${oreFormat}\n`;
+        const anno = parseInt(document.getElementById('filtro-anno').value);
+        const meseIdx = parseInt(document.getElementById('filtro-mese').value);
+
+        if (document.getElementById('filtro-mese').value === "all") {
+            return showModal("Attenzione", "Seleziona un MESE specifico per scaricare il foglio presenze.");
         }
+
+        const colonneMapping = [
+            "Giorno", "IN", "OUT",
+            "ASS. BAG.", "ISTRUTTORE", "AQUAFIT.", "PROPAG.", "LEZ. INDIV.", "SEGRETERIA",
+            "NOTE"
+        ];
+
+        let csvContent = colonneMapping.join(";") + "\n";
+
+        const giorniNelMese = new Date(anno, meseIdx, 0).getDate();
+
+        for (let i = 1; i <= giorniNelMese; i++) {
+            let dataString = `${anno}-${String(meseIdx).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            
+            let turniDelGiorno = turniRawExport.filter(t => t.data === dataString);
+
+            let oraIn = "";
+            let oraOut = "";
+            let noteGiorno = "";
+            let orePerColonna = {}; 
+            colonneMapping.forEach(col => orePerColonna[col] = "");
+
+            if (turniDelGiorno.length > 0) {
+                let orariIn = turniDelGiorno.map(t => t.oraInizio).filter(o => o).sort();
+                let orariOut = turniDelGiorno.map(t => t.oraFine).filter(o => o).sort();
+                if (orariIn.length > 0) oraIn = orariIn[0];
+                if (orariOut.length > 0) oraOut = orariOut[orariOut.length - 1];
+
+                noteGiorno = turniDelGiorno.map(t => t.note).filter(n => n).join(" | ");
+
+                turniDelGiorno.forEach(turno => {
+                    let m = turno.mansione;
+                    let col = "";
+
+                    if (m === "Assistente bagnanti") col = "ASS. BAG.";
+                    else if (m === "Istruttore") col = "ISTRUTTORE";
+                    else if (m === "Fitness") col = "AQUAFIT.";
+                    else if (m === "Propaganda") col = "PROPAG.";
+                    else if (m === "Lezione individuale") col = "LEZ. INDIV.";
+                    else if (m === "Segreteria") col = "SEGRETERIA";
+
+                    if (col) {
+                        let currentVal = parseFloat(orePerColonna[col].replace(",", ".") || 0);
+                        let newVal = currentVal + parseFloat(turno.ore);
+                        orePerColonna[col] = newVal.toString().replace(".", ",");
+                    }
+                });
+            }
+
+            let rigaCSV = [];
+            colonneMapping.forEach(col => {
+                if (col === "Giorno") rigaCSV.push(i);
+                else if (col === "IN") rigaCSV.push(oraIn);
+                else if (col === "OUT") rigaCSV.push(oraOut);
+                else if (col === "NOTE") rigaCSV.push(noteGiorno.replace(/;/g, " ")); 
+                else rigaCSV.push(orePerColonna[col]);
+            });
+
+            csvContent += rigaCSV.join(";") + "\n";
+        }
+
         const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", "riepilogo.csv");
+        link.setAttribute("download", `Foglio_Ore_${meseIdx}_${anno}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
