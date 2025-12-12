@@ -15,26 +15,42 @@
         
         button { background-color: #007bff; color: white; cursor: pointer; border: none; font-weight: bold; transition: background 0.3s; }
         button:hover { background-color: #0056b3; }
+        
         .logout-btn { background-color: #dc3545; margin-top: 30px; }
         .logout-btn:hover { background-color: #a71d2a; }
 
+        /* Bottone Elimina (Cestino) */
+        .delete-btn {
+            background-color: #ffebee; 
+            color: #c62828; 
+            border: 1px solid #ffcdd2; 
+            padding: 5px 10px; 
+            width: auto; 
+            font-size: 14px; 
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover { background-color: #ef9a9a; color: white; }
+
         /* Tabella */
         table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 14px; }
-        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; }
+        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; vertical-align: middle; }
         th { background-color: #f8f9fa; color: #666; font-weight: 600; }
         tr:hover { background-color: #f1f1f1; }
 
         /* Utilità */
         #app-panel, #loading { display: none; } 
         .totale-box { margin-top: 20px; text-align: right; font-size: 1.2em; color: #28a745; }
-        .admin-badge { background: #ffc107; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: black; display: none; }
+        .admin-badge { background: #ffc107; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: black; display: none; margin-left: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="welcome-msg">Login Collaboratori</h2>
-    <span id="admin-indicator" class="admin-badge">ADMIN MODE</span>
+    <div style="display: flex; align-items: center;">
+        <h2 id="welcome-msg">Login Collaboratori</h2>
+        <span id="admin-indicator" class="admin-badge">ADMIN MODE</span>
+    </div>
 
     <div id="login-panel">
         <p style="color: #666; margin-bottom: 20px;">Inserisci le tue credenziali per accedere.</p>
@@ -69,6 +85,7 @@
                     <th>Collaboratore</th>
                     <th>Mansione</th>
                     <th>Ore</th>
+                    <th>Azioni</th>
                 </tr>
             </thead>
             <tbody id="tabella-ore">
@@ -82,11 +99,13 @@
 </div>
 
 <script type="module">
+    // Importiamo le librerie dai server di Google (CDN) per il browser
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- CONFIGURAZIONE (Incolla qui i tuoi dati) ---
+    // --- LA TUA CONFIGURAZIONE FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyAi5AwcIcjgLGyI7E8x4ndcYCI9DUIybeA",
       authDomain: "gestioneore-3bf5f.firebaseapp.com",
@@ -99,12 +118,16 @@
 
     // Inizializza Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getFirestore(app);
     
     let currentUser = null;
+    
+    // *** LA TUA MAIL ADMIN ***
+    const ADMIN_EMAIL = "a.chiodini01@gmail.com"; 
 
-    // Imposta data odierna
+    // Imposta data odierna come default
     document.getElementById('data-lavoro').valueAsDate = new Date();
 
     // --- LOGIN ---
@@ -122,13 +145,17 @@
     // --- LOGOUT ---
     window.logout = () => signOut(auth);
 
-    // --- STATO UTENTE ---
+    // --- GESTIONE UTENTE ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
             document.getElementById('login-panel').style.display = 'none';
             document.getElementById('app-panel').style.display = 'block';
-            document.getElementById('welcome-msg').innerText = `Ciao, ${user.email}`;
+            
+            // Messaggio di benvenuto personalizzato
+            let welcomeText = `Ciao, ${user.email}`;
+            document.getElementById('welcome-msg').innerText = welcomeText;
+            
             caricaDati(); 
         } else {
             currentUser = null;
@@ -156,7 +183,7 @@
                 ore: ore,
                 created_at: new Date()
             });
-            alert("Salvato!");
+            // Reset campi e ricarica
             document.getElementById('ore').value = "";
             caricaDati(); 
         } catch (e) {
@@ -165,34 +192,46 @@
         }
     };
 
-    // --- CARICA DATI (CON PRIVACY) ---
+    // --- ELIMINA RIGA ---
+    window.eliminaTurno = async (idDocumento) => {
+        if(confirm("Sei sicuro di voler eliminare questa voce?")) {
+            try {
+                await deleteDoc(doc(db, "turni", idDocumento));
+                caricaDati(); // Ricarica la tabella
+            } catch (e) {
+                console.error("Errore eliminazione:", e);
+                alert("Impossibile eliminare.");
+            }
+        }
+    };
+
+    // --- CARICA DATI (LOGICA PRIVACY) ---
     async function caricaDati() {
         const tbody = document.getElementById('tabella-ore');
-        tbody.innerHTML = "<tr><td colspan='4'>Caricamento...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='5'>Caricamento...</td></tr>";
         
         let totale = 0;
         let htmlRighe = "";
 
-        // *** CAMBIA QUESTA CON LA TUA EMAIL DA AMMINISTRATORE ***
-        const ADMIN_EMAIL = "a.chiodini01@gmail.com"; 
-
         try {
             let q;
-            // Verifica se sei l'admin
+            // Verifica se sei l'admin (confronto minuscolo per sicurezza)
             if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-                // SEI ADMIN: Vedi tutto
                 document.getElementById('admin-indicator').style.display = 'inline-block';
+                // L'admin vede TUTTO
                 q = query(collection(db, "turni"), orderBy("data", "desc"));
             } else {
-                // SEI UN COLLABORATORE: Vedi solo le tue ore
                 document.getElementById('admin-indicator').style.display = 'none';
+                // Il collaboratore vede SOLO LE SUE
                 q = query(collection(db, "turni"), where("uid", "==", currentUser.uid), orderBy("data", "desc"));
             }
             
             const querySnapshot = await getDocs(q);
             
-            querySnapshot.forEach((doc) => {
-                const row = doc.data();
+            querySnapshot.forEach((docSnap) => {
+                const row = docSnap.data();
+                const idDoc = docSnap.id;
+
                 const dataObj = new Date(row.data);
                 const dataFormat = dataObj.toLocaleDateString('it-IT');
 
@@ -201,12 +240,15 @@
                     <td><strong>${row.email}</strong></td>
                     <td>${row.mansione}</td>
                     <td>${row.ore}</td>
+                    <td>
+                        <button class="delete-btn" onclick="eliminaTurno('${idDoc}')" title="Elimina riga">🗑️</button>
+                    </td>
                 </tr>`;
                 totale += row.ore;
             });
 
             if(htmlRighe === "") {
-                tbody.innerHTML = "<tr><td colspan='4'>Nessun dato trovato.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='5'>Nessun dato trovato.</td></tr>";
             } else {
                 tbody.innerHTML = htmlRighe;
             }
@@ -214,14 +256,10 @@
 
         } catch (e) {
             console.error("Errore caricamento: ", e);
-            
-            // Gestione errore Indice Mancante (Firebase)
             if(e.message.includes("index")) {
-                alert("⚠️ ATTENZIONE: Manca l'indice su Firebase. Apri la Console del browser (F12) e clicca sul link nell'errore rosso per crearlo.");
-                tbody.innerHTML = "<tr><td colspan='4' style='color:red'>Errore Indice. Apri F12 e vedi console.</td></tr>";
-            } else {
-                tbody.innerHTML = "<tr><td colspan='4' style='color:red'>Errore nel caricamento.</td></tr>";
+                alert("⚠️ ATTENZIONE: Manca l'indice su Firebase. Apri la Console (F12), cerca il link rosso e cliccaci per crearlo.");
             }
+            tbody.innerHTML = "<tr><td colspan='5' style='color:red'>Errore nel caricamento.</td></tr>";
         }
     }
 </script>
