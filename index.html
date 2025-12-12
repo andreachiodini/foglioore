@@ -16,18 +16,27 @@
         button { background-color: #007bff; color: white; cursor: pointer; border: none; font-weight: bold; transition: background 0.3s; }
         button:hover { background-color: #0056b3; }
         
-        .logout-btn { background-color: #dc3545; margin-top: 30px; }
+        .logout-btn { background-color: #dc3545; }
         .logout-btn:hover { background-color: #a71d2a; }
 
         /* Pannello Admin (Anagrafica) */
         #admin-panel-tools {
-            display: none; /* Nascosto di default */
+            display: none; 
             background-color: #fff3cd;
             border: 1px solid #ffeeba;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
+
+        /* Pannello Cambio Password */
+        #password-panel-tools {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .toggle-pwd-btn { background-color: #6c757d; font-size: 0.9em; width: auto; padding: 8px 15px; }
+        .toggle-pwd-btn:hover { background-color: #5a6268; }
 
         /* Bottone Elimina */
         .delete-btn {
@@ -69,18 +78,15 @@
 
         <div id="admin-panel-tools">
             <h3>🛠️ Gestione Anagrafica (Solo Admin)</h3>
-            <p style="font-size:0.9em">Associa un nome a un'email. Se l'email esiste già, il nome verrà aggiornato.</p>
             <div style="display: flex; gap: 10px;">
                 <input type="email" id="new-user-email" placeholder="Email Collaboratore" style="flex:1">
                 <input type="text" id="new-user-name" placeholder="Nome e Cognome" style="flex:1">
             </div>
-            <button onclick="salvaAnagrafica()" style="background-color: #ffc107; color: black;">Salva Utente in Rubrica</button>
+            <button onclick="salvaAnagrafica()" style="background-color: #ffc107; color: black;">Salva in Rubrica</button>
         </div>
 
         <div style="background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
             <h3>Nuovo Inserimento</h3>
-            
-            <label style="font-size: 0.9em; font-weight: bold; margin-top: 10px; display:block;">Data e Mansione:</label>
             <input type="date" id="data-lavoro">
             <select id="mansione">
                 <option value="" disabled selected>-- Seleziona Mansione --</option>
@@ -90,11 +96,8 @@
                 <option value="Lezione individuale">Lezione individuale</option>
                 <option value="Segreteria">Segreteria</option>
             </select>
-
-            <label style="font-size: 0.9em; font-weight: bold; margin-top: 10px; display:block;">Dettagli:</label>
             <input type="number" id="ore" placeholder="Numero di ore (es. 4.5)" step="0.5">
             <input type="text" id="note" placeholder="Note (opzionale - es. Sostituzione, Pulizia...)">
-            
             <button onclick="salvaOre()" style="margin-top: 15px;">Registra Ore</button>
         </div>
 
@@ -119,14 +122,24 @@
         
         <p class="totale-box"><strong>Totale visualizzato: <span id="totale-ore">0</span></strong></p>
 
-        <button class="logout-btn" onclick="logout()">Esci</button>
+        <div id="password-panel-tools">
+            <button class="toggle-pwd-btn" onclick="togglePasswordForm()">🔒 Cambia Password</button>
+            
+            <div id="form-cambio-password" style="display: none; margin-top: 10px; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
+                <p style="margin: 0 0 10px 0; font-size: 0.9em;">Inserisci la nuova password (minimo 6 caratteri):</p>
+                <input type="password" id="nuova-password" placeholder="Nuova Password">
+                <button onclick="salvaNuovaPassword()" style="background-color: #17a2b8;">Aggiorna Password</button>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()" style="margin-top: 15px;">Esci</button>
     </div>
 </div>
 
 <script type="module">
-    // Importiamo setDoc e getDoc per gestire l'anagrafica
+    // Aggiunto updatePassword agli import
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // --- CONFIGURAZIONE ---
@@ -147,7 +160,6 @@
     let currentUser = null;
     const ADMIN_EMAIL = "a.chiodini01@gmail.com"; 
     
-    // Variabile globale per tenere in memoria i nomi (scaricati dal DB)
     let rubricaGlobale = {}; 
 
     document.getElementById('data-lavoro').valueAsDate = new Date();
@@ -173,14 +185,11 @@
             document.getElementById('login-panel').style.display = 'none';
             document.getElementById('app-panel').style.display = 'block';
             
-            // 1. Scarica prima la rubrica dal database
             await aggiornaRubricaLocale();
 
-            // 2. Mostra nome utente loggato
             let nomeDisplay = rubricaGlobale[user.email] || user.email;
             document.getElementById('welcome-msg').innerText = `Ciao, ${nomeDisplay}`;
             
-            // 3. Se sei Admin, mostra il pannello gestione anagrafica
             if(user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()){
                 document.getElementById('admin-panel-tools').style.display = 'block';
                 document.getElementById('admin-indicator').style.display = 'inline-block';
@@ -189,9 +198,7 @@
                 document.getElementById('admin-indicator').style.display = 'none';
             }
 
-            // 4. Carica la tabella ore
             caricaDati(); 
-
         } else {
             currentUser = null;
             document.getElementById('login-panel').style.display = 'block';
@@ -201,45 +208,56 @@
         }
     });
 
-    // --- FUNZIONI ANAGRAFICA (Nuove!) ---
-    
-    // Scarica tutti i nomi dal DB e li mette in memoria
+    // --- FUNZIONI CAMBIO PASSWORD (NUOVE) ---
+    window.togglePasswordForm = () => {
+        const form = document.getElementById('form-cambio-password');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    };
+
+    window.salvaNuovaPassword = async () => {
+        const newPass = document.getElementById('nuova-password').value;
+        if (newPass.length < 6) return alert("La password deve avere almeno 6 caratteri.");
+
+        try {
+            await updatePassword(currentUser, newPass);
+            alert("Password aggiornata con successo!");
+            document.getElementById('nuova-password').value = "";
+            document.getElementById('form-cambio-password').style.display = 'none';
+        } catch (error) {
+            console.error(error);
+            if (error.code === 'auth/requires-recent-login') {
+                alert("Per sicurezza, devi aver effettuato l'accesso da poco per cambiare la password. Fai Logout, rientra e riprova subito.");
+            } else {
+                alert("Errore: " + error.message);
+            }
+        }
+    };
+
+    // --- ANAGRAFICA ---
     async function aggiornaRubricaLocale() {
-        rubricaGlobale = {}; // Reset
+        rubricaGlobale = {}; 
         try {
             const querySnapshot = await getDocs(collection(db, "anagrafica"));
             querySnapshot.forEach((doc) => {
-                // Il documento ha ID=email e campo=nome
                 rubricaGlobale[doc.id] = doc.data().nome;
             });
-        } catch (e) {
-            console.error("Errore lettura anagrafica:", e);
-        }
+        } catch (e) { console.error("Errore rubrica", e); }
     }
 
-    // Salva un nuovo nome nel DB
     window.salvaAnagrafica = async () => {
         const email = document.getElementById('new-user-email').value.trim().toLowerCase();
         const nome = document.getElementById('new-user-name').value.trim();
 
-        if(!email || !nome) return alert("Inserisci sia Email che Nome.");
+        if(!email || !nome) return alert("Inserisci Email e Nome.");
 
         try {
-            // Usiamo setDoc con l'email come ID. Se esiste aggiorna, se no crea.
-            await setDoc(doc(db, "anagrafica", email), {
-                nome: nome
-            });
+            await setDoc(doc(db, "anagrafica", email), { nome: nome });
             alert(`Salvato: ${email} -> ${nome}`);
-            
-            // Pulisci campi e ricarica tutto
             document.getElementById('new-user-email').value = "";
             document.getElementById('new-user-name').value = "";
-            await aggiornaRubricaLocale(); // Aggiorna memoria
-            caricaDati(); // Aggiorna tabella per mostrare i nomi nuovi
-        } catch (e) {
-            console.error("Errore salvataggio anagrafica:", e);
-            alert("Errore salvataggio utente.");
-        }
+            await aggiornaRubricaLocale(); 
+            caricaDati(); 
+        } catch (e) { alert("Errore salvataggio utente."); }
     };
 
     // --- SALVA ORE ---
@@ -254,7 +272,7 @@
         try {
             await addDoc(collection(db, "turni"), {
                 uid: currentUser.uid,
-                email: currentUser.email, // Salviamo l'email, il nome lo recuperiamo al volo
+                email: currentUser.email,
                 data: data,
                 mansione: mansione,
                 ore: ore,
@@ -270,7 +288,7 @@
         }
     };
 
-    // --- ELIMINA TURNI ---
+    // --- ELIMINA ---
     window.eliminaTurno = async (idDocumento) => {
         if(confirm("Eliminare questa riga?")) {
             try {
@@ -301,13 +319,9 @@
             querySnapshot.forEach((docSnap) => {
                 const row = docSnap.data();
                 const idDoc = docSnap.id;
-
                 const dataObj = new Date(row.data);
                 const dataFormat = dataObj.toLocaleDateString('it-IT');
-                
-                // Cerca il nome nella rubrica scaricata (o usa l'email se non c'è)
                 const nomeCollaboratore = rubricaGlobale[row.email] || row.email;
-
                 const noteTesto = row.note ? row.note : "-";
 
                 htmlRighe += `<tr>
@@ -330,7 +344,7 @@
 
         } catch (e) {
             console.error(e);
-            if(e.message.includes("index")) alert("⚠️ Manca Indice Firebase. Apri Console (F12).");
+            if(e.message.includes("index")) alert("⚠️ Manca Indice Firebase. Premi F12.");
             tbody.innerHTML = "<tr><td colspan='6' style='color:red'>Errore caricamento.</td></tr>";
         }
     }
