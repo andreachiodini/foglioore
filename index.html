@@ -18,13 +18,13 @@
             --text-main: #1c1c1e;
             --text-muted: #8e8e93;
             --border-radius: 12px; 
-            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
 
-            /* COLORI PALLINI CALENDARIO */
+            /* COLORI PALLINI (iOS Style) */
             --dot-assistente: #ff3b30;  /* Rosso */
-            --dot-istruttore: #007aff;  /* Blu */
+            --dot-istruttore: #34c759;  /* Verde */
             --dot-propaganda: #af52de;  /* Viola */
-            --dot-lezione: #5ac8fa;     /* Azzurro */
+            --dot-lezione: #007aff;     /* Blu */
             --dot-fitness: #ffcc00;     /* Giallo */
             --dot-segreteria: #8e8e93;  /* Grigio */
         }
@@ -40,12 +40,12 @@
 
         .container { 
             max-width: 900px; margin: 0 auto; background: var(--bg-card); 
-            padding: 20px; border-radius: 18px; box-shadow: var(--shadow); 
-            min-height: 80vh; /* Altezza minima per estetica */
+            padding: 20px; border-radius: 20px; box-shadow: var(--shadow); 
+            min-height: 85vh;
         }
 
-        /* Gestione Visibilità Rigida */
-        .view-section { display: none; } /* Di base tutto nascosto */
+        /* Gestione Visibilità */
+        .view-section { display: none; } 
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -59,7 +59,7 @@
 
         label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
         input, select { 
-            width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; 
+            width: 100%; padding: 10px 12px; border: 1px solid #d1d1d6; border-radius: 10px; 
             font-size: 15px; background: #fff; color: var(--text-main); outline: none; appearance: none;
         }
         input:focus, select:focus { border-color: var(--primary); }
@@ -76,28 +76,58 @@
         .btn-secondary { background: #e5e5ea; color: var(--text-main); }
         .btn-danger { background: #ff3b30; color: white; }
 
-        /* --- CALENDARIO APPLE --- */
+        /* --- CALENDARIO APPLE COMPACT --- */
         .calendar-wrapper { 
-            background: #ffffff; border-radius: 16px; padding: 15px; 
-            border: 1px solid #e5e5ea; margin-bottom: 20px;
+            background: #ffffff; 
+            /* Rende il calendario compatto come richiesto */
+            max-width: 380px; 
+            margin: 0 auto 20px auto; 
+            padding: 15px; 
+            border-radius: 20px; 
+            border: 1px solid #e5e5ea; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
-        .cal-title { font-size: 1.1rem; font-weight: 700; text-transform: capitalize; }
-        .cal-nav { background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 5px 15px; width: auto; }
+        
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .cal-title { font-size: 1.1rem; font-weight: 700; text-transform: capitalize; color: #000; }
+        .cal-nav { background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0 10px; }
 
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 8px; text-align: center; }
-        .cal-weekday { font-size: 0.7rem; font-weight: 600; color: #86868b; text-transform: uppercase; margin-bottom: 5px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; text-align: center; }
         
-        .cal-day { 
-            aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            padding-top: 6px; cursor: pointer; border-radius: 50%; font-size: 1rem; color: var(--text-main); margin: 2px;
+        /* Giorni della settimana */
+        .cal-weekday { 
+            font-size: 0.7rem; font-weight: 600; color: #8e8e93; 
+            text-transform: uppercase; margin-bottom: 8px; 
         }
-        .cal-day.today span { color: #ff3b30; font-weight: 700; }
-        .cal-day.selected { background: #000; color: #fff !important; }
-        .cal-day.selected span { color: #fff; }
         
-        .cal-dots { display: flex; gap: 2px; margin-top: 4px; height: 6px; justify-content: center; }
+        /* Cella del giorno */
+        .cal-day { 
+            height: 44px; /* Altezza fissa compatta */
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            cursor: pointer; font-size: 1rem; color: var(--text-main); position: relative;
+            padding-top: 4px;
+        }
+        
+        /* Cerchio del numero */
+        .cal-num {
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; z-index: 2; font-weight: 500;
+        }
+
+        /* Stile Oggi: Pallino Rosso Pieno */
+        .cal-day.today .cal-num { background-color: #ff3b30; color: white; font-weight: 700; }
+        
+        /* Stile Selezionato: Pallino Nero */
+        .cal-day.selected .cal-num { background-color: #000; color: white; }
+        
+        /* Contenitore pallini mansioni */
+        .cal-dots { display: flex; gap: 3px; margin-top: 2px; height: 6px; justify-content: center; }
         .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+        /* --- FILTRI --- */
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; background: #f2f2f7; padding: 12px; border-radius: 12px; align-items: center; margin-bottom: 15px; }
+        .filter-bar select { flex: 1; min-width: 120px; background: white; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .filter-bar button { width: auto; padding: 8px 16px; font-size: 13px; margin: 0; }
 
         /* --- TABELLA --- */
         .table-wrap { overflow-x: auto; margin-top: 10px; border: 1px solid #e5e5ea; border-radius: 12px; }
@@ -108,11 +138,6 @@
         
         .action-icons { display: flex; gap: 8px; justify-content: flex-end; }
         .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px; width: auto; }
-
-        /* --- FILTRI --- */
-        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; background: #f2f2f7; padding: 12px; border-radius: 12px; align-items: center; margin-bottom: 15px; }
-        .filter-bar select { flex: 1; min-width: 120px; background: white; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .filter-bar button { width: auto; padding: 8px 16px; font-size: 13px; margin: 0; }
 
         /* --- ADMIN CARDS --- */
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -127,7 +152,7 @@
             .container { padding: 15px; box-shadow: none; background: transparent; }
             .time-row { flex-direction: column; gap: 10px; }
             .filter-bar { flex-direction: column; align-items: stretch; }
-            .filter-bar button { width: 100%; }
+            .filter-bar button { width: 100%; margin-top: 5px; }
             /* Card view tabella mobile */
             thead { display: none; }
             tr { display: block; background: white; border: 1px solid #e5e5ea; border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
@@ -207,10 +232,10 @@
         <div class="calendar-wrapper">
             <div class="cal-header">
                 <button class="cal-nav" onclick="changeMonth(-1)">❮</button>
-                <div class="cal-title" id="cal-title">Mese Anno</div>
+                <div class="cal-title" id="cal-title">Caricamento...</div>
                 <button class="cal-nav" onclick="changeMonth(1)">❯</button>
             </div>
-            <div class="cal-weekdays">
+            <div class="cal-grid" style="margin-bottom:5px">
                 <div class="cal-weekday">Lun</div><div class="cal-weekday">Mar</div><div class="cal-weekday">Mer</div>
                 <div class="cal-weekday">Gio</div><div class="cal-weekday">Ven</div><div class="cal-weekday">Sab</div>
                 <div class="cal-weekday">Dom</div>
@@ -237,7 +262,7 @@
             <select id="c-filtro-anno" onchange="syncCalFromFilter()">
                 <option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option>
             </select>
-            <button onclick="excelCollab()" class="btn-success">Excel</button>
+            <button onclick="excelCollab()" class="btn-success">📥 Scarica Excel</button>
         </div>
 
         <div class="table-wrap">
@@ -283,7 +308,7 @@
             </select>
             <select id="a-filtro-anno"><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select>
             <button onclick="loadAdminData()" class="btn-primary">Aggiorna</button>
-            <button onclick="excelAdminGlobal()" class="btn-success">Excel Global</button>
+            <button onclick="excelAdminGlobal()" class="btn-success">📥 Scarica Excel</button>
         </div>
 
         <div id="cards-container" class="cards-grid"></div>
@@ -301,7 +326,7 @@
             </table>
         </div>
         <div style="text-align:right; font-weight:700; margin-top:10px">Totale: <span id="d-totale">0</span></div>
-        <button onclick="excelAdminDetail()" class="btn-success" style="margin-top:15px; width:auto">Scarica Excel Utente</button>
+        <button onclick="excelAdminDetail()" class="btn-success" style="margin-top:15px; width:auto">📥 Scarica Excel Utente</button>
     </div>
 
 </div>
@@ -355,13 +380,13 @@
     let detailUserEmail = null;
     let currentEditEmail = null;
     
-    // Calendar
+    // Calendar State (Init with Today)
     let calDate = new Date(); 
     let selectedDay = null;
 
     const Mansioni = ["Assistente bagnanti", "Istruttore", "Fitness", "Propaganda", "Lezione individuale", "Segreteria"];
 
-    // SYSTEM: VIEW SWITCHER (FIX SOVRAPPOSIZIONI)
+    // SYSTEM: VIEW SWITCHER
     window.switchView = (viewId) => {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         const target = document.getElementById(viewId);
@@ -383,21 +408,25 @@
     window.closeModal = () => document.getElementById('custom-modal').style.display='none';
     const toggleLoading = (id,l) => { const b=document.getElementById(id); if(b){ l?b.innerHTML='<div class="spinner"></div>':b.innerText=b.id==='btn-login'?'Accedi':'Registra Turno'; b.disabled=l; }};
 
-    // INIT DATE
+    // INIT DROPDOWNS & DATE (SAFE INIT)
     const today = new Date();
-    document.getElementById('c-data').valueAsDate = today;
-    document.getElementById('c-filtro-mese').value = today.getMonth() + 1;
-    document.getElementById('c-filtro-anno').value = today.getFullYear();
-    document.getElementById('a-filtro-mese').value = today.getMonth() + 1;
-    document.getElementById('a-filtro-anno').value = today.getFullYear();
+    if(document.getElementById('c-data')) {
+        document.getElementById('c-data').valueAsDate = today;
+        document.getElementById('c-filtro-mese').value = today.getMonth() + 1;
+        document.getElementById('c-filtro-anno').value = today.getFullYear();
+        document.getElementById('a-filtro-mese').value = today.getMonth() + 1;
+        document.getElementById('a-filtro-anno').value = today.getFullYear();
+    }
 
-    // CALENDAR ENGINE
+    // CALENDAR LOGIC (Apple Compact)
     const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
     
     window.renderCalendar = () => {
         const m = calDate.getMonth();
         const y = calDate.getFullYear();
-        document.getElementById('cal-title').innerText = `${monthNames[m]} ${y}`;
+        
+        const titleEl = document.getElementById('cal-title');
+        if(titleEl) titleEl.innerText = `${monthNames[m]} ${y}`;
         
         // Sync selects
         document.getElementById('c-filtro-mese').value = m + 1;
@@ -408,7 +437,7 @@
         const grid = document.getElementById('cal-grid');
         grid.innerHTML = "";
 
-        // Pad (Lun=0 logic fix: getDay 0=Dom, 1=Lun. Want Lun=0)
+        // Pad (Lun=0 logic)
         let pad = firstDay === 0 ? 6 : firstDay - 1;
         for(let i=0; i<pad; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
 
@@ -434,7 +463,7 @@
             
             const div = document.createElement('div');
             div.className = `cal-day ${isToday ? 'today' : ''} ${isSel ? 'selected' : ''}`;
-            div.innerHTML = `<span>${d}</span><div class="cal-dots">${dots}</div>`;
+            div.innerHTML = `<span class="cal-num">${d}</span><div class="cal-dots">${dots}</div>`;
             div.onclick = () => { selectedDay = (selectedDay === d) ? null : d; renderCalendar(); renderCollabTable(); };
             grid.appendChild(div);
         }
@@ -489,7 +518,7 @@
                 loadAdminData();
             } else {
                 switchView('collaborator-view');
-                loadCollabData();
+                loadCollabData(); 
             }
         } else {
             currentUser = null;
@@ -498,7 +527,7 @@
         }
     });
 
-    // COLLABORATOR
+    // COLLABORATOR ACTIONS
     window.calcDiff = () => {
         const i = document.getElementById('c-inizio').value, f = document.getElementById('c-fine').value;
         if(i && f) {
@@ -541,7 +570,7 @@
         const snap = await getDocs(q);
         myTurni = [];
         snap.forEach(d => myTurni.push({id: d.id, ...d.data()}));
-        renderCalendar();
+        renderCalendar(); 
         renderCollabTable();
     }
 
@@ -580,6 +609,41 @@
             `;
         });
         document.getElementById('c-totale').innerText = tot.toFixed(1);
+    };
+
+    // SHARED EDIT
+    window.delRow = (id, isAdmin=false) => {
+        modal("Eliminare?", "Confermi cancellazione?", async () => {
+            await deleteDoc(doc(db, "turni", id));
+            toast("Eliminato");
+            isAdmin ? loadAdminData() : loadCollabData();
+        });
+    };
+    window.editRow = (id, isAdmin=false) => {
+        const tr = document.getElementById((isAdmin?'arow-':'row-')+id);
+        const src = isAdmin ? allTurni : myTurni;
+        const t = src.find(x => x.id === id);
+        tr.innerHTML = `
+            <td data-label="Data"><input type="date" id="ed-d-${id}" value="${t.data}" class="table-input"></td>
+            <td data-label="Mansione"><select id="ed-m-${id}" class="table-input">${Mansioni.map(m=>`<option ${m==t.mansione?'selected':''}>${m}</option>`).join('')}</select></td>
+            <td data-label="Orario"><div style="display:flex; gap:2px"><input type="time" id="ed-i-${id}" value="${t.oraInizio}" class="table-input"><input type="time" id="ed-f-${id}" value="${t.oraFine}" class="table-input"></div></td>
+            <td data-label="Ore"><input type="number" id="ed-h-${id}" value="${t.ore}" step="0.5" class="table-input" style="width:50px"></td>
+            <td data-label="Note"><input type="text" id="ed-n-${id}" value="${t.note}" class="table-input"></td>
+            <td class="actions-cell"><button class="btn-success" onclick="saveEdit('${id}', ${isAdmin})" style="padding:5px">OK</button></td>
+        `;
+    };
+    window.saveEdit = async (id, isAdmin) => {
+        try {
+            await updateDoc(doc(db, "turni", id), {
+                data: document.getElementById(`ed-d-${id}`).value,
+                mansione: document.getElementById(`ed-m-${id}`).value,
+                ore: parseFloat(document.getElementById(`ed-h-${id}`).value),
+                oraInizio: document.getElementById(`ed-i-${id}`).value,
+                oraFine: document.getElementById(`ed-f-${id}`).value,
+                note: document.getElementById(`ed-n-${id}`).value
+            });
+            toast("Modificato"); isAdmin ? loadAdminData() : loadCollabData();
+        } catch(e) { modal("Errore", e.message); }
     };
 
     // ADMIN
@@ -647,14 +711,14 @@
             tot+=t.ore;
             tbody.innerHTML += `
                 <tr id="arow-${t.id}">
-                    <td data-label="Data"><input type="date" id="ed-d-${t.id}" value="${t.data}" class="table-input"></td>
-                    <td data-label="Mansione"><select id="ed-m-${t.id}" class="table-input">${Mansioni.map(m=>`<option ${m==t.mansione?'selected':''}>${m}</option>`).join('')}</select></td>
-                    <td data-label="Orario"><div style="display:flex; gap:2px"><input type="time" id="ed-i-${t.id}" value="${t.oraInizio}" class="table-input"><input type="time" id="ed-f-${t.id}" value="${t.oraFine}" class="table-input"></div></td>
-                    <td data-label="Ore"><input type="number" id="ed-h-${t.id}" value="${t.ore}" step="0.5" class="table-input" style="width:50px"></td>
-                    <td data-label="Note"><input type="text" id="ed-n-${t.id}" value="${t.note}" class="table-input"></td>
+                    <td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td>
+                    <td data-label="Mansione">${t.mansione}</td>
+                    <td data-label="Orario">${t.oraInizio}-${t.oraFine}</td>
+                    <td data-label="Ore"><strong>${t.ore}</strong></td>
+                    <td data-label="Note">${t.note||''}</td>
                     <td class="actions-cell">
                         <div class="action-icons">
-                            <button class="icon-btn" onclick="saveEdit('${t.id}', true)">💾</button>
+                            <button class="icon-btn" onclick="editRow('${t.id}', true)">✏️</button>
                             <button class="icon-btn" onclick="delRow('${t.id}', true)">🗑️</button>
                         </div>
                     </td>
@@ -663,41 +727,6 @@
         });
         document.getElementById('d-totale').innerText = tot.toFixed(1);
     }
-
-    // SHARED EDIT
-    window.delRow = (id, isAdmin=false) => {
-        modal("Eliminare?", "Confermi cancellazione?", async () => {
-            await deleteDoc(doc(db, "turni", id));
-            toast("Eliminato");
-            isAdmin ? loadAdminData() : loadCollabData();
-        });
-    };
-    window.editRow = (id, isAdmin=false) => {
-        const tr = document.getElementById((isAdmin?'arow-':'row-')+id);
-        const src = isAdmin ? allTurni : myTurni;
-        const t = src.find(x => x.id === id);
-        tr.innerHTML = `
-            <td data-label="Data"><input type="date" id="ed-d-${id}" value="${t.data}" class="table-input"></td>
-            <td data-label="Mansione"><select id="ed-m-${id}" class="table-input">${Mansioni.map(m=>`<option ${m==t.mansione?'selected':''}>${m}</option>`).join('')}</select></td>
-            <td data-label="Orario"><div style="display:flex; gap:2px"><input type="time" id="ed-i-${id}" value="${t.oraInizio}" class="table-input"><input type="time" id="ed-f-${id}" value="${t.oraFine}" class="table-input"></div></td>
-            <td data-label="Ore"><input type="number" id="ed-h-${id}" value="${t.ore}" step="0.5" class="table-input" style="width:50px"></td>
-            <td data-label="Note"><input type="text" id="ed-n-${id}" value="${t.note}" class="table-input"></td>
-            <td class="actions-cell"><button class="btn-success" onclick="saveEdit('${id}', ${isAdmin})" style="padding:5px">OK</button></td>
-        `;
-    };
-    window.saveEdit = async (id, isAdmin) => {
-        try {
-            await updateDoc(doc(db, "turni", id), {
-                data: document.getElementById(`ed-d-${id}`).value,
-                mansione: document.getElementById(`ed-m-${id}`).value,
-                ore: parseFloat(document.getElementById(`ed-h-${id}`).value),
-                oraInizio: document.getElementById(`ed-i-${id}`).value,
-                oraFine: document.getElementById(`ed-f-${id}`).value,
-                note: document.getElementById(`ed-n-${id}`).value
-            });
-            toast("Modificato"); isAdmin ? loadAdminData() : loadCollabData();
-        } catch(e) { modal("Errore", e.message); }
-    };
 
     // EXPORT
     function generateCsv(data, filename) {
