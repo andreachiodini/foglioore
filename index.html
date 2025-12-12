@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- 1. RESET & VARIABILI (STILE COMPATTO) --- */
+        /* --- 1. RESET & VARIABILI (STILE COMPATTO V7) --- */
         :root {
             --primary: #2563eb; --primary-dark: #1d4ed8;
             --secondary: #64748b; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
@@ -111,15 +111,23 @@
             transition: all 0.2s; 
             border-left: 4px solid var(--primary); 
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
         }
         .user-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); }
         
-        .card-name { font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 2px; }
-        .card-sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+        .card-name { font-weight: 700; font-size: 1.05rem; color: var(--text-main); }
+        .card-sub { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: block;}
         
         .card-stat-box { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid #f1f5f9; padding-top: 8px; }
         .card-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;}
         .card-stat { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+
+        .edit-user-btn { 
+            background: #f1f5f9; border:none; border-radius: 4px; width: 24px; height: 24px; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; margin: 0; padding: 0;
+        }
+        .edit-user-btn:hover { background: #e2e8f0; color: var(--primary); }
 
         /* --- UTILS --- */
         #toast { visibility: hidden; min-width: 200px; background: #1e293b; color: #fff; text-align: center; border-radius: 50px; padding: 10px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
@@ -308,8 +316,7 @@
         </div>
 
         <div id="admin-dashboard">
-            <div id="cards-container" class="cards-grid">
-                </div>
+            <div id="cards-container" class="cards-grid"></div>
         </div>
 
         <div id="admin-detail" class="hidden">
@@ -342,6 +349,17 @@
     </div>
 </div>
 
+<div id="edit-user-modal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+        <h3>Modifica Nome</h3>
+        <input type="text" id="edit-name-input" placeholder="Nome Cognome">
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="document.getElementById('edit-user-modal').style.display='none'">Annulla</button>
+            <button class="btn-primary" onclick="saveEditUser()">Salva</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -368,6 +386,7 @@
     let myTurni = []; 
     let allTurni = []; 
     let detailUserEmail = null;
+    let currentEditEmail = null; // Per modifica nome
     const Mansioni = ["Assistente bagnanti", "Istruttore", "Fitness", "Propaganda", "Lezione individuale", "Segreteria"];
 
     // INIT
@@ -533,6 +552,24 @@
         toggleLoading('btn-anagrafica', false);
     };
 
+    window.openEditUser = (email, nome) => {
+        currentEditEmail = email;
+        document.getElementById('edit-name-input').value = nome;
+        document.getElementById('edit-user-modal').style.display = 'flex';
+    };
+
+    window.saveEditUser = async () => {
+        if(!currentEditEmail) return;
+        const newName = document.getElementById('edit-name-input').value;
+        try {
+            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: newName }, { merge: true });
+            rubrica[currentEditEmail] = newName; // Aggiorna locale
+            toast("Nome modificato");
+            document.getElementById('edit-user-modal').style.display = 'none';
+            loadAdminData(); // Ricarica card
+        } catch(e) { modal("Errore", e.message); }
+    };
+
     window.loadAdminData = async () => {
         const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
         const role = document.getElementById('a-filtro-mansione').value; // Filtro mansione admin
@@ -570,7 +607,10 @@
             const s = stats[email];
             grid.innerHTML += `
                 <div class="user-card" onclick="openDetail('${email}')">
-                    <div class="card-name">${s.nome}</div>
+                    <div class="card-header">
+                        <div class="card-name">${s.nome}</div>
+                        <button class="edit-user-btn" onclick="event.stopPropagation(); openEditUser('${email}', '${s.nome}')">✏️</button>
+                    </div>
                     <div class="card-sub">${email}</div>
                     <div class="card-stat-box">
                         <span class="card-label">TOTALE ORE</span>
