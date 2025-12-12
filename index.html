@@ -233,7 +233,6 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    // Aggiunto updateDoc per la modifica
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -265,7 +264,8 @@
     document.getElementById('filtro-mese').value = (oggi.getMonth() + 1).toString();
     document.getElementById('filtro-anno').value = oggi.getFullYear().toString();
 
-    // --- CALCOLO ORE AUTOMATICO ---
+
+    // --- FUNZIONE CALCOLO ORE AUTOMATICO ---
     window.calcolaDifferenza = () => {
         const inizio = document.getElementById('ora-inizio').value;
         const fine = document.getElementById('ora-fine').value;
@@ -280,25 +280,45 @@
         }
     };
 
-    // --- LOGIN/LOGOUT/AUTH OMITTED FOR BREVITY ---
-    // (Le funzioni sono le stesse della versione precedente)
-    window.login = async () => { /* ... */ };
+
+    // --- LOGIN ---
+    window.login = async () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        if(!email || !pass) return alert("Inserisci email e password");
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch (error) {
+            alert("Errore login: " + error.message);
+        }
+    };
+
     window.logout = () => signOut(auth);
-    window.togglePasswordForm = () => { /* ... */ };
-    window.salvaNuovaPassword = async () => { /* ... */ };
-    window.salvaAnagrafica = async () => { /* ... */ };
-    window.salvaOre = async () => { /* ... */ };
-    window.eliminaTurno = async (idDocumento) => { /* ... */ };
-    async function aggiornaRubricaLocale() { /* ... */ }
+
+
+    // --- GESTIONE UTENTE E ANAGRAFICA ---
+
+    // Chiamata all'avvio per popolare la rubrica
+    async function aggiornaRubricaLocale() {
+        rubricaGlobale = {}; 
+        try {
+            const querySnapshot = await getDocs(collection(db, "anagrafica"));
+            querySnapshot.forEach((doc) => { rubricaGlobale[doc.id] = doc.data().nome; });
+        } catch (e) { console.error("Errore rubrica", e); }
+    }
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
             document.getElementById('login-panel').style.display = 'none';
             document.getElementById('app-panel').style.display = 'block';
+            
+            // *CHIAMATA ESSENZIALE per mostrare i nomi*
             await aggiornaRubricaLocale();
+            
             let nomeDisplay = rubricaGlobale[user.email] || user.email;
             document.getElementById('welcome-msg').innerText = `Ciao, ${nomeDisplay}`;
+            
             if(user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()){
                 document.getElementById('admin-panel-tools').style.display = 'block';
                 document.getElementById('admin-indicator').style.display = 'inline-block';
@@ -316,16 +336,90 @@
         }
     });
 
-    // --- NUOVA FUNZIONE: MODIFICA RIGA ---
+    window.salvaAnagrafica = async () => {
+        const email = document.getElementById('new-user-email').value.trim().toLowerCase();
+        const nome = document.getElementById('new-user-name').value.trim();
+        if(!email || !nome) return alert("Dati mancanti.");
+        try {
+            await setDoc(doc(db, "anagrafica", email), { nome: nome });
+            alert(`Salvato: ${nome}`);
+            document.getElementById('new-user-email').value = "";
+            document.getElementById('new-user-name').value = "";
+            await aggiornaRubricaLocale(); 
+            caricaDati(); 
+        } catch (e) { alert("Errore salvataggio utente."); }
+    };
+
+
+    // --- GESTIONE PASSWORD ---
+    window.togglePasswordForm = () => {
+        const form = document.getElementById('form-cambio-password');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    };
+
+    window.salvaNuovaPassword = async () => {
+        const newPass = document.getElementById('nuova-password').value;
+        if (newPass.length < 6) return alert("Minimo 6 caratteri.");
+        try {
+            await updatePassword(currentUser, newPass);
+            alert("Password aggiornata!");
+            document.getElementById('form-cambio-password').style.display = 'none';
+        } catch (error) {
+            if (error.code === 'auth/requires-recent-login') alert("Devi fare Logout e rientrare per cambiare password.");
+            else alert("Errore: " + error.message); 
+        }
+    };
+
+
+    // --- AZIONI DATI (SALVA/ELIMINA) ---
+    window.salvaOre = async () => {
+        const data = document.getElementById('data-lavoro').value;
+        const mansione = document.getElementById('mansione').value;
+        const ore = parseFloat(document.getElementById('ore').value);
+        const note = document.getElementById('note').value;
+        const inizio = document.getElementById('ora-inizio').value;
+        const fine = document.getElementById('ora-fine').value;
+
+        if(!data || !mansione || !ore) return alert("Compila data, mansione e totale ore!");
+
+        try {
+            await addDoc(collection(db, "turni"), {
+                uid: currentUser.uid, 
+                email: currentUser.email, 
+                data: data, 
+                mansione: mansione, 
+                ore: ore, 
+                oraInizio: inizio || "",
+                oraFine: fine || "",
+                note: note || "", 
+                created_at: new Date()
+            });
+            // Reset
+            document.getElementById('ore').value = "";
+            document.getElementById('note').value = "";
+            document.getElementById('ora-inizio').value = "";
+            document.getElementById('ora-fine').value = "";
+            caricaDati(); 
+        } catch (e) { console.error(e); alert("Errore salvataggio."); }
+    };
+
+    window.eliminaTurno = async (idDocumento) => {
+        if(confirm("Eliminare?")) {
+            try { await deleteDoc(doc(db, "turni", idDocumento)); caricaDati(); } 
+            catch (e) { alert("Errore eliminazione."); }
+        }
+    };
+
+
+    // --- FUNZIONI MODIFICA ---
     window.modificaTurno = (idDoc) => {
         const row = document.getElementById(`riga-${idDoc}`);
         if (!row) return;
 
         // Recupera i dati correnti per pre-popolare i campi
         const dataAttuale = row.cells[0].getAttribute('data-val');
-        const collaboratoreAttuale = row.cells[1].innerText;
         const mansioneAttuale = row.cells[2].getAttribute('data-val');
-        const orarioAttuale = row.cells[3].innerText.split(' - ');
+        const orarioAttuale = row.cells[3].getAttribute('data-val').split(' - '); // Uso data-val per recuperare inizio/fine
         const oreAttuali = row.cells[4].innerText;
         const noteAttuali = row.cells[5].getAttribute('title');
 
@@ -353,7 +447,6 @@
         document.getElementById(`edit-fine-${idDoc}`).onchange = () => calcolaModificaOre(idDoc);
     };
 
-    // Funzione per calcolare le ore durante la modifica (simile a calcolaDifferenza)
     const calcolaModificaOre = (idDoc) => {
         const inizio = document.getElementById(`edit-inizio-${idDoc}`).value;
         const fine = document.getElementById(`edit-fine-${idDoc}`).value;
@@ -368,8 +461,6 @@
         }
     };
 
-
-    // --- NUOVA FUNZIONE: SALVA MODIFICHE ---
     window.salvaModifiche = async (idDoc) => {
         const data = document.getElementById(`edit-data-${idDoc}`).value;
         const mansione = document.getElementById(`edit-mansione-${idDoc}`).value;
@@ -388,17 +479,18 @@
                 oraInizio: inizio || "",
                 oraFine: fine || "",
                 note: note || "",
-                modified_at: new Date() // Segna la data di modifica (utile per tracciamento)
+                modified_at: new Date()
             });
             alert("Modifiche salvate!");
-            caricaDati(); // Ricarica la tabella per tornare alla vista normale
+            caricaDati(); 
         } catch (e) {
             console.error("Errore salvataggio modifiche:", e);
             alert("Errore nel salvataggio. Controlla console.");
         }
     };
 
-    // --- CARICA DATI (Aggiornata per la modifica) ---
+
+    // --- CARICA DATI (LOGICA PRINCIPALE) ---
     window.caricaDati = async () => {
         const tbody = document.getElementById('tabella-ore');
         tbody.innerHTML = "<tr><td colspan='7'>Caricamento...</td></tr>";
@@ -440,6 +532,7 @@
                 statsPerMansione[row.mansione] += row.ore;
 
                 const dataFormat = dataObj.toLocaleDateString('it-IT');
+                // *RIPRISTINATO: Recupero il nome del collaboratore*
                 const nomeCollaboratore = rubricaGlobale[row.email] || row.email;
                 const noteTesto = row.note ? row.note : "";
                 
@@ -453,7 +546,7 @@
                     <td data-val="${row.data}">${dataFormat}</td>
                     <td><strong>${nomeCollaboratore}</strong></td>
                     <td data-val="${row.mansione}">${row.mansione}</td>
-                    <td>${orarioDisplay}</td>
+                    <td data-val="${row.oraInizio || ''} - ${row.oraFine || ''}">${orarioDisplay}</td>
                     <td><strong>${row.ore}</strong></td>
                     <td class="note-cell" title="${noteTesto}">${noteTesto || '-'}</td>
                     <td>
