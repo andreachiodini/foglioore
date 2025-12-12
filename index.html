@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Ore Collaboratori</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 950px; margin: 0 auto; padding: 20px; background-color: #f4f4f9; color: #333; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        /* Base e Layout Generale */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 950px; margin: 0 auto; padding: 10px; background-color: #f4f4f9; color: #333; }
+        .container { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h2, h3 { color: #2c3e50; }
         
         /* Input e Bottoni */
@@ -46,7 +47,7 @@
             flex-wrap: wrap;
         }
         .filter-bar select { width: auto; flex: 1; min-width: 120px; margin: 0; }
-        .filter-bar button { width: auto; margin: 0; padding: 10px 20px; }
+        .filter-bar button { width: auto; margin: 0; padding: 10px 15px; } 
 
         /* Box Statistiche Mansioni */
         #stats-box {
@@ -56,6 +57,8 @@
             border-radius: 8px;
             margin-top: 20px;
             font-size: 0.95em;
+            overflow-x: auto; 
+            white-space: nowrap;
         }
         .stat-item { display: inline-block; margin-right: 15px; font-weight: bold; color: #0277bd; }
 
@@ -75,8 +78,8 @@
         }
         .delete-btn-icon:hover { color: #dc3545; }
         .edit-btn-icon:hover { color: #007bff; }
-        .save-btn { background-color: #28a745; color: white; padding: 5px 10px; font-weight: normal; margin: 0; width: auto; }
-        .cancel-btn { background-color: #6c757d; color: white; padding: 5px 10px; font-weight: normal; margin: 0; width: auto; }
+        .save-btn { background-color: #28a745; color: white; padding: 5px 10px; font-weight: normal; margin: 0; width: auto; font-size: 0.9em; }
+        .cancel-btn { background-color: #6c757d; color: white; padding: 5px 10px; font-weight: normal; margin: 0; width: auto; font-size: 0.9em; }
 
         /* Tabella */
         table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 14px; }
@@ -84,7 +87,7 @@
         th { background-color: #f8f9fa; color: #666; font-weight: 600; }
         tr:hover { background-color: #f1f1f1; }
         
-        td.note-cell { color: #666; font-style: italic; font-size: 0.85em; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        td.note-cell { color: #666; font-style: italic; font-size: 0.85em; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* Utilità */
         #app-panel { display: none; } 
@@ -98,6 +101,66 @@
         /* Input specifici in tabella */
         .table-input { padding: 4px; margin: 0; width: 100%; box-sizing: border-box; font-size: 1em; }
         .time-input-table { width: 60px; }
+
+
+        /* ================================================= */
+        /* MEDIA QUERY: STILE PER TELEFONI (max 600px)       */
+        /* ================================================= */
+        @media only screen and (max-width: 600px) {
+            
+            body { padding: 5px; }
+            .container { padding: 10px; }
+            
+            /* Filtri: bottone Export a capo se non c'è spazio */
+            .filter-bar {
+                display: block; 
+                gap: 0;
+            }
+            .filter-bar select, .filter-bar button {
+                width: 100%;
+                margin-top: 5px;
+            }
+            .export-btn {
+                margin-top: 10px !important; 
+            }
+            
+            /* Inserimento: Orari/Ore */
+            .time-row {
+                flex-direction: column; 
+                gap: 0;
+            }
+            .time-row > div {
+                width: 100%;
+            }
+
+            /* TABELLA: nascondi le colonne meno importanti e scroll orizzontale */
+            .container > table { 
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100%;
+            }
+            
+            table th, table td {
+                min-width: 80px;
+            }
+            
+            /* Nascondi la colonna Note sui telefoni */
+            table th:nth-child(6), 
+            table td:nth-child(6) {
+                display: none;
+            }
+            
+            /* Riduzione larghezza icone Azioni */
+            table td:nth-child(7) {
+                min-width: 100px;
+            }
+            
+            /* Riduzione dimensione font per leggibilità */
+            table {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -236,7 +299,7 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- CONFIGURAZIONE ---
+    // --- CONFIGURAZIONE (INSERISCI I TUOI DATI QUI SOTTO) ---
     const firebaseConfig = {
       apiKey: "AIzaSyAi5AwcIcjgLGyI7E8x4ndcYCI9DUIybeA",
       authDomain: "gestioneore-3bf5f.firebaseapp.com",
@@ -281,7 +344,7 @@
     };
 
 
-    // --- LOGIN ---
+    // --- GESTIONE AUTH ---
     window.login = async () => {
         const email = document.getElementById('email').value;
         const pass = document.getElementById('password').value;
@@ -295,10 +358,26 @@
 
     window.logout = () => signOut(auth);
 
+    window.togglePasswordForm = () => {
+        const form = document.getElementById('form-cambio-password');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    };
 
-    // --- GESTIONE UTENTE E ANAGRAFICA ---
+    window.salvaNuovaPassword = async () => {
+        const newPass = document.getElementById('nuova-password').value;
+        if (newPass.length < 6) return alert("Minimo 6 caratteri.");
+        try {
+            await updatePassword(currentUser, newPass);
+            alert("Password aggiornata!");
+            document.getElementById('form-cambio-password').style.display = 'none';
+        } catch (error) {
+            if (error.code === 'auth/requires-recent-login') alert("Devi fare Logout e rientrare per cambiare password.");
+            else alert("Errore: " + error.message); 
+        }
+    };
 
-    // Chiamata all'avvio per popolare la rubrica
+
+    // --- GESTIONE ANAGRAFICA ---
     async function aggiornaRubricaLocale() {
         rubricaGlobale = {}; 
         try {
@@ -307,13 +386,26 @@
         } catch (e) { console.error("Errore rubrica", e); }
     }
 
+    window.salvaAnagrafica = async () => {
+        const email = document.getElementById('new-user-email').value.trim().toLowerCase();
+        const nome = document.getElementById('new-user-name').value.trim();
+        if(!email || !nome) return alert("Dati mancanti.");
+        try {
+            await setDoc(doc(db, "anagrafica", email), { nome: nome });
+            alert(`Salvato: ${nome}`);
+            document.getElementById('new-user-email').value = "";
+            document.getElementById('new-user-name').value = "";
+            await aggiornaRubricaLocale(); 
+            caricaDati(); 
+        } catch (e) { alert("Errore salvataggio utente."); }
+    };
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
             document.getElementById('login-panel').style.display = 'none';
             document.getElementById('app-panel').style.display = 'block';
             
-            // *CHIAMATA ESSENZIALE per mostrare i nomi*
             await aggiornaRubricaLocale();
             
             let nomeDisplay = rubricaGlobale[user.email] || user.email;
@@ -336,42 +428,8 @@
         }
     });
 
-    window.salvaAnagrafica = async () => {
-        const email = document.getElementById('new-user-email').value.trim().toLowerCase();
-        const nome = document.getElementById('new-user-name').value.trim();
-        if(!email || !nome) return alert("Dati mancanti.");
-        try {
-            await setDoc(doc(db, "anagrafica", email), { nome: nome });
-            alert(`Salvato: ${nome}`);
-            document.getElementById('new-user-email').value = "";
-            document.getElementById('new-user-name').value = "";
-            await aggiornaRubricaLocale(); 
-            caricaDati(); 
-        } catch (e) { alert("Errore salvataggio utente."); }
-    };
-
-
-    // --- GESTIONE PASSWORD ---
-    window.togglePasswordForm = () => {
-        const form = document.getElementById('form-cambio-password');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    };
-
-    window.salvaNuovaPassword = async () => {
-        const newPass = document.getElementById('nuova-password').value;
-        if (newPass.length < 6) return alert("Minimo 6 caratteri.");
-        try {
-            await updatePassword(currentUser, newPass);
-            alert("Password aggiornata!");
-            document.getElementById('form-cambio-password').style.display = 'none';
-        } catch (error) {
-            if (error.code === 'auth/requires-recent-login') alert("Devi fare Logout e rientrare per cambiare password.");
-            else alert("Errore: " + error.message); 
-        }
-    };
-
-
-    // --- AZIONI DATI (SALVA/ELIMINA) ---
+    
+    // --- AZIONI DATI (SALVA/MODIFICA/ELIMINA) ---
     window.salvaOre = async () => {
         const data = document.getElementById('data-lavoro').value;
         const mansione = document.getElementById('mansione').value;
@@ -410,20 +468,16 @@
         }
     };
 
-
-    // --- FUNZIONI MODIFICA ---
     window.modificaTurno = (idDoc) => {
         const row = document.getElementById(`riga-${idDoc}`);
         if (!row) return;
 
-        // Recupera i dati correnti per pre-popolare i campi
         const dataAttuale = row.cells[0].getAttribute('data-val');
         const mansioneAttuale = row.cells[2].getAttribute('data-val');
-        const orarioAttuale = row.cells[3].getAttribute('data-val').split(' - '); // Uso data-val per recuperare inizio/fine
+        const orarioAttuale = row.cells[3].getAttribute('data-val').split(' - ');
         const oreAttuali = row.cells[4].innerText;
         const noteAttuali = row.cells[5].getAttribute('title');
 
-        // Formato Select Mansione
         let mansioneOptions = Mansioni.map(m => 
             `<option value="${m}" ${m === mansioneAttuale ? 'selected' : ''}>${m}</option>`
         ).join('');
@@ -438,11 +492,9 @@
         row.cells[4].innerHTML = `<input type="number" id="edit-ore-${idDoc}" class="table-input" value="${oreAttuali}" step="0.5" style="width: 60px;">`;
         row.cells[5].innerHTML = `<input type="text" id="edit-note-${idDoc}" class="table-input" value="${noteAttuali}">`;
         
-        // Sostituisci le icone Azioni con Salva e Annulla
         row.cells[6].innerHTML = `<button class="save-btn" onclick="salvaModifiche('${idDoc}')" title="Salva modifiche">💾</button>
                                   <button class="cancel-btn" onclick="caricaDati()" title="Annulla modifiche" style="margin-left: 5px;">❌</button>`;
 
-        // Aggiungi listener per ricalcolare le ore durante l'editing
         document.getElementById(`edit-inizio-${idDoc}`).onchange = () => calcolaModificaOre(idDoc);
         document.getElementById(`edit-fine-${idDoc}`).onchange = () => calcolaModificaOre(idDoc);
     };
@@ -532,13 +584,14 @@
                 statsPerMansione[row.mansione] += row.ore;
 
                 const dataFormat = dataObj.toLocaleDateString('it-IT');
-                // *RIPRISTINATO: Recupero il nome del collaboratore*
                 const nomeCollaboratore = rubricaGlobale[row.email] || row.email;
                 const noteTesto = row.note ? row.note : "";
                 
                 let orarioDisplay = "-";
+                let orarioDataVal = "-";
                 if(row.oraInizio && row.oraFine) {
                     orarioDisplay = `${row.oraInizio} - ${row.oraFine}`;
+                    orarioDataVal = `${row.oraInizio} - ${row.oraFine}`;
                 }
 
                 // --- GENERAZIONE RIGA HTML ---
