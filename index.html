@@ -22,7 +22,7 @@
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border-radius: 8px; 
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08);
         }
 
         *, *::before, *::after { box-sizing: border-box; -webkit-box-sizing: border-box; }
@@ -35,7 +35,7 @@
         }
 
         .container { 
-            max-width: 900px; margin: 0 auto; background: var(--bg-card); 
+            max-width: 950px; margin: 0 auto; background: var(--bg-card); 
             padding: 20px; border-radius: 12px; box-shadow: var(--shadow); 
         }
 
@@ -45,17 +45,17 @@
 
         /* --- INPUT & SELECT --- */
         input, select { 
-            display: block; width: 100%; max-width: 100%; padding: 10px 12px; margin: 4px 0; 
-            border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-family: inherit;
+            display: block; width: 100%; max-width: 100%; padding: 8px 12px; margin: 4px 0; 
+            border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; font-family: inherit;
             background-color: #f8fafc; color: var(--text-main); -webkit-appearance: none; appearance: none; min-width: 0;
         }
-        input[type="date"], input[type="time"] { -webkit-appearance: none; min-height: 40px; background-color: #f8fafc; }
-        input:focus, select:focus { border-color: var(--primary); background-color: #fff; outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        input[type="date"], input[type="time"] { -webkit-appearance: none; min-height: 38px; background-color: #f8fafc; }
+        input:focus, select:focus { border-color: var(--primary); background-color: #fff; outline: none; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
         label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-left: 2px; display: block; margin-top: 4px; }
 
         /* --- BOTTONI & LOADING --- */
         button { 
-            width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; 
+            width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 6px; 
             font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s;
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
@@ -64,23 +64,18 @@
         .btn-primary:active { transform: scale(0.98); }
         .btn-primary:disabled { background-color: var(--secondary); opacity: 0.7; cursor: not-allowed; }
 
-        /* Spinner Rotante CSS */
-        .spinner {
-            width: 16px; height: 16px; border: 2px solid #ffffff; border-top-color: transparent; border-radius: 50%;
-            animation: spin 0.8s linear infinite; display: none;
-        }
+        /* Spinner */
+        .spinner { width: 14px; height: 14px; border: 2px solid #ffffff; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         .spinner-dark { border-color: var(--primary); border-top-color: transparent; width: 24px; height: 24px; margin: 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .btn-loading .spinner { display: block; }
-        .btn-loading span { display: none; }
+        .btn-loading .spinner { display: block; } .btn-loading span { display: none; }
 
-        .logout-btn { background-color: transparent; color: var(--danger); border: 1px solid #fecaca; margin-top: 25px; padding: 10px; }
-        .export-btn { background-color: #10b981; color: white; margin-top: 0; width: auto !important; padding: 8px 16px; font-size: 0.85rem; }
-        .toggle-pwd-btn { background-color: #f1f5f9; color: var(--text-muted); width: auto; font-size: 0.85em; padding: 8px 16px; }
+        .logout-btn { background-color: transparent; color: var(--danger); border: 1px solid #fecaca; margin-top: 25px; padding: 8px; font-size: 13px;}
+        .export-btn { background-color: #10b981; color: white; margin-top: 0; width: auto !important; padding: 8px 15px; font-size: 0.85rem; }
+        .toggle-pwd-btn { background-color: #f1f5f9; color: var(--text-muted); width: auto; font-size: 0.85em; padding: 8px 15px; }
 
         /* --- LAYOUT --- */
-        .form-box { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .form-box { background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .time-row { display: flex; gap: 10px; margin-bottom: 5px; } 
         .time-row > div { flex: 1; min-width: 0; } 
 
@@ -100,29 +95,26 @@
 
         /* Azioni */
         .action-btn-group { display: flex; gap: 5px; justify-content: flex-end; }
-        .action-icon { background: #f1f5f9; border: none; border-radius: 6px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
+        .action-icon { background: #f1f5f9; border: none; border-radius: 6px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
         .edit-btn-icon:hover { background: #dbeafe; color: var(--primary); }
         .delete-btn-icon:hover { background: #fee2e2; color: var(--danger); }
-        .save-btn, .cancel-btn { padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; margin: 0; color: white; width: auto; }
+        .save-btn, .cancel-btn { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; margin: 0; color: white; width: auto; }
         .save-btn { background: #10b981; } .cancel-btn { background: #64748b; }
 
         /* Filtri */
-        .filter-bar { display: flex; gap: 8px; align-items: flex-end; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px dashed #cbd5e1; }
-        .filter-bar .input-group { flex: 1; }
-        .filter-bar button { margin: 0; padding: 0 16px; height: 42px; border-radius: 8px; font-size: 13px;}
+        .filter-bar { display: flex; gap: 8px; align-items: flex-end; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1; flex-wrap: wrap; }
+        .filter-bar .input-group { flex: 1; min-width: 100px; }
+        .filter-bar button { margin: 0; padding: 8px 15px; height: 38px; border-radius: 6px; font-size: 13px;}
 
-        /* --- MODALE PERSONALIZZATO (Nuovo) --- */
+        /* --- MODALE --- */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
-            z-index: 1000; display: none; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
+            z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal-box {
             background: white; padding: 25px; border-radius: 16px; width: 90%; max-width: 350px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;
-            transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .modal-overlay.active .modal-box { transform: translateY(0); }
         .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
@@ -142,9 +134,10 @@
             .time-row > div { width: 100%; }
             .filter-bar { flex-direction: column; align-items: stretch; background: white; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
             .filter-bar .export-btn { margin-top: 5px; }
+            .input-group { width: 100%; }
             
             thead { display: none; }
-            tr { display: block; background: white; margin-bottom: 10px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 12px; border: 1px solid #e2e8f0; }
+            tr { display: block; background: white; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 10px; border: 1px solid #e2e8f0; }
             td { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9; text-align: right; min-height: 25px; }
             td:last-child { border-bottom: none; margin-top: 5px; padding-top: 0;}
             td::before { content: attr(data-label); font-weight: 600; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; margin-right: 10px; text-align: left; }
@@ -186,8 +179,7 @@
             <input type="password" id="password" placeholder="••••••••">
         </div>
         <button id="btn-login" onclick="login()" class="btn-primary">
-            <span>Accedi</span>
-            <div class="spinner"></div>
+            <span>Accedi</span> <div class="spinner"></div>
         </button>
     </div>
 
@@ -246,13 +238,22 @@
             </div>
             
             <button id="btn-salva" onclick="salvaOre()" class="btn-primary">
-                <span>Registra Turno</span>
-                <div class="spinner"></div>
+                <span>Registra</span> <div class="spinner"></div>
             </button>
         </div>
 
         <h3>Riepilogo</h3>
         <div class="filter-bar">
+            <div class="input-group">
+                <select id="filtro-mansione">
+                    <option value="all">Tutte le Mansioni</option>
+                    <option value="Assistente bagnanti">Assistente bagnanti</option>
+                    <option value="Istruttore">Istruttore</option>
+                    <option value="Fitness">Fitness</option>
+                    <option value="Lezione individuale">Lezione individuale</option>
+                    <option value="Segreteria">Segreteria</option>
+                </select>
+            </div>
             <div class="input-group">
                 <select id="filtro-mese">
                     <option value="all">Tutti i Mesi</option>
@@ -286,7 +287,7 @@
                 <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Chi</th>
+                        <th id="col-header-chi" style="display:none;">Chi</th> 
                         <th>Cosa</th>
                         <th>Orario</th>
                         <th>Ore</th>
@@ -329,7 +330,7 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- CONFIGURAZIONE (INSERISCI I TUOI DATI) ---
+    // --- CONFIGURAZIONE ---
     const firebaseConfig = {
       apiKey: "AIzaSyAi5AwcIcjgLGyI7E8x4ndcYCI9DUIybeA",
       authDomain: "gestioneore-3bf5f.firebaseapp.com",
@@ -358,28 +359,18 @@
     document.getElementById('filtro-mese').value = (oggi.getMonth() + 1).toString();
     document.getElementById('filtro-anno').value = oggi.getFullYear().toString();
 
-    // --- HELPER UI (MODALI & LOADING) ---
+    // --- HELPERS ---
     window.showModal = (title, msg, onConfirm, showCancel = false) => {
         document.getElementById('modal-title').innerText = title;
         document.getElementById('modal-msg').innerText = msg;
         const confirmBtn = document.getElementById('modal-confirm');
         const cancelBtn = document.getElementById('modal-cancel');
-        const modal = document.getElementById('custom-modal');
-
         cancelBtn.style.display = showCancel ? 'block' : 'none';
-        
-        // Pulizia vecchi listener
         const newConfirm = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newConfirm, confirmBtn);
-        
-        newConfirm.onclick = () => {
-            if(onConfirm) onConfirm();
-            closeModal();
-        };
-
-        modal.style.display = 'flex';
-        // Timeout per animazione
-        setTimeout(() => modal.classList.add('active'), 10);
+        newConfirm.onclick = () => { if(onConfirm) onConfirm(); closeModal(); };
+        document.getElementById('custom-modal').style.display = 'flex';
+        setTimeout(() => document.getElementById('custom-modal').classList.add('active'), 10);
     };
 
     window.closeModal = () => {
@@ -391,16 +382,11 @@
     const toggleLoading = (btnId, isLoading) => {
         const btn = document.getElementById(btnId);
         if(!btn) return;
-        if(isLoading) {
-            btn.classList.add('btn-loading');
-            btn.disabled = true;
-        } else {
-            btn.classList.remove('btn-loading');
-            btn.disabled = false;
-        }
+        if(isLoading) { btn.classList.add('btn-loading'); btn.disabled = true; } 
+        else { btn.classList.remove('btn-loading'); btn.disabled = false; }
     };
 
-    // --- LOGICA DI BUSINESS ---
+    // --- LOGIC ---
     window.calcolaDifferenza = () => {
         const inizio = document.getElementById('ora-inizio').value;
         const fine = document.getElementById('ora-fine').value;
@@ -417,14 +403,9 @@
         const email = document.getElementById('email').value;
         const pass = document.getElementById('password').value;
         if(!email || !pass) return showModal("Attenzione", "Inserisci email e password.");
-        
         toggleLoading('btn-login', true);
-        try { 
-            await signInWithEmailAndPassword(auth, email, pass); 
-        } catch (error) { 
-            showModal("Errore Login", error.message);
-            toggleLoading('btn-login', false);
-        }
+        try { await signInWithEmailAndPassword(auth, email, pass); } 
+        catch (error) { showModal("Errore", error.message); toggleLoading('btn-login', false); }
     };
 
     window.logout = () => signOut(auth);
@@ -436,18 +417,13 @@
 
     window.salvaNuovaPassword = async () => {
         const newPass = document.getElementById('nuova-password').value;
-        if (newPass.length < 6) return showModal("Errore", "La password deve avere almeno 6 caratteri.");
-        
+        if (newPass.length < 6) return showModal("Errore", "Minimo 6 caratteri.");
         toggleLoading('btn-pwd', true);
         try {
             await updatePassword(currentUser, newPass);
             showModal("Successo", "Password aggiornata!");
             document.getElementById('form-cambio-password').style.display = 'none';
-            document.getElementById('nuova-password').value = "";
-        } catch (error) {
-            if (error.code === 'auth/requires-recent-login') showModal("Sicurezza", "Per cambiare la password devi aver fatto il login da poco. Fai Logout e rientra.");
-            else showModal("Errore", error.message); 
-        }
+        } catch (error) { showModal("Errore", error.message); }
         toggleLoading('btn-pwd', false);
     };
 
@@ -456,18 +432,17 @@
         try {
             const querySnapshot = await getDocs(collection(db, "anagrafica"));
             querySnapshot.forEach((doc) => { rubricaGlobale[doc.id] = doc.data().nome; });
-        } catch (e) { console.error("Errore rubrica", e); }
+        } catch (e) { console.error(e); }
     }
 
     window.salvaAnagrafica = async () => {
         const email = document.getElementById('new-user-email').value.trim().toLowerCase();
         const nome = document.getElementById('new-user-name').value.trim();
-        if(!email || !nome) return showModal("Dati mancanti", "Inserisci Email e Nome.");
-        
+        if(!email || !nome) return showModal("Dati mancanti", "Compila tutto.");
         toggleLoading('btn-anagrafica', true);
         try {
             await setDoc(doc(db, "anagrafica", email), { nome: nome });
-            showModal("Salvato", `Utente ${nome} aggiornato.`);
+            showModal("Salvato", "Utente salvato.");
             document.getElementById('new-user-email').value = "";
             document.getElementById('new-user-name').value = "";
             await aggiornaRubricaLocale(); 
@@ -485,21 +460,24 @@
             let nomeDisplay = rubricaGlobale[user.email] || user.email;
             document.getElementById('welcome-msg').innerText = `Ciao, ${nomeDisplay.split(' ')[0]}`;
             
-            if(user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()){
+            const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+            if(isAdmin){
                 document.getElementById('admin-panel-tools').style.display = 'block';
                 document.getElementById('admin-indicator').style.display = 'inline-block';
+                // Mostra colonna CHI
+                document.getElementById('col-header-chi').style.display = 'table-cell';
             } else {
                 document.getElementById('admin-panel-tools').style.display = 'none';
                 document.getElementById('admin-indicator').style.display = 'none';
+                // Nascondi colonna CHI
+                document.getElementById('col-header-chi').style.display = 'none';
             }
             caricaDati(); 
         } else {
             currentUser = null;
             document.getElementById('login-panel').style.display = 'block';
             document.getElementById('app-panel').style.display = 'none';
-            document.getElementById('welcome-msg').innerText = "Benvenuto";
-            document.getElementById('admin-indicator').style.display = 'none';
-            toggleLoading('btn-login', false); // Reset in caso di logout
+            toggleLoading('btn-login', false);
         }
     });
 
@@ -511,7 +489,7 @@
         const inizio = document.getElementById('ora-inizio').value;
         const fine = document.getElementById('ora-fine').value;
 
-        if(!data || !mansione || !ore) return showModal("Attenzione", "Compila Data, Mansione e Ore.");
+        if(!data || !mansione || !ore) return showModal("Attenzione", "Compila i campi principali.");
 
         toggleLoading('btn-salva', true);
         try {
@@ -524,36 +502,45 @@
             document.getElementById('ora-inizio').value = "";
             document.getElementById('ora-fine').value = "";
             caricaDati(); 
-        } catch (e) { console.error(e); showModal("Errore", "Salvataggio fallito."); }
+        } catch (e) { showModal("Errore", "Salvataggio fallito."); }
         toggleLoading('btn-salva', false);
     };
 
     window.eliminaTurno = async (idDocumento) => {
-        showModal("Conferma Eliminazione", "Sei sicuro di voler eliminare questo turno?", async () => {
+        showModal("Conferma", "Vuoi eliminare questo turno?", async () => {
             try { await deleteDoc(doc(db, "turni", idDocumento)); caricaDati(); } 
-            catch (e) { showModal("Errore", "Eliminazione fallita."); }
+            catch (e) { showModal("Errore", "Errore eliminazione."); }
         }, true);
     };
 
     window.modificaTurno = (idDoc) => {
         const row = document.getElementById(`riga-${idDoc}`);
         if (!row) return;
-
-        const dataAttuale = row.cells[0].getAttribute('data-val');
-        const mansioneAttuale = row.cells[2].getAttribute('data-val');
-        const orarioAttuale = row.cells[3].getAttribute('data-val').split(' - ');
-        const oreAttuali = row.cells[4].innerText;
-        const noteAttuali = row.cells[5].getAttribute('title');
-
-        let mansioneOptions = Mansioni.map(m => `<option value="${m}" ${m === mansioneAttuale ? 'selected' : ''}>${m}</option>`).join('');
-
-        row.cells[0].innerHTML = `<input type="date" id="edit-data-${idDoc}" class="table-input" value="${dataAttuale}">`;
-        row.cells[2].innerHTML = `<select id="edit-mansione-${idDoc}" class="table-input">${mansioneOptions}</select>`;
-        row.cells[3].innerHTML = `<div style="display:flex; gap:5px;"><input type="time" id="edit-inizio-${idDoc}" class="table-input" value="${orarioAttuale[0]||''}"><input type="time" id="edit-fine-${idDoc}" class="table-input" value="${orarioAttuale[1]||''}"></div>`;
-        row.cells[4].innerHTML = `<input type="number" id="edit-ore-${idDoc}" class="table-input" value="${oreAttuali}" step="0.5">`;
-        row.cells[5].innerHTML = `<input type="text" id="edit-note-${idDoc}" class="table-input" value="${noteAttuali}">`;
+        const dataAtt = row.cells[0].getAttribute('data-val');
         
-        row.cells[6].innerHTML = `<div class="action-btn-group"><button class="save-btn" onclick="salvaModifiche('${idDoc}')">OK</button><button class="cancel-btn" onclick="caricaDati()">No</button></div>`;
+        // Gestione indici colonne variabile (se Admin c'è CHI, se no non c'è)
+        const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+        // Indici: 0=Data, (1=Chi se admin), Next=Mansione, Next=Orario, Next=Ore, Next=Note, Next=Azioni
+        const idxMansione = isAdmin ? 2 : 1;
+        const idxOrario = isAdmin ? 3 : 2;
+        const idxOre = isAdmin ? 4 : 3;
+        const idxNote = isAdmin ? 5 : 4;
+        const idxAzioni = isAdmin ? 6 : 5;
+
+        const mansAtt = row.cells[idxMansione].getAttribute('data-val');
+        const orarioAtt = row.cells[idxOrario].getAttribute('data-val').split(' - ');
+        const oreAtt = row.cells[idxOre].innerText;
+        const noteAtt = row.cells[idxNote].getAttribute('title');
+
+        let mansOpts = Mansioni.map(m => `<option value="${m}" ${m === mansAtt ? 'selected' : ''}>${m}</option>`).join('');
+
+        row.cells[0].innerHTML = `<input type="date" id="edit-data-${idDoc}" class="table-input" value="${dataAtt}">`;
+        row.cells[idxMansione].innerHTML = `<select id="edit-mansione-${idDoc}" class="table-input">${mansOpts}</select>`;
+        row.cells[idxOrario].innerHTML = `<div style="display:flex; gap:5px;"><input type="time" id="edit-inizio-${idDoc}" class="table-input" value="${orarioAtt[0]||''}"><input type="time" id="edit-fine-${idDoc}" class="table-input" value="${orarioAtt[1]||''}"></div>`;
+        row.cells[idxOre].innerHTML = `<input type="number" id="edit-ore-${idDoc}" class="table-input" value="${oreAtt}" step="0.5">`;
+        row.cells[idxNote].innerHTML = `<input type="text" id="edit-note-${idDoc}" class="table-input" value="${noteAtt}">`;
+        
+        row.cells[idxAzioni].innerHTML = `<div class="action-btn-group"><button class="save-btn" onclick="salvaModifiche('${idDoc}')">OK</button><button class="cancel-btn" onclick="caricaDati()">No</button></div>`;
 
         document.getElementById(`edit-inizio-${idDoc}`).onchange = () => calcolaModificaOre(idDoc);
         document.getElementById(`edit-fine-${idDoc}`).onchange = () => calcolaModificaOre(idDoc);
@@ -579,19 +566,18 @@
         const inizio = document.getElementById(`edit-inizio-${idDoc}`).value;
         const fine = document.getElementById(`edit-fine-${idDoc}`).value;
 
-        if(!data || !mansione || isNaN(ore)) return showModal("Dati Mancanti", "Compila i campi principali.");
+        if(!data || !mansione || isNaN(ore)) return showModal("Errore", "Compila i dati.");
 
         try {
             await updateDoc(doc(db, "turni", idDoc), {
                 data: data, mansione: mansione, ore: ore, oraInizio: inizio || "", oraFine: fine || "", note: note || "", modified_at: new Date()
             });
             caricaDati(); 
-        } catch (e) { console.error(e); showModal("Errore", "Modifica fallita."); }
+        } catch (e) { showModal("Errore", "Modifica fallita."); }
     };
 
     window.caricaDati = async () => {
         const tbody = document.getElementById('tabella-ore');
-        // Spinner Tabella
         tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:30px;'><div class='spinner spinner-dark' style='display:block'></div></td></tr>";
         
         let totale = 0;
@@ -599,12 +585,16 @@
         datiFiltratiPerExport = []; 
         totaliPerMansioneExport = {};
         let statsPerMansione = {}; 
+        
         const meseScelto = document.getElementById('filtro-mese').value;
         const annoScelto = document.getElementById('filtro-anno').value;
+        const mansioneScelta = document.getElementById('filtro-mansione').value; // NUOVO FILTRO
+
+        const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
         try {
             let q;
-            if (currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+            if (isAdmin) {
                 q = query(collection(db, "turni"), orderBy("data", "desc"));
             } else {
                 q = query(collection(db, "turni"), where("uid", "==", currentUser.uid), orderBy("data", "desc"));
@@ -616,9 +606,14 @@
                 const idDoc = docSnap.id;
                 const dataObj = new Date(row.data);
                 
+                // --- FILTRI ---
                 if (meseScelto !== "all") {
                     if ((dataObj.getMonth() + 1).toString() !== meseScelto || dataObj.getFullYear().toString() !== annoScelto) return;
                 }
+                if (mansioneScelta !== "all") {
+                    if (row.mansione !== mansioneScelta) return;
+                }
+                // -------------
 
                 totale += row.ore;
                 if(!statsPerMansione[row.mansione]) statsPerMansione[row.mansione] = 0;
@@ -629,9 +624,12 @@
                 const noteTesto = row.note ? row.note : "";
                 let orarioDisplay = (row.oraInizio && row.oraFine) ? `${row.oraInizio} - ${row.oraFine}` : "-";
 
+                // Se ADMIN -> Mostra colonna CHI. Se COLLAB -> Nascondi.
+                const colonnaChi = isAdmin ? `<td data-label="Chi"><strong>${nomeCollaboratore}</strong></td>` : ``;
+
                 htmlRighe += `<tr id="riga-${idDoc}">
                     <td data-label="Data" data-val="${row.data}">${dataFormat}</td>
-                    <td data-label="Chi"><strong>${nomeCollaboratore}</strong></td>
+                    ${colonnaChi}
                     <td data-label="Cosa" data-val="${row.mansione}">${row.mansione}</td>
                     <td data-label="Orario" data-val="${row.oraInizio || ''} - ${row.oraFine || ''}">${orarioDisplay}</td>
                     <td data-label="Ore"><strong>${row.ore}</strong></td>
@@ -668,7 +666,7 @@
 
         } catch (e) {
             console.error(e);
-            if(e.message.includes("index")) showModal("Configurazione", "Manca l'Indice di Firebase. Apri la console (F12) per il link.");
+            if(e.message.includes("index")) showModal("Configurazione", "Manca l'Indice di Firebase.");
             tbody.innerHTML = "<tr><td colspan='7' style='color:red; text-align:center'>Errore caricamento.</td></tr>";
         }
     }
