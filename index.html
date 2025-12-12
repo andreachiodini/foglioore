@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- 1. RESET & VARIABILI (STILE COMPATTO V7) --- */
+        /* --- 1. RESET & VARIABILI (STILE COMPATTO) --- */
         :root {
             --primary: #2563eb; --primary-dark: #1d4ed8;
             --secondary: #64748b; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
@@ -572,7 +572,7 @@
 
     window.loadAdminData = async () => {
         const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
-        const role = document.getElementById('a-filtro-mansione').value; // Filtro mansione admin
+        const role = document.getElementById('a-filtro-mansione').value;
         const q = query(collection(db, "turni"), orderBy("data", "desc"));
         const snap = await getDocs(q);
         
@@ -789,13 +789,39 @@
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
-    window.excelCollab = () => generateCsv(myTurni, "Mio_Foglio_Ore.csv");
+    // EXPORT COLLABORATORE (Nome Dinamico)
+    window.excelCollab = () => {
+        const selectMese = document.getElementById('c-filtro-mese');
+        const selectAnno = document.getElementById('c-filtro-anno');
+        const meseTesto = selectMese.options[selectMese.selectedIndex].text;
+        const annoTesto = selectAnno.value;
+        let nomeFile = "Mio_Foglio_Ore";
+        if(currentUser) {
+            const nomeUser = (rubrica[currentUser.email] || currentUser.email.split('@')[0]).replace(/\s+/g, '');
+            nomeFile = `Presenze_${nomeUser}_${meseTesto}_${annoTesto}.csv`;
+        }
+        generateCsv(myTurni, nomeFile);
+    };
+
+    // EXPORT ADMIN DETTAGLIO (Nome Dinamico)
     window.excelAdminDetail = () => {
+        const selectMese = document.getElementById('a-filtro-mese');
+        const selectAnno = document.getElementById('a-filtro-anno');
+        const meseTesto = selectMese.options[selectMese.selectedIndex].text;
+        const annoTesto = selectAnno.value;
         const userTurni = allTurni.filter(t => t.email === detailUserEmail);
-        generateCsv(userTurni, `Foglio_Ore_${detailUserEmail}.csv`);
+        const nomeUser = (rubrica[detailUserEmail] || detailUserEmail).replace(/\s+/g, '');
+        const nomeFile = `Presenze_${nomeUser}_${meseTesto}_${annoTesto}.csv`;
+        generateCsv(userTurni, nomeFile);
     };
     
+    // EXPORT ADMIN GLOBALE (Nome Dinamico)
     window.excelAdminGlobal = () => {
+        const selectMese = document.getElementById('a-filtro-mese');
+        const selectAnno = document.getElementById('a-filtro-anno');
+        const meseTesto = selectMese.options[selectMese.selectedIndex].text;
+        const nomeFile = `Report_Globale_${meseTesto}_${selectAnno.value}.csv`;
+
         let csv = "Data;Collaboratore;Mansione;Ore;Orario;Note\n";
         allTurni.forEach(t => {
             const nome = rubrica[t.email] || t.email;
@@ -803,7 +829,7 @@
         });
         const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "Report_Globale_Admin.csv";
+        const a = document.createElement("a"); a.href = url; a.download = nomeFile;
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     };
 
