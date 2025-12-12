@@ -12,15 +12,15 @@
     <style>
         /* --- 1. RESET & VARIABILI --- */
         :root {
-            --primary: #2563eb; 
-            --bg-body: #f5f5f7; /* Grigio Apple chiaro */
+            --primary: #007aff; /* Apple Blue */
+            --bg-body: #f2f2f7; 
             --bg-card: #ffffff;
-            --text-main: #1d1d1f;
-            --text-muted: #86868b;
+            --text-main: #1c1c1e;
+            --text-muted: #8e8e93;
             --border-radius: 12px; 
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
 
-            /* COLORI PALLINI (Apple Style) */
+            /* COLORI PALLINI CALENDARIO */
             --dot-assistente: #ff3b30;  /* Rosso */
             --dot-istruttore: #007aff;  /* Blu */
             --dot-propaganda: #af52de;  /* Viola */
@@ -41,103 +41,94 @@
         .container { 
             max-width: 900px; margin: 0 auto; background: var(--bg-card); 
             padding: 20px; border-radius: 18px; box-shadow: var(--shadow); 
+            min-height: 80vh; /* Altezza minima per estetica */
         }
 
-        h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 10px 0; } 
+        /* Gestione Visibilità Rigida */
+        .view-section { display: none; } /* Di base tutto nascosto */
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 15px 0; color: #000; } 
         h3 { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; font-weight: 600; }
 
-        /* --- INPUT & FORM --- */
-        .form-box { background: #fbfbfd; padding: 20px; border-radius: 16px; border: 1px solid #d2d2d7; margin-bottom: 20px; }
-        
+        /* --- FORM ELEMENTS --- */
+        .form-box { background: #f2f2f7; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
         .time-row { display: flex; gap: 15px; margin-bottom: 15px; } 
         .time-row > div { flex: 1; } 
 
         label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
-        
         input, select { 
-            width: 100%; padding: 10px 12px; border: 1px solid #d2d2d7; border-radius: 8px; 
-            font-size: 14px; background: #fff; color: var(--text-main); outline: none; appearance: none;
+            width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; 
+            font-size: 15px; background: #fff; color: var(--text-main); outline: none; appearance: none;
         }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
+        input:focus, select:focus { border-color: var(--primary); }
 
-        /* --- BOTTONI --- */
         button { 
-            width: 100%; padding: 12px; border: none; border-radius: 10px; 
-            font-size: 14px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; gap: 8px;
-            transition: transform 0.1s;
+            width: 100%; padding: 12px; border: none; border-radius: 12px; 
+            font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; gap: 8px;
+            transition: opacity 0.2s;
         }
-        button:active { transform: scale(0.98); }
-        .btn-primary { background: #007aff; color: white; }
+        button:active { opacity: 0.7; }
+        .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: #34c759; color: white; }
         .btn-warning { background: #ff9500; color: white; }
         .btn-secondary { background: #e5e5ea; color: var(--text-main); }
-        
-        /* --- CALENDARIO APPLE STYLE --- */
+        .btn-danger { background: #ff3b30; color: white; }
+
+        /* --- CALENDARIO APPLE --- */
         .calendar-wrapper { 
             background: #ffffff; border-radius: 16px; padding: 15px; 
-            border: 1px solid #e5e5ea; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px;
+            border: 1px solid #e5e5ea; margin-bottom: 20px;
         }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 10px; }
-        .cal-title { font-size: 1.1rem; font-weight: 700; text-transform: capitalize; color: #1d1d1f; }
-        .cal-nav { background: none; border: none; color: #007aff; font-size: 1.2rem; cursor: pointer; padding: 5px 10px; width: auto; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
+        .cal-title { font-size: 1.1rem; font-weight: 700; text-transform: capitalize; }
+        .cal-nav { background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 5px 15px; width: auto; }
 
-        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 5px; }
-        .cal-weekday { font-size: 0.7rem; font-weight: 600; color: #86868b; text-transform: uppercase; }
-
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 8px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 8px; text-align: center; }
+        .cal-weekday { font-size: 0.7rem; font-weight: 600; color: #86868b; text-transform: uppercase; margin-bottom: 5px; }
         
         .cal-day { 
             aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            padding-top: 6px; cursor: pointer; border-radius: 50%; position: relative;
-            font-size: 1rem; color: #1d1d1f; margin: 2px;
+            padding-top: 6px; cursor: pointer; border-radius: 50%; font-size: 1rem; color: var(--text-main); margin: 2px;
         }
-        .cal-day:hover { background-color: #f2f2f7; }
-        .cal-day.empty { pointer-events: none; }
+        .cal-day.today span { color: #ff3b30; font-weight: 700; }
+        .cal-day.selected { background: #000; color: #fff !important; }
+        .cal-day.selected span { color: #fff; }
         
-        /* Giorno Corrente (Cerchio Rosso pieno se non selezionato, o stile outline) */
-        .cal-day.today { color: #ff3b30; font-weight: 700; }
-        .cal-day.today span { background: rgba(255, 59, 48, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
-
-        /* Giorno Selezionato (Cerchio Nero pieno) */
-        .cal-day.selected span { background: #1d1d1f; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
-        
-        /* Pallini */
         .cal-dots { display: flex; gap: 2px; margin-top: 4px; height: 6px; justify-content: center; }
         .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
-
-        /* --- FILTRI --- */
-        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; background: #f5f5f7; padding: 12px; border-radius: 12px; align-items: center; }
-        .filter-bar select { flex: 1; min-width: 120px; background: white; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .filter-bar button { width: auto; padding: 8px 16px; font-size: 13px; margin: 0; }
 
         /* --- TABELLA --- */
         .table-wrap { overflow-x: auto; margin-top: 10px; border: 1px solid #e5e5ea; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; }
         th { text-align: left; padding: 12px; border-bottom: 1px solid #e5e5ea; color: #86868b; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #f5f5f7; color: #1d1d1f; vertical-align: middle; }
+        td { padding: 12px; border-bottom: 1px solid #f2f2f7; color: #1d1d1f; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
-        td strong { font-weight: 600; }
         
         .action-icons { display: flex; gap: 8px; justify-content: flex-end; }
         .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px; width: auto; }
-        .icon-btn:hover { transform: scale(1.1); }
+
+        /* --- FILTRI --- */
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; background: #f2f2f7; padding: 12px; border-radius: 12px; align-items: center; margin-bottom: 15px; }
+        .filter-bar select { flex: 1; min-width: 120px; background: white; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .filter-bar button { width: auto; padding: 8px 16px; font-size: 13px; margin: 0; }
 
         /* --- ADMIN CARDS --- */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-top: 20px; }
-        .user-card { background: white; border: 1px solid #e5e5ea; border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.2s; position: relative; }
-        .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .card-name { font-weight: 700; font-size: 1.1rem; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 20px; }
+        .user-card { background: white; border: 1px solid #e5e5ea; border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .card-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
         .card-sub { color: #86868b; font-size: 0.8rem; margin-bottom: 15px; }
-        .card-stat { font-size: 1.8rem; font-weight: 800; color: #007aff; text-align: right; }
-        
+        .card-stat { font-size: 1.8rem; font-weight: 800; color: var(--primary); text-align: right; }
+
         /* Mobile */
         @media (max-width: 600px) {
             .container { padding: 15px; box-shadow: none; background: transparent; }
-            .form-box, .calendar-wrapper { padding: 15px; }
             .time-row { flex-direction: column; gap: 10px; }
             .filter-bar { flex-direction: column; align-items: stretch; }
             .filter-bar button { width: 100%; }
-            /* Card view per tabella mobile */
+            /* Card view tabella mobile */
             thead { display: none; }
             tr { display: block; background: white; border: 1px solid #e5e5ea; border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
             td { display: flex; justify-content: space-between; padding: 5px 0; border: none; text-align: right; }
@@ -146,6 +137,7 @@
         }
 
         /* Utils */
+        .hidden { display: none !important; }
         #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} } @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
@@ -175,17 +167,17 @@
         <button id="logout-btn" onclick="logout()" class="btn-secondary hidden" style="width:auto; padding:8px 16px;">Esci</button>
     </div>
 
-    <div id="login-view">
+    <div id="login-view" class="view-section active">
         <div class="form-box" style="max-width:350px; margin:40px auto; text-align:center;">
             <h2 style="margin-bottom:20px">Accesso</h2>
             <input type="email" id="email" placeholder="Email" style="margin-bottom:10px">
             <input type="password" id="password" placeholder="Password" style="margin-bottom:20px">
             <button id="btn-login" onclick="login()" class="btn-primary">Accedi</button>
-            <p onclick="resetPwd()" style="color:#007aff; cursor:pointer; font-size:0.85rem; margin-top:15px">Password dimenticata?</p>
+            <p onclick="resetPwd()" style="color:var(--primary); cursor:pointer; font-size:0.85rem; margin-top:15px">Password dimenticata?</p>
         </div>
     </div>
 
-    <div id="collaborator-view" class="hidden">
+    <div id="collaborator-view" class="view-section">
         <div class="form-box">
             <h3>➕ Nuovo Turno</h3>
             <div class="time-row">
@@ -261,7 +253,7 @@
         </div>
     </div>
 
-    <div id="admin-view" class="hidden">
+    <div id="admin-view" class="view-section">
         <div class="form-box" style="background:#fffbeb; border-color:#fcd34d">
             <h3 style="color:#b45309; margin-top:0">🛠️ Anagrafica</h3>
             <div class="time-row" style="margin-bottom:0">
@@ -295,22 +287,23 @@
         </div>
 
         <div id="cards-container" class="cards-grid"></div>
-
-        <div id="admin-detail" class="hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 10px 0; background:#e5e5ea; padding:10px; border-radius:10px">
-                <h3 style="margin:0" id="detail-name">Utente</h3>
-                <button onclick="closeDetail()" class="btn-secondary" style="width:auto; padding:5px 10px; margin:0">Indietro</button>
-            </div>
-            <div class="table-wrap">
-                <table>
-                    <thead><tr><th>Data</th><th>Mansione</th><th>Orario</th><th>Ore</th><th>Note</th><th style="text-align:right">Azioni</th></tr></thead>
-                    <tbody id="detail-tbody"></tbody>
-                </table>
-            </div>
-            <div style="text-align:right; font-weight:700; margin-top:10px">Totale: <span id="d-totale">0</span></div>
-            <button onclick="excelAdminDetail()" class="btn-success" style="margin-top:15px; width:auto">Scarica Excel Utente</button>
-        </div>
     </div>
+
+    <div id="admin-detail" class="view-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:#e5e5ea; padding:10px; border-radius:12px">
+            <h3 style="margin:0" id="detail-name">Utente</h3>
+            <button onclick="switchView('admin-view')" class="btn-secondary" style="width:auto; padding:5px 15px; margin:0">Indietro</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Data</th><th>Mansione</th><th>Orario</th><th>Ore</th><th>Note</th><th style="text-align:right">Azioni</th></tr></thead>
+                <tbody id="detail-tbody"></tbody>
+            </table>
+        </div>
+        <div style="text-align:right; font-weight:700; margin-top:10px">Totale: <span id="d-totale">0</span></div>
+        <button onclick="excelAdminDetail()" class="btn-success" style="margin-top:15px; width:auto">Scarica Excel Utente</button>
+    </div>
+
 </div>
 
 <div id="pwd-modal" class="modal-overlay" style="display:none">
@@ -362,11 +355,22 @@
     let detailUserEmail = null;
     let currentEditEmail = null;
     
-    // Calendar State
-    let calDate = new Date(); // Start with TODAY
+    // Calendar
+    let calDate = new Date(); 
     let selectedDay = null;
 
     const Mansioni = ["Assistente bagnanti", "Istruttore", "Fitness", "Propaganda", "Lezione individuale", "Segreteria"];
+
+    // SYSTEM: VIEW SWITCHER (FIX SOVRAPPOSIZIONI)
+    window.switchView = (viewId) => {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(viewId);
+        if(target) target.classList.add('active');
+        if(viewId === 'login-view') {
+            document.getElementById('logout-btn').classList.add('hidden');
+            document.getElementById('welcome-msg').innerText = "Login";
+        }
+    };
 
     // Utils
     window.toast = (msg) => { const t = document.getElementById("toast"); t.innerText=msg; t.className="show"; setTimeout(()=>t.className="",3000); };
@@ -379,7 +383,7 @@
     window.closeModal = () => document.getElementById('custom-modal').style.display='none';
     const toggleLoading = (id,l) => { const b=document.getElementById(id); if(b){ l?b.innerHTML='<div class="spinner"></div>':b.innerText=b.id==='btn-login'?'Accedi':'Registra Turno'; b.disabled=l; }};
 
-    // INIT DROPDOWNS TO TODAY (Fix Undefined NaN)
+    // INIT DATE
     const today = new Date();
     document.getElementById('c-data').valueAsDate = today;
     document.getElementById('c-filtro-mese').value = today.getMonth() + 1;
@@ -387,7 +391,7 @@
     document.getElementById('a-filtro-mese').value = today.getMonth() + 1;
     document.getElementById('a-filtro-anno').value = today.getFullYear();
 
-    // CALENDAR LOGIC
+    // CALENDAR ENGINE
     const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
     
     window.renderCalendar = () => {
@@ -404,7 +408,7 @@
         const grid = document.getElementById('cal-grid');
         grid.innerHTML = "";
 
-        // Pad (Lunedi=0 per noi, JS Dom=0)
+        // Pad (Lun=0 logic fix: getDay 0=Dom, 1=Lun. Want Lun=0)
         let pad = firstDay === 0 ? 6 : firstDay - 1;
         for(let i=0; i<pad; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
 
@@ -452,7 +456,7 @@
         renderCollabTable();
     };
 
-    // AUTH & CORE
+    // AUTH
     window.login = async () => {
         const e=document.getElementById('email').value, p=document.getElementById('password').value;
         if(!e||!p) return modal("Errore", "Inserisci dati.");
@@ -473,7 +477,6 @@
     onAuthStateChanged(auth, async (user) => {
         if(user) {
             currentUser = user;
-            document.getElementById('login-view').classList.add('hidden');
             document.getElementById('logout-btn').classList.remove('hidden');
             
             const snap = await getDocs(collection(db, "anagrafica"));
@@ -482,23 +485,20 @@
 
             if(user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
                 document.getElementById('admin-indicator').classList.remove('hidden');
-                document.getElementById('admin-view').classList.remove('hidden');
+                switchView('admin-view');
                 loadAdminData();
             } else {
-                document.getElementById('collaborator-view').classList.remove('hidden');
-                loadCollabData(); // Loads data then renders calendar
+                switchView('collaborator-view');
+                loadCollabData();
             }
         } else {
             currentUser = null;
-            document.getElementById('login-view').classList.remove('hidden');
-            document.getElementById('collaborator-view').classList.add('hidden');
-            document.getElementById('admin-view').classList.add('hidden');
-            document.getElementById('logout-btn').classList.add('hidden');
+            switchView('login-view');
             toggleLoading('btn-login', false);
         }
     });
 
-    // COLLABORATOR ACTIONS
+    // COLLABORATOR
     window.calcDiff = () => {
         const i = document.getElementById('c-inizio').value, f = document.getElementById('c-fine').value;
         if(i && f) {
@@ -541,7 +541,7 @@
         const snap = await getDocs(q);
         myTurni = [];
         snap.forEach(d => myTurni.push({id: d.id, ...d.data()}));
-        renderCalendar(); // Init visual components after data load
+        renderCalendar();
         renderCollabTable();
     }
 
@@ -582,6 +582,88 @@
         document.getElementById('c-totale').innerText = tot.toFixed(1);
     };
 
+    // ADMIN
+    window.saveAnagrafica = async () => {
+        const e = document.getElementById('adm-email').value.trim().toLowerCase();
+        if(!e) return modal("Errore", "Manca email.");
+        try { await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value }); toast("OK"); loadAdminData(); } 
+        catch(e) { modal("Errore", e.message); }
+    };
+    window.saveEditUser = async () => {
+        if(!currentEditEmail) return;
+        try { 
+            const n = document.getElementById('edit-name-input').value;
+            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n }, { merge: true });
+            rubrica[currentEditEmail] = n; toast("Nome aggiornato"); 
+            document.getElementById('edit-user-modal').style.display='none'; loadAdminData();
+        } catch(e) { modal("Errore", e.message); }
+    };
+    window.openEditUser = (e,n) => { currentEditEmail=e; document.getElementById('edit-name-input').value=n; document.getElementById('edit-user-modal').style.display='flex'; };
+
+    window.loadAdminData = async () => {
+        const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
+        const role = document.getElementById('a-filtro-mansione').value, sort = document.getElementById('a-sort-order').value;
+        const q = query(collection(db, "turni"), orderBy("data", "desc"));
+        const snap = await getDocs(q);
+        allTurni = []; const stats = {};
+
+        snap.forEach(d => {
+            const t = d.data(); const date = new Date(t.data);
+            if((m=='all'||(date.getMonth()+1)==m) && date.getFullYear()==y && (role=='all'||t.mansione==role)) {
+                allTurni.push({id:d.id, ...t});
+                if(!stats[t.email]) stats[t.email] = { ore:0, nome: rubrica[t.email]||t.email, last:0 };
+                stats[t.email].ore += t.ore;
+                const ts = t.created_at ? t.created_at.seconds : date.getTime()/1000;
+                if(ts > stats[t.email].last) stats[t.email].last = ts;
+            }
+        });
+
+        let cards = Object.entries(stats).map(([e,d]) => ({email:e, ...d}));
+        if(sort === 'alpha') cards.sort((a,b) => a.nome.localeCompare(b.nome));
+        else cards.sort((a,b) => b.last - a.last);
+
+        const grid = document.getElementById('cards-container'); grid.innerHTML = "";
+        cards.forEach(u => {
+            grid.innerHTML += `
+                <div class="user-card" onclick="openDetail('${u.email}')">
+                    <div style="display:flex; justify-content:space-between">
+                        <div class="card-name">${u.nome}</div>
+                        <button style="background:none; border:none; padding:0; width:auto; cursor:pointer" onclick="event.stopPropagation(); openEditUser('${u.email}','${u.nome}')">✏️</button>
+                    </div>
+                    <div class="card-sub">${u.email}</div>
+                    <div class="card-stat">${u.ore.toFixed(1)}</div>
+                </div>
+            `;
+        });
+        if(document.getElementById('admin-detail').classList.contains('active')) renderAdminDetailTable();
+    };
+
+    window.openDetail = (e) => { detailUserEmail=e; switchView('admin-detail'); document.getElementById('detail-name').innerText=rubrica[e]||e; renderAdminDetailTable(); };
+    window.closeDetail = () => { detailUserEmail=null; switchView('admin-view'); };
+
+    function renderAdminDetailTable() {
+        const tbody = document.getElementById('detail-tbody'); tbody.innerHTML=""; let tot=0;
+        allTurni.filter(t=>t.email===detailUserEmail).forEach(t => {
+            tot+=t.ore;
+            tbody.innerHTML += `
+                <tr id="arow-${t.id}">
+                    <td data-label="Data"><input type="date" id="ed-d-${t.id}" value="${t.data}" class="table-input"></td>
+                    <td data-label="Mansione"><select id="ed-m-${t.id}" class="table-input">${Mansioni.map(m=>`<option ${m==t.mansione?'selected':''}>${m}</option>`).join('')}</select></td>
+                    <td data-label="Orario"><div style="display:flex; gap:2px"><input type="time" id="ed-i-${t.id}" value="${t.oraInizio}" class="table-input"><input type="time" id="ed-f-${t.id}" value="${t.oraFine}" class="table-input"></div></td>
+                    <td data-label="Ore"><input type="number" id="ed-h-${t.id}" value="${t.ore}" step="0.5" class="table-input" style="width:50px"></td>
+                    <td data-label="Note"><input type="text" id="ed-n-${t.id}" value="${t.note}" class="table-input"></td>
+                    <td class="actions-cell">
+                        <div class="action-icons">
+                            <button class="icon-btn" onclick="saveEdit('${t.id}', true)">💾</button>
+                            <button class="icon-btn" onclick="delRow('${t.id}', true)">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        document.getElementById('d-totale').innerText = tot.toFixed(1);
+    }
+
     // SHARED EDIT
     window.delRow = (id, isAdmin=false) => {
         modal("Eliminare?", "Confermi cancellazione?", async () => {
@@ -616,89 +698,6 @@
             toast("Modificato"); isAdmin ? loadAdminData() : loadCollabData();
         } catch(e) { modal("Errore", e.message); }
     };
-
-    // ADMIN
-    window.saveAnagrafica = async () => {
-        const e = document.getElementById('adm-email').value.trim().toLowerCase();
-        if(!e) return modal("Errore", "Manca email.");
-        try { await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value }); toast("OK"); loadAdminData(); } 
-        catch(e) { modal("Errore", e.message); }
-    };
-    window.saveEditUser = async () => {
-        if(!currentEditEmail) return;
-        try { 
-            const n = document.getElementById('edit-name-input').value;
-            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n }, { merge: true });
-            rubrica[currentEditEmail] = n; toast("Nome aggiornato"); 
-            document.getElementById('edit-user-modal').style.display='none'; loadAdminData();
-        } catch(e) { modal("Errore", e.message); }
-    };
-    window.openEditUser = (e,n) => { currentEditEmail=e; document.getElementById('edit-name-input').value=n; document.getElementById('edit-user-modal').style.display='flex'; };
-
-    window.loadAdminData = async () => {
-        const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
-        const role = document.getElementById('a-filtro-mansione').value, sort = document.getElementById('a-sort-order').value;
-        
-        const q = query(collection(db, "turni"), orderBy("data", "desc"));
-        const snap = await getDocs(q);
-        allTurni = []; const stats = {};
-
-        snap.forEach(d => {
-            const t = d.data(); const date = new Date(t.data);
-            if((m=='all'||(date.getMonth()+1)==m) && date.getFullYear()==y && (role=='all'||t.mansione==role)) {
-                allTurni.push({id:d.id, ...t});
-                if(!stats[t.email]) stats[t.email] = { ore:0, nome: rubrica[t.email]||t.email, last:0 };
-                stats[t.email].ore += t.ore;
-                const ts = t.created_at ? t.created_at.seconds : date.getTime()/1000;
-                if(ts > stats[t.email].last) stats[t.email].last = ts;
-            }
-        });
-
-        let cards = Object.entries(stats).map(([e,d]) => ({email:e, ...d}));
-        if(sort === 'alpha') cards.sort((a,b) => a.nome.localeCompare(b.nome));
-        else cards.sort((a,b) => b.last - a.last);
-
-        const grid = document.getElementById('cards-container'); grid.innerHTML = "";
-        cards.forEach(u => {
-            grid.innerHTML += `
-                <div class="user-card" onclick="openDetail('${u.email}')">
-                    <div style="display:flex; justify-content:space-between">
-                        <div class="card-name">${u.nome}</div>
-                        <button style="background:none; border:none; padding:0; width:auto; cursor:pointer" onclick="event.stopPropagation(); openEditUser('${u.email}','${u.nome}')">✏️</button>
-                    </div>
-                    <div class="card-sub">${u.email}</div>
-                    <div class="card-stat">${u.ore.toFixed(1)}</div>
-                </div>
-            `;
-        });
-        if(!document.getElementById('admin-detail').classList.contains('hidden')) renderAdminDetailTable();
-    };
-
-    window.openDetail = (e) => { detailUserEmail=e; document.getElementById('admin-dashboard').classList.add('hidden'); document.getElementById('admin-detail').classList.remove('hidden'); document.getElementById('detail-name').innerText=rubrica[e]||e; renderAdminDetailTable(); };
-    window.closeDetail = () => { detailUserEmail=null; document.getElementById('admin-dashboard').classList.remove('hidden'); document.getElementById('admin-detail').classList.add('hidden'); };
-
-    function renderAdminDetailTable() {
-        const tbody = document.getElementById('detail-tbody'); tbody.innerHTML=""; let tot=0;
-        allTurni.filter(t=>t.email===detailUserEmail).forEach(t => {
-            tot+=t.ore;
-            tbody.innerHTML += `
-                <tr id="arow-${t.id}">
-                    <td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td>
-                    <td data-label="Mansione">${t.mansione}</td>
-                    <td data-label="Orario">${t.oraInizio}-${t.oraFine}</td>
-                    <td data-label="Ore"><strong>${t.ore}</strong></td>
-                    <td data-label="Note">${t.note||''}</td>
-                    <td class="actions-cell">
-                        <div class="action-icons">
-                            <button class="icon-btn" onclick="editRow('${t.id}', true)">✏️</button>
-                            <button class="icon-btn" onclick="delRow('${t.id}', true)">🗑️</button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        });
-        document.getElementById('d-totale').innerText = tot.toFixed(1);
-    }
 
     // EXPORT
     function generateCsv(data, filename) {
@@ -741,7 +740,6 @@
             csv += row.join(";") + "\n";
         }
         
-        // Total row
         let tr = ["TOTALE","","", ...cols.slice(3).map(c => tots[c] ? tots[c].toString().replace('.',',') : "")];
         csv += "\n" + tr.join(";") + "\n";
 
