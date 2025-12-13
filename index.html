@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- RESET & VARIABILI --- */
+        /* --- 1. RESET & VARIABILI --- */
         :root {
             --primary: #007aff;
             --bg-body: #f2f2f7; 
@@ -44,17 +44,15 @@
             min-height: 85vh;
         }
 
-        /* --- VISIBILITÀ (SISTEMA A TAB) --- */
-        /* Nascondiamo tutto di default, mostriamo solo .active */
+        /* Gestione Visibilità */
         .view-section { display: none; } 
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
-        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 15px 0; color: #000; } 
+        h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 5px 0; color: #000; } 
         h3 { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; font-weight: 600; }
 
-        /* --- UI ELEMENTS --- */
+        /* --- FORM ELEMENTS --- */
         .form-box { background: #f2f2f7; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
         .time-row { display: flex; gap: 15px; margin-bottom: 15px; } 
         .time-row > div { flex: 1; } 
@@ -99,11 +97,12 @@
         .cal-dots { display: flex; gap: 3px; margin-top: 2px; height: 6px; justify-content: center; }
         .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
 
-        /* --- FILTRI E TABELLE --- */
+        /* --- FILTRI --- */
         .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; background: #f2f2f7; padding: 12px; border-radius: 12px; align-items: center; margin-bottom: 15px; }
         .filter-bar select { flex: 1; min-width: 120px; background: white; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .filter-bar button { width: auto; padding: 8px 16px; font-size: 13px; margin: 0; }
 
+        /* --- TABELLA --- */
         .table-wrap { overflow-x: auto; margin-top: 10px; border: 1px solid #e5e5ea; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; }
         th { text-align: left; padding: 12px; border-bottom: 1px solid #e5e5ea; color: #86868b; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
@@ -112,11 +111,12 @@
         .action-icons { display: flex; gap: 8px; justify-content: flex-end; }
         .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px; width: auto; }
 
-        /* --- STATS & CARDS --- */
+        /* --- STATISTICHE --- */
         .stats-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
         .stat-pill { background: #fff; border: 1px solid #e5e5ea; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 500; }
         .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
 
+        /* --- ADMIN CARDS --- */
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 20px; }
         .user-card { background: white; border: 1px solid #e5e5ea; border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
@@ -124,8 +124,9 @@
         .card-sub { color: #86868b; font-size: 0.8rem; margin-bottom: 15px; }
         .card-stat { font-size: 1.8rem; font-weight: 800; color: var(--primary); text-align: right; }
         .edit-user-btn { background: #f2f2f7; border:none; border-radius: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #86868b; margin: 0; padding: 0; }
+        .edit-user-btn:hover { background: #e5e5ea; color: var(--primary); }
 
-        /* Mobile & Utils */
+        /* Mobile */
         @media (max-width: 600px) {
             .container { padding: 15px; box-shadow: none; background: transparent; }
             .time-row { flex-direction: column; gap: 10px; }
@@ -138,6 +139,8 @@
             td:before { content: attr(data-label); color: #86868b; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; text-align: left; }
             .table-input { text-align: right; width: 60%; }
         }
+
+        /* Utils */
         .hidden { display: none !important; }
         #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
@@ -164,7 +167,10 @@
 
 <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-        <h2 id="welcome-msg" style="margin:0">Login</h2>
+        <div>
+            <h2 id="welcome-msg" style="margin:0">Login</h2>
+            <span id="admin-indicator" class="hidden" style="background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:12px; font-size:0.65rem; font-weight:700; margin-left:5px">ADMIN</span>
+        </div>
         <button id="logout-btn" class="btn-secondary hidden" style="width:auto; padding:8px 16px;">Esci</button>
     </div>
 
@@ -336,7 +342,6 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyAi5AwcIcjgLGyI7E8x4ndcYCI9DUIybeA",
       authDomain: "gestioneore-3bf5f.firebaseapp.com",
@@ -428,15 +433,22 @@
         
         if (user) {
             currentUser = user;
+            document.getElementById('logout-btn').classList.remove('hidden');
             
-            // 1. DETERMINA RUOLO E CAMBIA VISTA SUBITO
+            // 1. DETERMINA RUOLO E CAMBIA VISTA SUBITO (Non aspettare dati)
             const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
             
-            if(isAdmin) {
-                document.getElementById('admin-indicator').classList.remove('hidden');
+            if (isAdmin) {
+                // Controllo se l'elemento esiste prima di usarlo
+                const adminBad = document.getElementById('admin-indicator');
+                if(adminBad) adminBad.classList.remove('hidden');
+                
                 switchView('admin-view');
+                
             } else {
-                document.getElementById('admin-indicator').classList.add('hidden');
+                const adminBad = document.getElementById('admin-indicator');
+                if(adminBad) adminBad.classList.add('hidden');
+                
                 switchView('collaborator-view');
             }
 
@@ -622,8 +634,64 @@
             `;
         });
         document.getElementById('c-totale').innerText = tot.toFixed(1);
-        Object.keys(breakdown).forEach(m => { statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`; });
+        
+        Object.keys(breakdown).forEach(m => {
+            statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`;
+        });
     };
+
+    // SHARED EDIT
+    window.delRow = (id, isAdmin=false) => {
+        modal("Eliminare?", "Confermi cancellazione?", async () => {
+            await deleteDoc(doc(db, "turni", id));
+            toast("Eliminato");
+            isAdmin ? loadAdminData() : loadCollabData();
+        });
+    };
+    window.editRow = (id, isAdmin=false) => {
+        const tr = document.getElementById((isAdmin?'arow-':'row-')+id);
+        const src = isAdmin ? allTurni : myTurni;
+        const t = src.find(x => x.id === id);
+        tr.innerHTML = `
+            <td data-label="Data"><input type="date" id="ed-d-${id}" value="${t.data}" class="table-input"></td>
+            <td data-label="Mansione"><select id="ed-m-${id}" class="table-input">${Mansioni.map(m=>`<option ${m==t.mansione?'selected':''}>${m}</option>`).join('')}</select></td>
+            <td data-label="Orario"><div style="display:flex; gap:2px"><input type="time" id="ed-i-${id}" value="${t.oraInizio}" class="table-input"><input type="time" id="ed-f-${id}" value="${t.oraFine}" class="table-input"></div></td>
+            <td data-label="Ore"><input type="number" id="ed-h-${id}" value="${t.ore}" step="0.5" class="table-input" style="width:50px"></td>
+            <td data-label="Note"><input type="text" id="ed-n-${id}" value="${t.note}" class="table-input"></td>
+            <td class="actions-cell"><button class="btn-success" onclick="saveEdit('${id}', ${isAdmin})" style="padding:5px">OK</button></td>
+        `;
+    };
+    window.saveEdit = async (id, isAdmin) => {
+        try {
+            await updateDoc(doc(db, "turni", id), {
+                data: document.getElementById(`ed-d-${id}`).value,
+                mansione: document.getElementById(`ed-m-${id}`).value,
+                ore: parseFloat(document.getElementById(`ed-h-${id}`).value),
+                oraInizio: document.getElementById(`ed-i-${id}`).value,
+                oraFine: document.getElementById(`ed-f-${id}`).value,
+                note: document.getElementById(`ed-n-${id}`).value
+            });
+            toast("Modificato"); isAdmin ? loadAdminData() : loadCollabData();
+        } catch(e) { modal("Errore", e.message); }
+    };
+
+    // ADMIN
+    window.saveAnagrafica = async () => {
+        const e = document.getElementById('adm-email').value.trim().toLowerCase();
+        if(!e) return modal("Errore", "Manca email.");
+        try { await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value }); toast("OK"); loadAdminData(); } 
+        catch(e) { modal("Errore", e.message); }
+    };
+    window.saveEditUser = async () => {
+        if(!currentEditEmail) return;
+        try { 
+            const n = document.getElementById('edit-name-input').value;
+            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n }, { merge: true });
+            rubrica[currentEditEmail] = n; toast("Nome aggiornato"); 
+            document.getElementById('edit-user-modal').style.display='none'; loadAdminData();
+        } catch(e) { modal("Errore", e.message); }
+    };
+    window.openEditUser = (e,n) => { currentEditEmail=e; document.getElementById('edit-name-input').value=n; document.getElementById('edit-user-modal').style.display='flex'; };
 
     window.loadAdminData = async () => {
         const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
@@ -674,6 +742,7 @@
             tot+=t.ore;
             if(!breakdown[t.mansione]) breakdown[t.mansione]=0;
             breakdown[t.mansione] += t.ore;
+
             tbody.innerHTML += `
                 <tr id="arow-${t.id}">
                     <td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td>
@@ -691,63 +760,13 @@
             `;
         });
         document.getElementById('d-totale').innerText = tot.toFixed(1);
-        Object.keys(breakdown).forEach(m => { statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`; });
+        
+        Object.keys(breakdown).forEach(m => {
+            statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`;
+        });
     }
 
-    // SHARED
-    window.delRow = (id, isAdmin=false) => {
-        modal("Eliminare?", "Confermi?", async () => {
-            await deleteDoc(doc(db, "turni", id));
-            toast("Eliminato"); isAdmin ? loadAdminData() : loadCollabData();
-        });
-    };
-    window.editRow = (id, isAdmin=false) => {
-        const tr = document.getElementById((isAdmin?'arow-':'row-')+id);
-        const src = isAdmin ? allTurni : myTurni;
-        const t = src.find(x => x.id === id);
-        tr.innerHTML = `
-            <td data-label="Data"><input type="date" id="ed-d-${id}" value="${t.data}" class="table-input"></td>
-            <td data-label="Mansione"><select id="ed-m-${id}" class="table-input">${Mansioni.map(m=>`<option ${m==t.mansione?'selected':''}>${m}</option>`).join('')}</select></td>
-            <td data-label="Orario"><div style="display:flex; gap:2px"><input type="time" id="ed-i-${id}" value="${t.oraInizio}" class="table-input"><input type="time" id="ed-f-${id}" value="${t.oraFine}" class="table-input"></div></td>
-            <td data-label="Ore"><input type="number" id="ed-h-${id}" value="${t.ore}" step="0.5" class="table-input" style="width:50px"></td>
-            <td data-label="Note"><input type="text" id="ed-n-${id}" value="${t.note}" class="table-input"></td>
-            <td class="actions-cell"><button class="btn-success" onclick="saveEdit('${id}', ${isAdmin})" style="padding:5px">OK</button></td>
-        `;
-    };
-    window.saveEdit = async (id, isAdmin) => {
-        try {
-            await updateDoc(doc(db, "turni", id), {
-                data: document.getElementById(`ed-d-${id}`).value,
-                mansione: document.getElementById(`ed-m-${id}`).value,
-                ore: parseFloat(document.getElementById(`ed-h-${id}`).value),
-                oraInizio: document.getElementById(`ed-i-${id}`).value,
-                oraFine: document.getElementById(`ed-f-${id}`).value,
-                note: document.getElementById(`ed-n-${id}`).value
-            });
-            toast("Modificato"); isAdmin ? loadAdminData() : loadCollabData();
-        } catch(e) { modal("Errore", e.message); }
-    };
-
-    window.saveAnagrafica = async () => {
-        const e = document.getElementById('adm-email').value.trim().toLowerCase();
-        if(!e) return modal("Errore", "Email mancante.");
-        try { await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value }); toast("OK"); loadAdminData(); } 
-        catch(e) { modal("Errore", e.message); }
-    };
-    window.saveEditUser = async () => {
-        if(!currentEditEmail) return;
-        try { 
-            const n = document.getElementById('edit-name-input').value;
-            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n }, { merge: true });
-            rubrica[currentEditEmail] = n; toast("Aggiornato"); 
-            document.getElementById('edit-user-modal').style.display='none'; loadAdminData();
-        } catch(e) { modal("Errore", e.message); }
-    };
-    window.openEditUser = (e,n) => { currentEditEmail=e; document.getElementById('edit-name-input').value=n; document.getElementById('edit-user-modal').style.display='flex'; };
-    
     // EXPORT
-    window.changePwd = async () => { try { await updatePassword(currentUser, document.getElementById('new-pwd').value); toast("Fatto"); document.getElementById('pwd-modal').style.display='none'; } catch(e){ modal("Errore", e.message); } };
-
     function generateCsv(data, filename) {
         if(data.length === 0) return modal("Info", "Nessun dato.");
         const y = document.getElementById(currentUser.email===ADMIN_EMAIL ? 'a-filtro-anno':'c-filtro-anno').value;
