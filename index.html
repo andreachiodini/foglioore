@@ -111,12 +111,16 @@
         tr:last-child td { border-bottom: none; }
         .action-icons { display: flex; gap: 8px; justify-content: flex-end; }
         .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px; width: auto; }
+        
+        /* Icona lucchetto per righe bloccate */
+        .icon-lock { font-size: 1rem; color: #ccc; cursor: not-allowed; padding: 4px;}
 
-        /* Stats & Cards */
+        /* Stats */
         .stats-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
         .stat-pill { background: #fff; border: 1px solid #e5e5ea; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 500; }
         .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
 
+        /* Admin Cards */
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 20px; }
         .user-card { background: white; border: 1px solid #e5e5ea; border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
@@ -458,7 +462,7 @@
         catch(err) { modal("Errore", err.message); }
     });
 
-    // AUTO LOGOUT (10 MIN)
+    // AUTO LOGOUT
     let inactivityTimer;
     const resetInactivityTimer = () => {
         if (!currentUser) return;
@@ -466,6 +470,25 @@
         inactivityTimer = setTimeout(() => { modal("Sessione Scaduta", "Disconnesso per inattività.", () => signOut(auth)); signOut(auth); }, 600000);
     };
     ['click', 'mousemove', 'keypress', 'touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer));
+
+    // LOCK LOGIC (Novità)
+    const isLocked = (dateStr) => {
+        if(currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return false; 
+        const d = new Date(dateStr);
+        const now = new Date();
+        // Confronte Anno e Mese (YYYYMM)
+        const shiftY = d.getFullYear();
+        const shiftM = d.getMonth();
+        const curY = now.getFullYear();
+        const curM = now.getMonth();
+        
+        // Se anno precedente -> bloccato
+        if (shiftY < curY) return true;
+        // Se anno uguale ma mese precedente -> bloccato
+        if (shiftY === curY && shiftM < curM) return true;
+        
+        return false;
+    };
 
     // AUTH STATE
     onAuthStateChanged(auth, async (user) => {
@@ -488,11 +511,9 @@
             }
 
             try {
-                // Carica anagrafica (contiene nome + pacchetto tariffe)
                 const snap = await getDocs(collection(db, "anagrafica"));
                 snap.forEach(d => {
                     const data = d.data();
-                    // Struttura rubrica: { email: { nome: "Mario", tariffe: { "Istruttore": 15, ... } } }
                     rubrica[d.id] = { nome: data.nome, tariffe: data.tariffe || {} };
                 });
                 const userData = rubrica[user.email] || { nome: 'User' };
@@ -532,6 +553,10 @@
     window.salvaOre = async () => {
         const d=document.getElementById('c-data').value, m=document.getElementById('c-mansione').value, h=parseFloat(document.getElementById('c-ore').value);
         if(!d || !m || !h) return modal("Errore", "Compila i campi.");
+        
+        // CHECK LOCK
+        if(isLocked(d)) return modal("Attenzione", "Le modifiche per i mesi passati sono bloccate.");
+
         const btn = document.getElementById('btn-salva');
         btn.innerHTML = '<div class="spinner"></div>';
         try {
@@ -633,7 +658,6 @@
         let tot = 0;
         let breakdown = {};
         
-        // RECUPERA TARIFFE PERSONALI
         const myRates = rubrica[currentUser.email]?.tariffe || {};
         let totSoldi = 0;
 
@@ -647,13 +671,26 @@
 
         filtered.forEach(t => {
             tot += t.ore;
-            
-            // Calcolo Soldi
             const rate = myRates[t.mansione] || 0;
             totSoldi += (t.ore * rate);
 
             if(!breakdown[t.mansione]) breakdown[t.mansione]=0;
             breakdown[t.mansione] += t.ore;
+
+            // CHECK LOCK FOR ACTIONS
+            const locked = isLocked(t.data);
+            let actionHtml = '';
+            if (!locked) {
+                actionHtml = `
+                    <div class="action-icons">
+                        <button class="icon-btn" onclick="duplicaTurno('${t.id}')">📄</button>
+                        <button class="icon-btn" onclick="editRow('${t.id}')">✏️</button>
+                        <button class="icon-btn" onclick="delRow('${t.id}')">🗑️</button>
+                    </div>
+                `;
+            } else {
+                actionHtml = `<span class="icon-lock">🔒</span>`;
+            }
 
             tbody.innerHTML += `
                 <tr id="row-${t.id}">
@@ -662,18 +699,11 @@
                     <td data-label="Orario">${t.oraInizio}-${t.oraFine}</td>
                     <td data-label="Ore"><strong>${t.ore}</strong></td>
                     <td data-label="Note">${t.note||''}</td>
-                    <td class="actions-cell">
-                        <div class="action-icons">
-                            <button class="icon-btn" onclick="duplicaTurno('${t.id}')">📄</button>
-                            <button class="icon-btn" onclick="editRow('${t.id}')">✏️</button>
-                            <button class="icon-btn" onclick="delRow('${t.id}')">🗑️</button>
-                        </div>
-                    </td>
+                    <td class="actions-cell">${actionHtml}</td>
                 </tr>
             `;
         });
         document.getElementById('c-totale').innerText = tot.toFixed(1);
-        // MOSTRA SOLDI
         const soldiEl = document.getElementById('c-soldi');
         if(soldiEl) soldiEl.innerText = totSoldi.toFixed(2);
         
@@ -687,7 +717,6 @@
         const e = document.getElementById('adm-email').value.trim().toLowerCase();
         if(!e) return modal("Errore", "Manca email.");
         try { 
-            // Inizializza con tariffe vuote
             await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value, tariffe: {} }); 
             toast("OK"); loadAdminData(); 
         } 
@@ -701,7 +730,6 @@
         const container = document.getElementById('rate-inputs-container');
         container.innerHTML = "";
         
-        // Carica le tariffe salvate per questo utente
         const userRates = rubrica[email]?.tariffe || {};
 
         Mansioni.forEach(m => {
@@ -721,22 +749,18 @@
         try { 
             const n = document.getElementById('edit-name-input').value;
             const newRates = {};
-            
-            // Raccogli tutte le tariffe dal modale
             Mansioni.forEach(m => {
                 const val = parseFloat(document.getElementById(`rate-${m}`).value) || 0;
                 newRates[m] = val;
             });
 
-            // Salva su Firebase
             await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n, tariffe: newRates }, { merge: true });
             
-            // Aggiorna cache locale
             rubrica[currentEditEmail] = { nome: n, tariffe: newRates };
             
             toast("Aggiornato"); 
             document.getElementById('edit-user-modal').style.display='none'; 
-            loadAdminData(); // Ricalcola i totali dashboard
+            loadAdminData(); 
         } catch(e) { modal("Errore", e.message); }
     };
 
@@ -759,8 +783,6 @@
                 }
                 
                 stats[userEmail].ore += t.ore;
-                
-                // CALCOLO SOLDI PRECISO (Tariffa specifica per mansione)
                 const tariffaOraria = stats[userEmail].tariffe[t.mansione] || 0;
                 stats[userEmail].soldi += (t.ore * tariffaOraria);
 
