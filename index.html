@@ -49,7 +49,7 @@
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 5px 0; color: #000; } 
+        h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 15px 0; color: #000; } 
         h3 { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; font-weight: 600; }
 
         /* --- FORM ELEMENTS --- */
@@ -101,6 +101,8 @@
         .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; background: #f2f2f7; padding: 12px; border-radius: 12px; align-items: center; margin-bottom: 15px; }
         .filter-bar select { flex: 1; min-width: 120px; background: white; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .filter-bar button { width: auto; padding: 8px 16px; font-size: 13px; margin: 0; }
+        /* Stile specifico per la barra di ricerca Admin */
+        #a-search { flex: 2; min-width: 200px; border-color: #007aff; }
 
         /* --- TABELLA --- */
         .table-wrap { overflow-x: auto; margin-top: 10px; border: 1px solid #e5e5ea; border-radius: 12px; }
@@ -273,6 +275,8 @@
 
         <h3 style="margin-top:30px">Riepilogo</h3>
         <div class="filter-bar">
+            <input type="text" id="a-search" placeholder="🔍 Cerca collaboratore..." style="flex:2; min-width:200px; border-color:var(--primary)">
+            
             <select id="a-sort-order"><option value="alpha">A-Z</option><option value="recent">Recenti</option></select>
             <select id="a-filtro-mansione">
                 <option value="all">Tutte</option>
@@ -372,6 +376,7 @@
     const loginBtn = document.getElementById('btn-login');
     const resetLink = document.getElementById('reset-link');
     const logoutBtn = document.getElementById('logout-btn');
+    const searchInput = document.getElementById('a-search');
 
     // UI UTILS
     window.toast = (msg) => { const t = document.getElementById("toast"); t.innerText=msg; t.className="show"; setTimeout(()=>t.className="",3000); };
@@ -397,6 +402,19 @@
             logoutBtn.classList.remove('hidden');
         }
     };
+
+    // SEARCH LOGIC (DOM Filter)
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.user-card');
+            cards.forEach(card => {
+                const name = card.querySelector('.card-name').innerText.toLowerCase();
+                if(name.includes(term)) card.style.display = "block";
+                else card.style.display = "none";
+            });
+        });
+    }
 
     // LOGIN LOGIC
     loginBtn.addEventListener('click', async () => {
@@ -539,9 +557,7 @@
     window.renderCalendar = () => {
         const m = calDate.getMonth();
         const y = calDate.getFullYear();
-        
-        const titleEl = document.getElementById('cal-title');
-        if(titleEl) titleEl.innerText = `${monthNames[m]} ${y}`;
+        document.getElementById('cal-title').innerText = `${monthNames[m]} ${y}`;
         
         document.getElementById('c-filtro-mese').value = m + 1;
         document.getElementById('c-filtro-anno').value = y;
