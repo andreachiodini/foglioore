@@ -193,7 +193,7 @@
 <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
         <h2 id="welcome-msg" style="margin:0">Login</h2>
-        <button id="logout-btn" onclick="logout()" class="btn-secondary hidden" style="width:auto; padding:8px 16px;">Esci</button>
+        <button id="logout-btn" class="btn-secondary hidden" style="width:auto; padding:8px 16px;">Esci</button>
     </div>
 
     <div id="login-view" class="view-section active">
@@ -498,7 +498,17 @@
         toggleLoading('btn-login', true);
         try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { modal("Errore", err.message); toggleLoading('btn-login', false); }
     };
-    window.logout = () => { clearTimeout(inactivityTimer); signOut(auth); };
+    
+    // NEW: Explicit Logout Function
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            // State observer handles UI
+        } catch(e) { console.error(e); }
+    };
+    // Attach listener
+    document.getElementById('logout-btn').addEventListener('click', logout);
+
     window.resetPwd = async () => {
         const e = document.getElementById('email').value;
         if(!e) return modal("Info", "Inserisci email sopra.");
@@ -510,7 +520,7 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
-        toggleLoading('btn-login', false); // Stop spinner
+        toggleLoading('btn-login', false);
         if(user) {
             currentUser = user;
             document.getElementById('logout-btn').classList.remove('hidden');
