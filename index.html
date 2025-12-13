@@ -10,9 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- 1. THEME VARIABLES --- */
+        /* --- 1. RESET & VARIABILI --- */
         :root {
-            /* LIGHT THEME (Default) */
             --primary: #007aff;
             --bg-body: #f2f2f7; 
             --bg-card: #ffffff;
@@ -25,7 +24,7 @@
             --money-color: #34c759;
             --hover-btn: #e5e5ea;
 
-            /* PALLINI (Rimangono uguali per contrasto) */
+            /* PALLINI */
             --dot-assistente: #ff3b30;
             --dot-istruttore: #34c759;
             --dot-propaganda: #af52de;
@@ -34,7 +33,7 @@
             --dot-segreteria: #8e8e93;
         }
 
-        /* DARK THEME OVERRIDES */
+        /* DARK THEME */
         [data-theme="dark"] {
             --bg-body: #000000;
             --bg-card: #1c1c1e;
@@ -61,7 +60,6 @@
             min-height: 85vh;
         }
 
-        /* Gestione Visibilità */
         .view-section { display: none; } 
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -75,11 +73,11 @@
         .time-row > div { flex: 1; } 
 
         label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
-        input, select { 
+        input, select, textarea { 
             width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 10px; 
             font-size: 15px; background: var(--bg-input); color: var(--text-main); outline: none; appearance: none;
         }
-        input:focus, select:focus { border-color: var(--primary); }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
 
         button { 
             width: 100%; padding: 12px; border: none; border-radius: 12px; 
@@ -96,9 +94,27 @@
         .link-text { color: var(--primary); cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 10px; }
         .link-text:hover { text-decoration: underline; }
 
-        /* Header Actions */
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .theme-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; width: auto; color: var(--text-main); }
+        /* Header Actions & Badge */
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn-header { 
+            background: none; border: none; font-size: 1.3rem; cursor: pointer; 
+            padding: 8px; width: auto; color: var(--text-main); position: relative;
+        }
+        .badge { 
+            position: absolute; top: 0px; right: 0px; 
+            background: #ff3b30; color: white; border-radius: 50%; 
+            width: 16px; height: 16px; font-size: 10px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; border: 2px solid var(--bg-card);
+        }
+
+        /* Notice List Styles */
+        .notice-item { border-bottom: 1px solid var(--border-color); padding: 12px 0; display:flex; justify-content:space-between; align-items:flex-start; }
+        .notice-item:last-child { border-bottom: none; }
+        .notice-content { flex: 1; }
+        .notice-date { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; display:block; }
+        .notice-text { font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; }
+        .notice-del-btn { background:none; border:none; color:#ff3b30; font-size:1rem; cursor:pointer; padding:0 0 0 10px; width:auto; }
 
         /* Calendario */
         .calendar-wrapper { 
@@ -206,7 +222,10 @@
             <span id="admin-indicator" class="hidden" style="background:#fef3c7; color:#d97706; padding:2px 8px; border-radius:12px; font-size:0.65rem; font-weight:700; margin-left:5px">ADMIN</span>
         </div>
         <div class="header-actions">
-            <button id="theme-btn" class="theme-btn" onclick="toggleTheme()">🌙</button>
+            <button id="notice-btn" class="icon-btn-header hidden" onclick="openNotices()">
+                🔔<span id="notice-badge" class="badge hidden">0</span>
+            </button>
+            <button id="theme-btn" class="icon-btn-header" onclick="toggleTheme()">🌙</button>
             <button id="logout-btn" class="btn-secondary hidden" style="width:auto; padding:8px 16px;">Esci</button>
         </div>
     </div>
@@ -412,6 +431,24 @@
     </div>
 </div>
 
+<div id="notice-modal" class="modal-overlay" style="display:none">
+    <div class="modal-box" style="max-width:400px; text-align:left">
+        <h3 style="margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:10px">Bacheca Avvisi</h3>
+        
+        <div id="admin-notice-input" class="hidden" style="margin-bottom:15px; background:var(--bg-body); padding:10px; border-radius:8px">
+            <textarea id="new-notice-text" rows="3" placeholder="Scrivi un avviso per il team..." style="margin-bottom:5px"></textarea>
+            <button onclick="postNotice()" class="btn-primary" style="width:100%">Pubblica Avviso</button>
+        </div>
+
+        <div id="notice-list" style="max-height:300px; overflow-y:auto;">
+            </div>
+
+        <div style="text-align:center; margin-top:15px">
+            <button class="btn-secondary" onclick="document.getElementById('notice-modal').style.display='none'">Chiudi</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -448,6 +485,8 @@
     const resetLink = document.getElementById('reset-link');
     const logoutBtn = document.getElementById('logout-btn');
     const searchInput = document.getElementById('a-search');
+    const noticeBtn = document.getElementById('notice-btn');
+    const noticeBadge = document.getElementById('notice-badge');
 
     // --- DARK MODE LOGIC ---
     window.toggleTheme = () => {
@@ -458,7 +497,6 @@
         localStorage.setItem('theme', next);
         document.getElementById('theme-btn').innerText = next === 'dark' ? '☀️' : '🌙';
     };
-    // Init Theme
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.getElementById('theme-btn').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
@@ -474,6 +512,71 @@
     window.closeModal = () => document.getElementById('custom-modal').style.display='none';
     const toggleLoading = (el, loading) => { if(el) { loading ? el.innerHTML='<div class="spinner"></div>' : el.innerText='Accedi'; el.disabled = loading; }};
 
+    // NOTICE BOARD LOGIC
+    window.openNotices = () => {
+        const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+        if(isAdmin) document.getElementById('admin-notice-input').classList.remove('hidden');
+        else document.getElementById('admin-notice-input').classList.add('hidden');
+        document.getElementById('notice-modal').style.display = 'flex';
+        // Reset badge locally (visual only, real logic would require "read" status)
+        noticeBadge.classList.add('hidden');
+    };
+
+    window.postNotice = async () => {
+        const txt = document.getElementById('new-notice-text').value;
+        if(!txt.trim()) return;
+        try {
+            await addDoc(collection(db, "avvisi"), {
+                text: txt, date: new Date(), active: true
+            });
+            document.getElementById('new-notice-text').value = "";
+            loadNotices();
+            toast("Avviso pubblicato");
+        } catch(e) { modal("Errore", e.message); }
+    };
+
+    window.deleteNotice = async (id) => {
+        try {
+            await deleteDoc(doc(db, "avvisi", id));
+            loadNotices();
+        } catch(e) { console.error(e); }
+    };
+
+    async function loadNotices() {
+        const q = query(collection(db, "avvisi"), orderBy("date", "desc"));
+        const snap = await getDocs(q);
+        const list = document.getElementById('notice-list');
+        list.innerHTML = "";
+        let count = 0;
+        const isAdmin = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+        snap.forEach(d => {
+            const data = d.data();
+            count++;
+            const dateStr = new Date(data.date.seconds * 1000).toLocaleDateString('it-IT');
+            const delBtn = isAdmin ? `<button class="notice-del-btn" onclick="deleteNotice('${d.id}')">🗑️</button>` : '';
+            
+            list.innerHTML += `
+                <div class="notice-item">
+                    <div class="notice-content">
+                        <span class="notice-date">${dateStr}</span>
+                        <div class="notice-text">${data.text}</div>
+                    </div>
+                    ${delBtn}
+                </div>
+            `;
+        });
+
+        if(count === 0) list.innerHTML = "<p style='color:var(--text-muted); text-align:center; margin-top:20px'>Nessun avviso recente.</p>";
+        
+        if(count > 0) {
+            noticeBadge.innerText = count;
+            noticeBadge.classList.remove('hidden');
+        } else {
+            noticeBadge.classList.add('hidden');
+        }
+    }
+
     // SWITCH VIEW
     window.switchView = (viewId) => {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -482,9 +585,11 @@
         
         if(viewId === 'login-view') {
             logoutBtn.classList.add('hidden');
+            noticeBtn.classList.add('hidden');
             document.getElementById('welcome-msg').innerText = "Login";
         } else {
             logoutBtn.classList.remove('hidden');
+            noticeBtn.classList.remove('hidden');
         }
     };
 
@@ -525,7 +630,7 @@
         catch(err) { modal("Errore", err.message); }
     });
 
-    // AUTO LOGOUT
+    // AUTO LOGOUT (10 MIN)
     let inactivityTimer;
     const resetInactivityTimer = () => {
         if (!currentUser) return;
@@ -552,7 +657,9 @@
         if (user) {
             currentUser = user;
             document.getElementById('logout-btn').classList.remove('hidden');
+            document.getElementById('notice-btn').classList.remove('hidden');
             resetInactivityTimer();
+            loadNotices(); // Fetch notices
             
             const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
             
@@ -869,17 +976,14 @@
 
     window.saveAdminShift = async () => {
         if(!detailUserEmail) return;
-        // Recupera UID
         let targetUid = null;
         const knownShift = allTurni.find(t => t.email === detailUserEmail);
         if (knownShift) targetUid = knownShift.uid;
-        // Se non trovato (utente nuovo), servirebbe un meccanismo diverso, ma per ora usiamo questo fallback
         if (!targetUid) return modal("Errore", "Impossibile trovare UID (nessun turno precedente).");
 
         const d = document.getElementById('aa-data').value;
         const m = document.getElementById('aa-mansione').value;
         const h = parseFloat(document.getElementById('aa-ore').value);
-        
         if(!d || !m || !h) return modal("Errore", "Dati mancanti.");
 
         try {
