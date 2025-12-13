@@ -334,16 +334,7 @@
     </div>
 
     <div id="admin-view" class="view-section">
-        <div class="form-box" style="background:var(--bg-body); border-color:var(--border-color)">
-            <h3 style="color:var(--primary); margin-top:0">🛠️ Anagrafica</h3>
-            <div class="time-row" style="margin-bottom:0">
-                <input type="email" id="adm-email" placeholder="Email">
-                <input type="text" id="adm-name" placeholder="Nome Cognome">
-            </div>
-            <button onclick="saveAnagrafica()" class="btn-warning" style="margin-top:10px">Salva in Rubrica</button>
-        </div>
-
-        <h3 style="margin-top:30px">Riepilogo</h3>
+        <h3 style="margin-top:0">Riepilogo</h3>
         <div class="filter-bar">
             <input type="text" id="a-search" placeholder="🔍 Cerca collaboratore..." style="flex:2; min-width:200px; border-color:var(--primary)">
             <select id="a-sort-order"><option value="alpha">A-Z</option><option value="recent">Recenti</option></select>
@@ -368,6 +359,16 @@
         </div>
 
         <div id="cards-container" class="cards-grid"></div>
+
+        <div style="margin-top: 40px;"></div>
+        <div class="form-box" style="background:var(--bg-body); border-color:var(--border-color)">
+            <h3 style="color:var(--primary); margin-top:0">🛠️ Anagrafica</h3>
+            <div class="time-row" style="margin-bottom:0">
+                <input type="email" id="adm-email" placeholder="Email">
+                <input type="text" id="adm-name" placeholder="Nome Cognome">
+            </div>
+            <button onclick="saveAnagrafica()" class="btn-warning" style="margin-top:10px">Salva in Rubrica</button>
+        </div>
     </div>
 
     <div id="admin-detail" class="view-section">
