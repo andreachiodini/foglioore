@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Foglio Ore</title>
+    <title>Gestione Ore Team</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +19,7 @@
             --text-muted: #8e8e93;
             --border-radius: 12px; 
             --shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --money-color: #34c759; /* Verde per i soldi */
 
             /* COLORI PALLINI */
             --dot-assistente: #ff3b30;
@@ -44,7 +45,6 @@
             min-height: 85vh;
         }
 
-        /* Gestione Visibilità */
         .view-section { display: none; } 
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -79,7 +79,7 @@
         .link-text { color: var(--primary); cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 10px; }
         .link-text:hover { text-decoration: underline; }
 
-        /* --- CALENDARIO APPLE COMPACT --- */
+        /* --- CALENDARIO APPLE --- */
         .calendar-wrapper { 
             background: #ffffff; max-width: 380px; margin: 0 auto 20px auto; 
             padding: 15px; border-radius: 20px; border: 1px solid #e5e5ea; 
@@ -97,14 +97,12 @@
         .cal-dots { display: flex; gap: 3px; margin-top: 2px; height: 6px; justify-content: center; }
         .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
 
-        /* --- FILTRI --- */
+        /* --- FILTRI E TABELLE --- */
         .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; background: #f2f2f7; padding: 12px; border-radius: 12px; align-items: center; margin-bottom: 15px; }
         .filter-bar select { flex: 1; min-width: 120px; background: white; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .filter-bar button { width: auto; padding: 8px 16px; font-size: 13px; margin: 0; }
-        /* Stile specifico per la barra di ricerca Admin */
         #a-search { flex: 2; min-width: 200px; border-color: #007aff; }
 
-        /* --- TABELLA --- */
         .table-wrap { overflow-x: auto; margin-top: 10px; border: 1px solid #e5e5ea; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; }
         th { text-align: left; padding: 12px; border-bottom: 1px solid #e5e5ea; color: #86868b; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
@@ -124,7 +122,15 @@
         .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
         .card-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
         .card-sub { color: #86868b; font-size: 0.8rem; margin-bottom: 15px; }
-        .card-stat { font-size: 1.8rem; font-weight: 800; color: var(--primary); text-align: right; }
+        
+        /* Nuovi Stili per Compensi */
+        .card-stats-row { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #f2f2f7; padding-top: 10px; }
+        .stat-group { text-align: left; }
+        .stat-group.right { text-align: right; }
+        .stat-label { font-size: 0.65rem; color: #86868b; text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px; }
+        .stat-val-h { font-size: 1.4rem; font-weight: 800; color: var(--primary); line-height: 1; }
+        .stat-val-m { font-size: 1.4rem; font-weight: 800; color: var(--money-color); line-height: 1; }
+
         .edit-user-btn { background: #f2f2f7; border:none; border-radius: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #86868b; margin: 0; padding: 0; }
         .edit-user-btn:hover { background: #e5e5ea; color: var(--primary); }
 
@@ -142,7 +148,6 @@
             .table-input { text-align: right; width: 60%; }
         }
 
-        /* Utils */
         .hidden { display: none !important; }
         #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
@@ -267,16 +272,16 @@
         <div class="form-box" style="background:#fffbeb; border-color:#fcd34d">
             <h3 style="color:#b45309; margin-top:0">🛠️ Anagrafica</h3>
             <div class="time-row" style="margin-bottom:0">
-                <input type="email" id="adm-email" placeholder="Email">
-                <input type="text" id="adm-name" placeholder="Nome Cognome">
+                <div style="flex:2"><input type="email" id="adm-email" placeholder="Email"></div>
+                <div style="flex:2"><input type="text" id="adm-name" placeholder="Nome Cognome"></div>
+                <div style="flex:1"><input type="number" id="adm-rate" placeholder="€/h" step="0.5"></div>
             </div>
-            <button onclick="saveAnagrafica()" class="btn-warning" style="margin-top:10px">Salva</button>
+            <button onclick="saveAnagrafica()" class="btn-warning" style="margin-top:10px">Salva in Rubrica</button>
         </div>
 
         <h3 style="margin-top:30px">Riepilogo</h3>
         <div class="filter-bar">
             <input type="text" id="a-search" placeholder="🔍 Cerca collaboratore..." style="flex:2; min-width:200px; border-color:var(--primary)">
-            
             <select id="a-sort-order"><option value="alpha">A-Z</option><option value="recent">Recenti</option></select>
             <select id="a-filtro-mansione">
                 <option value="all">Tutte</option>
@@ -332,8 +337,9 @@
 
 <div id="edit-user-modal" class="modal-overlay" style="display:none">
     <div class="modal-box">
-        <h3>Modifica Nome</h3>
-        <input type="text" id="edit-name-input" placeholder="Nome" style="margin-bottom:20px">
+        <h3>Modifica Utente</h3>
+        <input type="text" id="edit-name-input" placeholder="Nome Cognome" style="margin-bottom:10px">
+        <input type="number" id="edit-rate-input" placeholder="Tariffa €/h" step="0.5" style="margin-bottom:20px">
         <div style="display:flex; gap:10px">
             <button class="btn-secondary" onclick="document.getElementById('edit-user-modal').style.display='none'">Annulla</button>
             <button class="btn-primary" onclick="saveEditUser()">Salva</button>
@@ -363,6 +369,7 @@
     const ADMIN_EMAIL = "a.chiodini01@gmail.com"; 
     let currentUser = null;
     let rubrica = {}; 
+    let tariffe = {}; // NUOVO DIZIONARIO TARIFFE
     let myTurni = []; 
     let allTurni = []; 
     let detailUserEmail = null;
@@ -403,7 +410,7 @@
         }
     };
 
-    // SEARCH LOGIC (DOM Filter)
+    // SEARCH LOGIC
     if(searchInput) {
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
@@ -462,7 +469,6 @@
             document.getElementById('logout-btn').classList.remove('hidden');
             resetInactivityTimer();
             
-            // 1. DETERMINA RUOLO E CAMBIA VISTA SUBITO
             const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
             
             if (isAdmin) {
@@ -475,10 +481,14 @@
                 switchView('collaborator-view');
             }
 
-            // 2. CARICA DATI IN BACKGROUND
             try {
+                // Carica dati rubrica e tariffe
                 const snap = await getDocs(collection(db, "anagrafica"));
-                snap.forEach(d => rubrica[d.id] = d.data().nome);
+                snap.forEach(d => {
+                    const data = d.data();
+                    rubrica[d.id] = data.nome;
+                    tariffe[d.id] = data.tariffa || 0; // Carica tariffa
+                });
                 document.getElementById('welcome-msg').innerText = `Ciao, ${rubrica[user.email]?.split(' ')[0] || 'User'}`;
                 
                 if(!isAdmin) {
@@ -694,19 +704,44 @@
     window.saveAnagrafica = async () => {
         const e = document.getElementById('adm-email').value.trim().toLowerCase();
         if(!e) return modal("Errore", "Manca email.");
-        try { await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value }); toast("OK"); loadAdminData(); } 
+        
+        // RECUPERA TARIFFA
+        const rate = parseFloat(document.getElementById('adm-rate').value) || 0;
+
+        try { 
+            await setDoc(doc(db, "anagrafica", e), { 
+                nome: document.getElementById('adm-name').value,
+                tariffa: rate
+            }); 
+            toast("OK"); loadAdminData(); 
+        } 
         catch(e) { modal("Errore", e.message); }
     };
+
     window.saveEditUser = async () => {
         if(!currentEditEmail) return;
         try { 
             const n = document.getElementById('edit-name-input').value;
-            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n }, { merge: true });
-            rubrica[currentEditEmail] = n; toast("Nome aggiornato"); 
-            document.getElementById('edit-user-modal').style.display='none'; loadAdminData();
+            const r = parseFloat(document.getElementById('edit-rate-input').value) || 0;
+            
+            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n, tariffa: r }, { merge: true });
+            
+            rubrica[currentEditEmail] = n; 
+            tariffe[currentEditEmail] = r;
+            
+            toast("Aggiornato"); 
+            document.getElementById('edit-user-modal').style.display='none'; 
+            loadAdminData();
         } catch(e) { modal("Errore", e.message); }
     };
-    window.openEditUser = (e,n) => { currentEditEmail=e; document.getElementById('edit-name-input').value=n; document.getElementById('edit-user-modal').style.display='flex'; };
+    
+    window.openEditUser = (e,n) => { 
+        currentEditEmail=e; 
+        document.getElementById('edit-name-input').value=n; 
+        // Pre-fill tariffa
+        document.getElementById('edit-rate-input').value = tariffe[e] || '';
+        document.getElementById('edit-user-modal').style.display='flex'; 
+    };
 
     window.loadAdminData = async () => {
         const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
@@ -732,6 +767,10 @@
 
         const grid = document.getElementById('cards-container'); grid.innerHTML = "";
         cards.forEach(u => {
+            // CALCOLO STIMA COMPENSO
+            const rate = tariffe[u.email] || 0;
+            const money = (u.ore * rate).toFixed(2);
+
             grid.innerHTML += `
                 <div class="user-card" onclick="openDetail('${u.email}')">
                     <div style="display:flex; justify-content:space-between">
@@ -739,7 +778,17 @@
                         <button style="background:none; border:none; padding:0; width:auto; cursor:pointer" onclick="event.stopPropagation(); openEditUser('${u.email}','${u.nome}')">✏️</button>
                     </div>
                     <div class="card-sub">${u.email}</div>
-                    <div class="card-stat">${u.ore.toFixed(1)}</div>
+                    
+                    <div class="card-stats-row">
+                        <div class="stat-group">
+                            <span class="stat-label">ORE</span>
+                            <span class="stat-val-h">${u.ore.toFixed(1)}</span>
+                        </div>
+                        <div class="stat-group right">
+                            <span class="stat-label">STIMA</span>
+                            <span class="stat-val-m">€ ${money}</span>
+                        </div>
+                    </div>
                 </div>
             `;
         });
