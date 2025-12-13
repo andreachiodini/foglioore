@@ -75,9 +75,6 @@
         .btn-warning { background: #ff9500; color: white; }
         .btn-secondary { background: #e5e5ea; color: var(--text-main); }
         .btn-danger { background: #ff3b30; color: white; }
-        
-        .link-text { color: var(--primary); cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 10px; }
-        .link-text:hover { text-decoration: underline; }
 
         /* --- CALENDARIO APPLE COMPACT --- */
         .calendar-wrapper { 
@@ -499,14 +496,10 @@
         try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { modal("Errore", err.message); toggleLoading('btn-login', false); }
     };
     
-    // NEW: Explicit Logout Function
+    // Explicit Logout Logic
     const logout = async () => {
-        try {
-            await signOut(auth);
-            // State observer handles UI
-        } catch(e) { console.error(e); }
+        try { await signOut(auth); } catch(e) { console.error(e); }
     };
-    // Attach listener
     document.getElementById('logout-btn').addEventListener('click', logout);
 
     window.resetPwd = async () => {
@@ -520,27 +513,37 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
+        // RESET SPINNER IMMEDIATAMENTE
         toggleLoading('btn-login', false);
+        
         if(user) {
             currentUser = user;
             document.getElementById('logout-btn').classList.remove('hidden');
             
+            // 1. DETERMINA RUOLO E CAMBIA VISTA SUBITO (Non aspettare dati)
+            const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+            
+            if (isAdmin) {
+                document.getElementById('admin-indicator').classList.remove('hidden');
+                switchView('admin-view');
+                // 2. Carica dati Admin
+                loadAdminData();
+            } else {
+                document.getElementById('admin-indicator').classList.add('hidden');
+                switchView('collaborator-view');
+                document.getElementById('c-data').valueAsDate = new Date();
+                syncCalFromFilter(); 
+                // 2. Carica dati Collab
+                loadCollabData(); 
+            }
+
+            // 3. Carica Anagrafica in Background (Non blocca la UI)
             try {
                 const snap = await getDocs(collection(db, "anagrafica"));
                 snap.forEach(d => rubrica[d.id] = d.data().nome);
                 document.getElementById('welcome-msg').innerText = `Ciao, ${rubrica[user.email]?.split(' ')[0] || 'User'}`;
-            } catch(e) { console.log("Rubrica error", e); }
+            } catch(e) { console.log("Errore rubrica (non bloccante)", e); }
 
-            if(user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-                document.getElementById('admin-indicator').classList.remove('hidden');
-                switchView('admin-view');
-                loadAdminData();
-            } else {
-                switchView('collaborator-view');
-                document.getElementById('c-data').valueAsDate = new Date();
-                syncCalFromFilter(); 
-                loadCollabData(); 
-            }
         } else {
             currentUser = null;
             switchView('login-view');
