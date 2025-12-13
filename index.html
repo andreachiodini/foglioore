@@ -12,7 +12,7 @@
     <style>
         /* --- 1. RESET & VARIABILI --- */
         :root {
-            --primary: #007aff; /* Apple Blue */
+            --primary: #007aff; 
             --bg-body: #f2f2f7; 
             --bg-card: #ffffff;
             --text-main: #1c1c1e;
@@ -20,20 +20,19 @@
             --border-radius: 12px; 
             --shadow: 0 4px 12px rgba(0,0,0,0.05);
 
-            /* COLORI PALLINI (iOS Style) */
-            --dot-assistente: #ff3b30;  /* Rosso */
-            --dot-istruttore: #34c759;  /* Verde */
-            --dot-propaganda: #af52de;  /* Viola */
-            --dot-lezione: #007aff;     /* Blu */
-            --dot-fitness: #ffcc00;     /* Giallo */
-            --dot-segreteria: #8e8e93;  /* Grigio */
+            /* COLORI PALLINI */
+            --dot-assistente: #ff3b30;
+            --dot-istruttore: #34c759;
+            --dot-propaganda: #af52de;
+            --dot-lezione: #007aff;
+            --dot-fitness: #ffcc00;
+            --dot-segreteria: #8e8e93;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
         
         body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            background-color: var(--bg-body); 
+            font-family: 'Inter', sans-serif; background-color: var(--bg-body); 
             color: var(--text-main); margin: 0; padding: 15px; 
             font-size: 14px; -webkit-font-smoothing: antialiased;
         }
@@ -75,41 +74,25 @@
         .btn-warning { background: #ff9500; color: white; }
         .btn-secondary { background: #e5e5ea; color: var(--text-main); }
         .btn-danger { background: #ff3b30; color: white; }
+        
+        .link-text { color: var(--primary); cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 10px; }
+        .link-text:hover { text-decoration: underline; }
 
         /* --- CALENDARIO APPLE COMPACT --- */
         .calendar-wrapper { 
-            background: #ffffff; 
-            max-width: 380px; 
-            margin: 0 auto 20px auto; 
-            padding: 15px; 
-            border-radius: 20px; 
-            border: 1px solid #e5e5ea; 
+            background: #ffffff; max-width: 380px; margin: 0 auto 20px auto; 
+            padding: 15px; border-radius: 20px; border: 1px solid #e5e5ea; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .cal-title { font-size: 1.1rem; font-weight: 700; text-transform: capitalize; color: #000; }
         .cal-nav { background: none; border: none; color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0 10px; }
-
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; text-align: center; }
-        
-        .cal-weekday { 
-            font-size: 0.7rem; font-weight: 600; color: #8e8e93; 
-            text-transform: uppercase; margin-bottom: 8px; 
-        }
-        
-        .cal-day { 
-            height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            cursor: pointer; font-size: 1rem; color: var(--text-main); position: relative; padding-top: 4px;
-        }
-        
-        .cal-num {
-            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; z-index: 2; font-weight: 500;
-        }
+        .cal-weekday { font-size: 0.7rem; font-weight: 600; color: #8e8e93; text-transform: uppercase; margin-bottom: 8px; }
+        .cal-day { height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; cursor: pointer; font-size: 1rem; color: var(--text-main); position: relative; padding-top: 4px; }
+        .cal-num { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; z-index: 2; font-weight: 500; }
         .cal-day.today .cal-num { background-color: #ff3b30; color: white; font-weight: 700; }
         .cal-day.selected .cal-num { background-color: #000; color: white; }
-        
         .cal-dots { display: flex; gap: 3px; margin-top: 2px; height: 6px; justify-content: center; }
         .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
 
@@ -124,16 +107,12 @@
         th { text-align: left; padding: 12px; border-bottom: 1px solid #e5e5ea; color: #86868b; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #f2f2f7; color: #1d1d1f; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
-        
         .action-icons { display: flex; gap: 8px; justify-content: flex-end; }
         .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px; width: auto; }
 
-        /* --- STATISTICHE MANSIONI --- */
+        /* --- STATISTICHE --- */
         .stats-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
-        .stat-pill { 
-            background: #fff; border: 1px solid #e5e5ea; padding: 4px 10px; border-radius: 20px; 
-            font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 500;
-        }
+        .stat-pill { background: #fff; border: 1px solid #e5e5ea; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 500; }
         .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
 
         /* --- ADMIN CARDS --- */
@@ -143,7 +122,6 @@
         .card-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
         .card-sub { color: #86868b; font-size: 0.8rem; margin-bottom: 15px; }
         .card-stat { font-size: 1.8rem; font-weight: 800; color: var(--primary); text-align: right; }
-        
         .edit-user-btn { background: #f2f2f7; border:none; border-radius: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #86868b; margin: 0; padding: 0; }
         .edit-user-btn:hover { background: #e5e5ea; color: var(--primary); }
 
@@ -154,7 +132,6 @@
             .filter-bar { flex-direction: column; align-items: stretch; }
             .filter-bar button { width: 100%; margin-top: 5px; }
             .stats-container { justify-content: flex-start; }
-            
             thead { display: none; }
             tr { display: block; background: white; border: 1px solid #e5e5ea; border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
             td { display: flex; justify-content: space-between; padding: 5px 0; border: none; text-align: right; }
@@ -512,37 +489,39 @@
         catch(e) { modal("Errore", e.message); }
     };
 
-    onAuthStateChanged(auth, async (user) => {
-        // RESET SPINNER IMMEDIATAMENTE
+    onAuthStateChanged(auth, (user) => { // Removed async from top level callback
         toggleLoading('btn-login', false);
-        
         if(user) {
             currentUser = user;
             document.getElementById('logout-btn').classList.remove('hidden');
             
-            // 1. DETERMINA RUOLO E CAMBIA VISTA SUBITO (Non aspettare dati)
+            // 1. SWITCH VIEW IMMEDIATELY (Don't await data)
             const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
             
             if (isAdmin) {
                 document.getElementById('admin-indicator').classList.remove('hidden');
                 switchView('admin-view');
-                // 2. Carica dati Admin
-                loadAdminData();
             } else {
                 document.getElementById('admin-indicator').classList.add('hidden');
                 switchView('collaborator-view');
-                document.getElementById('c-data').valueAsDate = new Date();
-                syncCalFromFilter(); 
-                // 2. Carica dati Collab
-                loadCollabData(); 
             }
 
-            // 3. Carica Anagrafica in Background (Non blocca la UI)
-            try {
-                const snap = await getDocs(collection(db, "anagrafica"));
-                snap.forEach(d => rubrica[d.id] = d.data().nome);
-                document.getElementById('welcome-msg').innerText = `Ciao, ${rubrica[user.email]?.split(' ')[0] || 'User'}`;
-            } catch(e) { console.log("Errore rubrica (non bloccante)", e); }
+            // 2. LOAD DATA ASYNC (Does not block UI)
+            (async () => {
+                try {
+                    const snap = await getDocs(collection(db, "anagrafica"));
+                    snap.forEach(d => rubrica[d.id] = d.data().nome);
+                    document.getElementById('welcome-msg').innerText = `Ciao, ${rubrica[user.email]?.split(' ')[0] || 'User'}`;
+                } catch(e) {}
+
+                if (isAdmin) {
+                    loadAdminData();
+                } else {
+                    document.getElementById('c-data').valueAsDate = new Date();
+                    syncCalFromFilter(); 
+                    loadCollabData(); 
+                }
+            })();
 
         } else {
             currentUser = null;
