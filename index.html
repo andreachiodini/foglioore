@@ -15,10 +15,8 @@
             --primary: #007aff;
             --bg-body: #f2f2f7; 
             --bg-card: #ffffff;
-            --bg-input: #ffffff;
             --text-main: #1c1c1e;
             --text-muted: #8e8e93;
-            --border-color: #d1d1d6;
             --border-radius: 12px; 
             --shadow: 0 4px 12px rgba(0,0,0,0.05);
             --money-color: #34c759;
@@ -94,7 +92,7 @@
         .link-text { color: var(--primary); cursor: pointer; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 10px; }
         .link-text:hover { text-decoration: underline; }
 
-        /* Header Actions & Badge */
+        /* Header & Badge */
         .header-actions { display: flex; align-items: center; gap: 8px; }
         .icon-btn-header { 
             background: none; border: none; font-size: 1.3rem; cursor: pointer; 
@@ -108,7 +106,7 @@
             font-weight: bold; border: 2px solid var(--bg-card);
         }
 
-        /* Notice List Styles */
+        /* Notice List */
         .notice-item { border-bottom: 1px solid var(--border-color); padding: 12px 0; display:flex; justify-content:space-between; align-items:flex-start; }
         .notice-item:last-child { border-bottom: none; }
         .notice-content { flex: 1; }
@@ -149,11 +147,12 @@
         .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px; width: auto; color: var(--text-main); }
         .icon-lock { font-size: 1rem; color: var(--text-muted); cursor: not-allowed; padding: 4px;}
 
-        /* Stats & Cards */
+        /* Stats */
         .stats-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
         .stat-pill { background: var(--bg-input); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 500; }
         .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
 
+        /* Admin Cards */
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 20px; }
         .user-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
@@ -434,15 +433,11 @@
 <div id="notice-modal" class="modal-overlay" style="display:none">
     <div class="modal-box" style="max-width:400px; text-align:left">
         <h3 style="margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:10px">Bacheca Avvisi</h3>
-        
         <div id="admin-notice-input" class="hidden" style="margin-bottom:15px; background:var(--bg-body); padding:10px; border-radius:8px">
             <textarea id="new-notice-text" rows="3" placeholder="Scrivi un avviso per il team..." style="margin-bottom:5px"></textarea>
             <button onclick="postNotice()" class="btn-primary" style="width:100%">Pubblica Avviso</button>
         </div>
-
-        <div id="notice-list" style="max-height:300px; overflow-y:auto;">
-            </div>
-
+        <div id="notice-list" style="max-height:300px; overflow-y:auto;"></div>
         <div style="text-align:center; margin-top:15px">
             <button class="btn-secondary" onclick="document.getElementById('notice-modal').style.display='none'">Chiudi</button>
         </div>
@@ -512,13 +507,12 @@
     window.closeModal = () => document.getElementById('custom-modal').style.display='none';
     const toggleLoading = (el, loading) => { if(el) { loading ? el.innerHTML='<div class="spinner"></div>' : el.innerText='Accedi'; el.disabled = loading; }};
 
-    // NOTICE BOARD LOGIC
+    // NOTICE BOARD
     window.openNotices = () => {
         const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
         if(isAdmin) document.getElementById('admin-notice-input').classList.remove('hidden');
         else document.getElementById('admin-notice-input').classList.add('hidden');
         document.getElementById('notice-modal').style.display = 'flex';
-        // Reset badge locally (visual only, real logic would require "read" status)
         noticeBadge.classList.add('hidden');
     };
 
@@ -526,21 +520,13 @@
         const txt = document.getElementById('new-notice-text').value;
         if(!txt.trim()) return;
         try {
-            await addDoc(collection(db, "avvisi"), {
-                text: txt, date: new Date(), active: true
-            });
+            await addDoc(collection(db, "avvisi"), { text: txt, date: new Date(), active: true });
             document.getElementById('new-notice-text').value = "";
-            loadNotices();
-            toast("Avviso pubblicato");
+            loadNotices(); toast("Avviso pubblicato");
         } catch(e) { modal("Errore", e.message); }
     };
 
-    window.deleteNotice = async (id) => {
-        try {
-            await deleteDoc(doc(db, "avvisi", id));
-            loadNotices();
-        } catch(e) { console.error(e); }
-    };
+    window.deleteNotice = async (id) => { try { await deleteDoc(doc(db, "avvisi", id)); loadNotices(); } catch(e) { console.error(e); } };
 
     async function loadNotices() {
         const q = query(collection(db, "avvisi"), orderBy("date", "desc"));
@@ -555,26 +541,11 @@
             count++;
             const dateStr = new Date(data.date.seconds * 1000).toLocaleDateString('it-IT');
             const delBtn = isAdmin ? `<button class="notice-del-btn" onclick="deleteNotice('${d.id}')">🗑️</button>` : '';
-            
-            list.innerHTML += `
-                <div class="notice-item">
-                    <div class="notice-content">
-                        <span class="notice-date">${dateStr}</span>
-                        <div class="notice-text">${data.text}</div>
-                    </div>
-                    ${delBtn}
-                </div>
-            `;
+            list.innerHTML += `<div class="notice-item"><div class="notice-content"><span class="notice-date">${dateStr}</span><div class="notice-text">${data.text}</div></div>${delBtn}</div>`;
         });
 
         if(count === 0) list.innerHTML = "<p style='color:var(--text-muted); text-align:center; margin-top:20px'>Nessun avviso recente.</p>";
-        
-        if(count > 0) {
-            noticeBadge.innerText = count;
-            noticeBadge.classList.remove('hidden');
-        } else {
-            noticeBadge.classList.add('hidden');
-        }
+        if(count > 0) { noticeBadge.innerText = count; noticeBadge.classList.remove('hidden'); } else { noticeBadge.classList.add('hidden'); }
     }
 
     // SWITCH VIEW
@@ -611,14 +582,8 @@
         const e = document.getElementById('email').value;
         const p = document.getElementById('password').value;
         if(!e || !p) return modal("Errore", "Inserisci email e password.");
-        
         toggleLoading(loginBtn, true);
-        try {
-            await signInWithEmailAndPassword(auth, e, p);
-        } catch(err) {
-            modal("Errore Login", err.message);
-            toggleLoading(loginBtn, false);
-        }
+        try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { modal("Errore Login", err.message); toggleLoading(loginBtn, false); }
     });
 
     logoutBtn.addEventListener('click', async () => { try { await signOut(auth); } catch(e) { console.error(e); } });
@@ -626,11 +591,10 @@
     resetLink.addEventListener('click', async () => {
         const e = document.getElementById('email').value;
         if(!e) return modal("Info", "Inserisci la tua email nel campo sopra.");
-        try { await sendPasswordResetEmail(auth, e); modal("Inviata", "Controlla la posta."); } 
-        catch(err) { modal("Errore", err.message); }
+        try { await sendPasswordResetEmail(auth, e); modal("Inviata", "Controlla la posta."); } catch(err) { modal("Errore", err.message); }
     });
 
-    // AUTO LOGOUT (10 MIN)
+    // AUTO LOGOUT
     let inactivityTimer;
     const resetInactivityTimer = () => {
         if (!currentUser) return;
@@ -659,10 +623,9 @@
             document.getElementById('logout-btn').classList.remove('hidden');
             document.getElementById('notice-btn').classList.remove('hidden');
             resetInactivityTimer();
-            loadNotices(); // Fetch notices
+            loadNotices();
             
             const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-            
             if (isAdmin) {
                 const adminBad = document.getElementById('admin-indicator');
                 if(adminBad) adminBad.classList.remove('hidden');
@@ -1055,9 +1018,65 @@
         Object.keys(breakdown).forEach(m => { statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`; });
     }
 
-    // EXPORT
+    // EXPORT PIVOT (MATRIX)
     window.changePwd = async () => { try { await updatePassword(currentUser, document.getElementById('new-pwd').value); toast("Fatto"); document.getElementById('pwd-modal').style.display='none'; } catch(e){ modal("Errore", e.message); } };
 
+    window.excelAdminGlobal = () => {
+        const sm = document.getElementById('a-filtro-mese'); 
+        const mTxt = sm.options[sm.selectedIndex].text;
+        
+        // 1. HEADER
+        let csv = "Collaboratore;" + Mansioni.join(";") + ";TOTALE\n";
+
+        // 2. AGGREGATE
+        const report = {};
+        allTurni.forEach(t => {
+            if (!report[t.email]) {
+                report[t.email] = {
+                    nome: rubrica[t.email]?.nome || t.email,
+                    hours: {},
+                    total: 0
+                };
+                Mansioni.forEach(m => report[t.email].hours[m] = 0);
+            }
+            if (report[t.email].hours[t.mansione] !== undefined) {
+                report[t.email].hours[t.mansione] += t.ore;
+                report[t.email].total += t.ore;
+            }
+        });
+
+        // 3. BUILD ROWS
+        const sortedUsers = Object.values(report).sort((a,b) => a.nome.localeCompare(b.nome));
+        sortedUsers.forEach(u => {
+            let row = [u.nome];
+            Mansioni.forEach(m => {
+                let h = u.hours[m];
+                row.push(h > 0 ? h.toString().replace('.', ',') : "0");
+            });
+            row.push(u.total.toString().replace('.', ','));
+            csv += row.join(";") + "\n";
+        });
+
+        // 4. DOWNLOAD
+        const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; 
+        a.download = `Report_Globale_Pivot_${mTxt}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    };
+
+    window.excelCollab = () => {
+        const sm = document.getElementById('c-filtro-mese'); const sy = document.getElementById('c-filtro-anno');
+        const n = (rubrica[currentUser.email]?.nome||currentUser.email.split('@')[0]).replace(/\s+/g,'');
+        generateCsv(myTurni, `Presenze_${n}_${sm.options[sm.selectedIndex].text}_${sy.value}.csv`);
+    };
+    window.excelAdminDetail = () => {
+        const sm = document.getElementById('a-filtro-mese'); const sy = document.getElementById('a-filtro-anno');
+        const n = (rubrica[detailUserEmail]?.nome||detailUserEmail).replace(/\s+/g,'');
+        generateCsv(allTurni.filter(t=>t.email===detailUserEmail), `Presenze_${n}_${sm.options[sm.selectedIndex].text}_${sy.value}.csv`);
+    };
+
+    // Standard CSV Generator
     function generateCsv(data, filename) {
         if(data.length === 0) return modal("Info", "Nessun dato.");
         const y = document.getElementById(currentUser.email===ADMIN_EMAIL ? 'a-filtro-anno':'c-filtro-anno').value;
@@ -1104,29 +1123,6 @@
         const a = document.createElement("a"); a.href = url; a.download = filename;
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
-
-    window.excelCollab = () => {
-        const sm = document.getElementById('c-filtro-mese'); const sy = document.getElementById('c-filtro-anno');
-        const n = (rubrica[currentUser.email]?.nome||currentUser.email.split('@')[0]).replace(/\s+/g,'');
-        generateCsv(myTurni, `Presenze_${n}_${sm.options[sm.selectedIndex].text}_${sy.value}.csv`);
-    };
-    window.excelAdminDetail = () => {
-        const sm = document.getElementById('a-filtro-mese'); const sy = document.getElementById('a-filtro-anno');
-        const n = (rubrica[detailUserEmail]?.nome||detailUserEmail).replace(/\s+/g,'');
-        generateCsv(allTurni.filter(t=>t.email===detailUserEmail), `Presenze_${n}_${sm.options[sm.selectedIndex].text}_${sy.value}.csv`);
-    };
-    window.excelAdminGlobal = () => {
-        const sm = document.getElementById('a-filtro-mese');
-        let csv = "Data;Collaboratore;Mansione;Ore;Orario;Note\n";
-        allTurni.forEach(t => {
-            const n = rubrica[t.email]?.nome || t.email;
-            csv += `${t.data};${n};${t.mansione};${t.ore.toString().replace('.',',')};${t.oraInizio}-${t.oraFine};${t.note}\n`;
-        });
-        const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `Report_Globale_${sm.options[sm.selectedIndex].text}.csv`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    };
 </script>
 </body>
 </html>
