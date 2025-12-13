@@ -45,7 +45,7 @@
             min-height: 85vh;
         }
 
-        /* Visibilità */
+        /* Gestione Visibilità */
         .view-section { display: none; } 
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -111,8 +111,6 @@
         tr:last-child td { border-bottom: none; }
         .action-icons { display: flex; gap: 8px; justify-content: flex-end; }
         .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 4px; width: auto; }
-        
-        /* Icona lucchetto per righe bloccate */
         .icon-lock { font-size: 1rem; color: #ccc; cursor: not-allowed; padding: 4px;}
 
         /* Stats */
@@ -126,7 +124,6 @@
         .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
         .card-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
         .card-sub { color: #86868b; font-size: 0.8rem; margin-bottom: 15px; }
-        
         .card-stats-row { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #f2f2f7; padding-top: 10px; }
         .stat-group { text-align: left; }
         .stat-group.right { text-align: right; }
@@ -320,7 +317,10 @@
     <div id="admin-detail" class="view-section">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:#e5e5ea; padding:10px; border-radius:12px">
             <h3 style="margin:0" id="detail-name">Utente</h3>
-            <button onclick="switchView('admin-view')" class="btn-secondary" style="width:auto; padding:5px 15px; margin:0">Indietro</button>
+            <div>
+                <button onclick="openAddShiftModal()" class="btn-primary" style="display:inline-flex; width:auto; margin-right:5px">➕ Aggiungi Turno</button>
+                <button onclick="switchView('admin-view')" class="btn-secondary" style="display:inline-flex; width:auto; padding:5px 15px; margin:0">Indietro</button>
+            </div>
         </div>
         <div class="table-wrap">
             <table>
@@ -350,15 +350,41 @@
     <div class="modal-box">
         <h3>Modifica Utente & Tariffe</h3>
         <input type="text" id="edit-name-input" placeholder="Nome Cognome" style="margin-bottom:15px; font-weight:bold">
-        
         <div style="max-height:250px; overflow-y:auto; border:1px solid #e5e5ea; padding:10px; border-radius:8px; margin-bottom:15px">
             <h4 style="margin:0 0 10px 0; font-size:0.75rem; color:#86868b; text-transform:uppercase">Tariffe Orarie (€)</h4>
             <div id="rate-inputs-container"></div>
         </div>
-
         <div style="display:flex; gap:10px">
             <button class="btn-secondary" onclick="document.getElementById('edit-user-modal').style.display='none'">Annulla</button>
             <button class="btn-primary" onclick="saveEditUser()">Salva Tutto</button>
+        </div>
+    </div>
+</div>
+
+<div id="admin-add-modal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+        <h3>Inserisci Turno per Utente</h3>
+        <div class="form-box" style="padding:10px; margin:0; border:none; background:transparent; text-align:left">
+            <label>Data</label><input type="date" id="aa-data">
+            <label>Mansione</label>
+            <select id="aa-mansione">
+                <option value="Assistente bagnanti">Assistente bagnanti</option>
+                <option value="Istruttore">Istruttore</option>
+                <option value="Fitness">Fitness</option>
+                <option value="Propaganda">Propaganda</option>
+                <option value="Lezione individuale">Lezione individuale</option>
+                <option value="Segreteria">Segreteria</option>
+            </select>
+            <div style="display:flex; gap:5px">
+                <div style="flex:1"><label>Inizio</label><input type="time" id="aa-inizio" onchange="calcDiffAdmin()"></div>
+                <div style="flex:1"><label>Fine</label><input type="time" id="aa-fine" onchange="calcDiffAdmin()"></div>
+            </div>
+            <label>Ore</label><input type="number" id="aa-ore" step="0.5" style="font-weight:bold; color:var(--primary)">
+            <label>Note</label><input type="text" id="aa-note" placeholder="Opzionale">
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px">
+            <button class="btn-secondary" onclick="document.getElementById('admin-add-modal').style.display='none'">Annulla</button>
+            <button class="btn-primary" onclick="saveAdminShift()">Inserisci</button>
         </div>
     </div>
 </div>
@@ -471,22 +497,15 @@
     };
     ['click', 'mousemove', 'keypress', 'touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer));
 
-    // LOCK LOGIC (Novità)
+    // LOCK LOGIC
     const isLocked = (dateStr) => {
         if(currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return false; 
         const d = new Date(dateStr);
         const now = new Date();
-        // Confronte Anno e Mese (YYYYMM)
-        const shiftY = d.getFullYear();
-        const shiftM = d.getMonth();
-        const curY = now.getFullYear();
-        const curM = now.getMonth();
-        
-        // Se anno precedente -> bloccato
+        const shiftY = d.getFullYear(); const shiftM = d.getMonth();
+        const curY = now.getFullYear(); const curM = now.getMonth();
         if (shiftY < curY) return true;
-        // Se anno uguale ma mese precedente -> bloccato
         if (shiftY === curY && shiftM < curM) return true;
-        
         return false;
     };
 
@@ -553,8 +572,6 @@
     window.salvaOre = async () => {
         const d=document.getElementById('c-data').value, m=document.getElementById('c-mansione').value, h=parseFloat(document.getElementById('c-ore').value);
         if(!d || !m || !h) return modal("Errore", "Compila i campi.");
-        
-        // CHECK LOCK
         if(isLocked(d)) return modal("Attenzione", "Le modifiche per i mesi passati sono bloccate.");
 
         const btn = document.getElementById('btn-salva');
@@ -677,17 +694,10 @@
             if(!breakdown[t.mansione]) breakdown[t.mansione]=0;
             breakdown[t.mansione] += t.ore;
 
-            // CHECK LOCK FOR ACTIONS
             const locked = isLocked(t.data);
             let actionHtml = '';
             if (!locked) {
-                actionHtml = `
-                    <div class="action-icons">
-                        <button class="icon-btn" onclick="duplicaTurno('${t.id}')">📄</button>
-                        <button class="icon-btn" onclick="editRow('${t.id}')">✏️</button>
-                        <button class="icon-btn" onclick="delRow('${t.id}')">🗑️</button>
-                    </div>
-                `;
+                actionHtml = `<div class="action-icons"><button class="icon-btn" onclick="duplicaTurno('${t.id}')">📄</button><button class="icon-btn" onclick="editRow('${t.id}')">✏️</button><button class="icon-btn" onclick="delRow('${t.id}')">🗑️</button></div>`;
             } else {
                 actionHtml = `<span class="icon-lock">🔒</span>`;
             }
@@ -726,20 +736,12 @@
     window.openEditUser = (email, nome) => { 
         currentEditEmail = email; 
         document.getElementById('edit-name-input').value = nome;
-        
         const container = document.getElementById('rate-inputs-container');
         container.innerHTML = "";
-        
         const userRates = rubrica[email]?.tariffe || {};
-
         Mansioni.forEach(m => {
             const val = userRates[m] || 0;
-            container.innerHTML += `
-                <div class="rate-matrix-row">
-                    <span class="rate-label">${m}</span>
-                    <input type="number" id="rate-${m}" value="${val}" step="0.5" class="rate-input" placeholder="0">
-                </div>
-            `;
+            container.innerHTML += `<div class="rate-matrix-row"><span class="rate-label">${m}</span><input type="number" id="rate-${m}" value="${val}" step="0.5" class="rate-input" placeholder="0"></div>`;
         });
         document.getElementById('edit-user-modal').style.display='flex'; 
     };
@@ -753,11 +755,8 @@
                 const val = parseFloat(document.getElementById(`rate-${m}`).value) || 0;
                 newRates[m] = val;
             });
-
             await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n, tariffe: newRates }, { merge: true });
-            
             rubrica[currentEditEmail] = { nome: n, tariffe: newRates };
-            
             toast("Aggiornato"); 
             document.getElementById('edit-user-modal').style.display='none'; 
             loadAdminData(); 
@@ -775,17 +774,14 @@
             const t = d.data(); const date = new Date(t.data);
             if((m=='all'||(date.getMonth()+1)==m) && date.getFullYear()==y && (role=='all'||t.mansione==role)) {
                 allTurni.push({id:d.id, ...t});
-                
                 const userEmail = t.email;
                 if(!stats[userEmail]) {
                     const userData = rubrica[userEmail] || { nome: userEmail, tariffe: {} };
                     stats[userEmail] = { ore:0, soldi:0, nome: userData.nome, last:0, tariffe: userData.tariffe };
                 }
-                
                 stats[userEmail].ore += t.ore;
                 const tariffaOraria = stats[userEmail].tariffe[t.mansione] || 0;
                 stats[userEmail].soldi += (t.ore * tariffaOraria);
-
                 const ts = t.created_at ? t.created_at.seconds : date.getTime()/1000;
                 if(ts > stats[userEmail].last) stats[userEmail].last = ts;
             }
@@ -804,16 +800,9 @@
                         <button style="background:none; border:none; padding:0; width:auto; cursor:pointer" onclick="event.stopPropagation(); openEditUser('${u.email}','${u.nome}')">✏️</button>
                     </div>
                     <div class="card-sub">${u.email}</div>
-                    
                     <div class="card-stats-row">
-                        <div class="stat-group">
-                            <span class="stat-label">ORE</span>
-                            <span class="stat-val-h">${u.ore.toFixed(1)}</span>
-                        </div>
-                        <div class="stat-group right">
-                            <span class="stat-label">STIMA</span>
-                            <span class="stat-val-m">€ ${u.soldi.toFixed(2)}</span>
-                        </div>
+                        <div class="stat-group"><span class="stat-label">ORE</span><span class="stat-val-h">${u.ore.toFixed(1)}</span></div>
+                        <div class="stat-group right"><span class="stat-label">STIMA</span><span class="stat-val-m">€ ${u.soldi.toFixed(2)}</span></div>
                     </div>
                 </div>
             `;
@@ -821,7 +810,89 @@
         if(document.getElementById('admin-detail').classList.contains('active')) renderAdminDetailTable();
     };
 
-    // Shared Edit
+    // ADMIN ADD SHIFT
+    window.openAddShiftModal = () => {
+        document.getElementById('aa-data').valueAsDate = new Date();
+        document.getElementById('aa-mansione').selectedIndex = 0;
+        document.getElementById('aa-inizio').value = "";
+        document.getElementById('aa-fine').value = "";
+        document.getElementById('aa-ore').value = "";
+        document.getElementById('aa-note').value = "";
+        document.getElementById('admin-add-modal').style.display = 'flex';
+    };
+
+    window.calcDiffAdmin = () => {
+        const i = document.getElementById('aa-inizio').value, f = document.getElementById('aa-fine').value;
+        if(i && f) {
+            let d = (new Date(`1970-01-01T${f}`) - new Date(`1970-01-01T${i}`))/36e5;
+            if(d<0) d+=24;
+            document.getElementById('aa-ore').value = d.toFixed(2);
+        }
+    };
+
+    window.saveAdminShift = async () => {
+        if(!detailUserEmail) return;
+        
+        // Cerca UID da turni precedenti
+        let targetUid = null;
+        const knownShift = allTurni.find(t => t.email === detailUserEmail);
+        if (knownShift) targetUid = knownShift.uid;
+        
+        // Fallback: se l'utente non ha turni nel periodo, cerca in tutti i turni caricati
+        // Nota: se l'utente è nuovissimo (0 turni totali), non possiamo inserire turni senza UID.
+        if (!targetUid) {
+             return modal("Errore", "Impossibile trovare UID utente (nessun turno precedente).");
+        }
+
+        const d = document.getElementById('aa-data').value;
+        const m = document.getElementById('aa-mansione').value;
+        const h = parseFloat(document.getElementById('aa-ore').value);
+        
+        if(!d || !m || !h) return modal("Errore", "Dati mancanti.");
+
+        try {
+            await addDoc(collection(db, "turni"), {
+                uid: targetUid,
+                email: detailUserEmail,
+                data: d, mansione: m, ore: h,
+                oraInizio: document.getElementById('aa-inizio').value,
+                oraFine: document.getElementById('aa-fine').value,
+                note: document.getElementById('aa-note').value,
+                created_at: new Date()
+            });
+            toast("Turno aggiunto!");
+            document.getElementById('admin-add-modal').style.display='none';
+            loadAdminData(); // Ricarica tutto
+        } catch(e) { modal("Errore", e.message); }
+    };
+
+    window.openDetail = (e) => { detailUserEmail=e; switchView('admin-detail'); document.getElementById('detail-name').innerText=rubrica[e]?.nome||e; renderAdminDetailTable(); };
+    window.closeDetail = () => { detailUserEmail=null; switchView('admin-view'); };
+
+    function renderAdminDetailTable() {
+        const tbody = document.getElementById('detail-tbody'); tbody.innerHTML=""; let tot=0; let breakdown={};
+        const statsBox = document.getElementById('d-stats-container'); statsBox.innerHTML="";
+
+        allTurni.filter(t=>t.email===detailUserEmail).forEach(t => {
+            tot+=t.ore;
+            if(!breakdown[t.mansione]) breakdown[t.mansione]=0;
+            breakdown[t.mansione] += t.ore;
+            tbody.innerHTML += `
+                <tr id="arow-${t.id}">
+                    <td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td>
+                    <td data-label="Mansione">${t.mansione}</td>
+                    <td data-label="Orario">${t.oraInizio}-${t.oraFine}</td>
+                    <td data-label="Ore"><strong>${t.ore}</strong></td>
+                    <td data-label="Note">${t.note||''}</td>
+                    <td class="actions-cell"><div class="action-icons"><button class="icon-btn" onclick="editRow('${t.id}', true)">✏️</button><button class="icon-btn" onclick="delRow('${t.id}', true)">🗑️</button></div></td>
+                </tr>
+            `;
+        });
+        document.getElementById('d-totale').innerText = tot.toFixed(1);
+        Object.keys(breakdown).forEach(m => { statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`; });
+    }
+
+    // SHARED
     window.editRow = (id, isAdmin=false) => {
         const tr = document.getElementById((isAdmin?'arow-':'row-')+id);
         const src = isAdmin ? allTurni : myTurni;
@@ -849,33 +920,6 @@
         } catch(e) { modal("Errore", e.message); }
     };
     window.delRow = (id, isAdmin=false) => { modal("Eliminare?", "Confermi?", async () => { await deleteDoc(doc(db, "turni", id)); toast("Eliminato"); isAdmin ? loadAdminData() : loadCollabData(); }); };
-
-    // Detail & Export
-    window.openDetail = (e) => { detailUserEmail=e; switchView('admin-detail'); document.getElementById('detail-name').innerText=rubrica[e]?.nome||e; renderAdminDetailTable(); };
-    window.closeDetail = () => { detailUserEmail=null; switchView('admin-view'); };
-
-    function renderAdminDetailTable() {
-        const tbody = document.getElementById('detail-tbody'); tbody.innerHTML=""; let tot=0; let breakdown={};
-        const statsBox = document.getElementById('d-stats-container'); statsBox.innerHTML="";
-
-        allTurni.filter(t=>t.email===detailUserEmail).forEach(t => {
-            tot+=t.ore;
-            if(!breakdown[t.mansione]) breakdown[t.mansione]=0;
-            breakdown[t.mansione] += t.ore;
-            tbody.innerHTML += `
-                <tr id="arow-${t.id}">
-                    <td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td>
-                    <td data-label="Mansione">${t.mansione}</td>
-                    <td data-label="Orario">${t.oraInizio}-${t.oraFine}</td>
-                    <td data-label="Ore"><strong>${t.ore}</strong></td>
-                    <td data-label="Note">${t.note||''}</td>
-                    <td class="actions-cell"><div class="action-icons"><button class="icon-btn" onclick="editRow('${t.id}', true)">✏️</button><button class="icon-btn" onclick="delRow('${t.id}', true)">🗑️</button></div></td>
-                </tr>
-            `;
-        });
-        document.getElementById('d-totale').innerText = tot.toFixed(1);
-        Object.keys(breakdown).forEach(m => { statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`; });
-    }
 
     // EXPORT
     window.changePwd = async () => { try { await updatePassword(currentUser, document.getElementById('new-pwd').value); toast("Fatto"); document.getElementById('pwd-modal').style.display='none'; } catch(e){ modal("Errore", e.message); } };
