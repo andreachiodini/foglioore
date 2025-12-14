@@ -423,6 +423,15 @@
     </div>
 </div>
 
+<div id="force-pwd-modal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+        <h3 id="force-pwd-title" style="color:#ff3b30">Cambio Password Richiesto</h3>
+        <p id="force-pwd-msg" style="color:var(--text-muted); margin-bottom:20px">È il tuo primo accesso o la password è scaduta.</p>
+        <input type="password" id="force-new-pwd" placeholder="Nuova Password (min 6 car.)" style="margin-bottom:20px; border:2px solid var(--primary)">
+        <button class="btn-primary" onclick="changePwd(true)">Aggiorna Password</button>
+    </div>
+</div>
+
 <div id="edit-user-modal" class="modal-overlay" style="display:none">
     <div class="modal-box">
         <h3>Modifica Utente & Tariffe</h3>
@@ -674,13 +683,36 @@
 
             try {
                 const snap = await getDocs(collection(db, "anagrafica"));
+                const userDoc = await getDocs(query(collection(db, "anagrafica"), where("__name__", "==", user.email)));
+                
+                // DATA CHECK FOR FORCED PWD CHANGE
+                let userData = {};
+                userDoc.forEach(d => userData = d.data());
+                
                 snap.forEach(d => {
                     const data = d.data();
                     rubrica[d.id] = { nome: data.nome, tariffe: data.tariffe || {} };
                 });
-                const userData = rubrica[user.email] || { nome: 'User' };
-                document.getElementById('welcome-msg').innerText = `Ciao, ${userData.nome.split(' ')[0]}`;
                 
+                document.getElementById('welcome-msg').innerText = `Ciao, ${rubrica[user.email]?.nome.split(' ')[0] || 'User'}`;
+                
+                // SECURITY CHECK
+                const lastChange = userData.lastPasswordChange ? userData.lastPasswordChange.toDate() : null;
+                const now = new Date();
+                const SIX_MONTHS = 180 * 24 * 60 * 60 * 1000;
+
+                if (!lastChange) {
+                    // FIRST LOGIN
+                    document.getElementById('force-pwd-title').innerText = "Primo Accesso";
+                    document.getElementById('force-pwd-msg').innerText = "Per sicurezza, imposta una nuova password.";
+                    document.getElementById('force-pwd-modal').style.display = 'flex';
+                } else if ((now - lastChange) > SIX_MONTHS) {
+                    // EXPIRED
+                    document.getElementById('force-pwd-title').innerText = "Password Scaduta";
+                    document.getElementById('force-pwd-msg').innerText = "Sono passati 6 mesi. Aggiorna la password.";
+                    document.getElementById('force-pwd-modal').style.display = 'flex';
+                }
+
                 if(!isAdmin) {
                     const today = new Date();
                     document.getElementById('c-data').valueAsDate = today;
@@ -1099,7 +1131,21 @@
     };
 
     // EXPORT PIVOT (MATRIX)
-    window.changePwd = async () => { try { await updatePassword(currentUser, document.getElementById('new-pwd').value); toast("Fatto"); document.getElementById('pwd-modal').style.display='none'; } catch(e){ modal("Errore", e.message); } };
+    window.changePwd = async (isForced = false) => { 
+        const id = isForced ? 'force-new-pwd' : 'new-pwd';
+        const newP = document.getElementById(id).value;
+        if (!newP || newP.length < 6) return modal("Errore", "La password deve avere almeno 6 caratteri.");
+
+        try { 
+            await updatePassword(currentUser, newP); 
+            // Aggiorna data cambio password nel DB
+            await setDoc(doc(db, "anagrafica", currentUser.email), { lastPasswordChange: new Date() }, { merge: true });
+            
+            toast("Password Aggiornata"); 
+            document.getElementById('pwd-modal').style.display='none'; 
+            document.getElementById('force-pwd-modal').style.display='none'; 
+        } catch(e){ modal("Errore", e.message); } 
+    };
 
     window.excelAdminGlobal = () => {
         const sm = document.getElementById('a-filtro-mese'); 
