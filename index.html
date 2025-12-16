@@ -860,7 +860,7 @@
         const myRates = rubrica[currentUser.email]?.tariffe || {};
         let totSoldi = 0;
 
-        // --- SORTING LOGIC ADDED ---
+        // --- SORTING LOGIC ---
         const sortOrder = document.getElementById('c-sort-order').value;
 
         const filtered = myTurni.filter(t => {
@@ -1309,7 +1309,10 @@
 
         const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
         const roleKeys = ["Assistente", "Istruttore", "Fitness", "Propaganda", "Lezione", "Segreteria"];
-        const tableHead = [["Giorno", "IN", "OUT", "ASS", "ISTR", "FIT", "PROP", "LEZ", "SEGR", "NOTE"]];
+        
+        // UPDATED LABELS FOR PDF
+        const tableHead = [["Giorno", "IN", "OUT", "ASS. BAG.", "ISTRUTT.", "FITNESS", "PROPAG.", "LEZ. IND.", "SEGRET.", "NOTE"]];
+        
         const tableBody = [];
         const totals = [0, 0, 0, 0, 0, 0]; // One for each role
 
@@ -1346,13 +1349,20 @@
             body: tableBody,
             startY: 40,
             theme: 'grid',
-            headStyles: { fillColor: [200, 200, 200], textColor: 20, fontSize: 8 },
-            bodyStyles: { fontSize: 8, cellPadding: 1 },
+            headStyles: { fillColor: [220, 220, 220], textColor: 20, fontSize: 8, fontStyle: 'bold', lineColor: [200, 200, 200], lineWidth: 0.1 },
+            bodyStyles: { fontSize: 8, cellPadding: 1, textColor: 20 },
             columnStyles: {
-                0: { cellWidth: 10 }, // Giorno
+                0: { cellWidth: 20, fillColor: [240, 240, 240], fontStyle: 'bold' }, // Giorno wider + light gray
                 1: { cellWidth: 12 }, // IN
                 2: { cellWidth: 12 }, // OUT
                 9: { cellWidth: 'auto' } // Note
+            },
+            didParseCell: function(data) {
+                // Totals row styling (last row)
+                if (data.row.index === tableBody.length - 1) {
+                    data.cell.styles.fillColor = [224, 224, 224]; // Slightly darker gray for totals
+                    data.cell.styles.fontStyle = 'bold';
+                }
             }
         });
 
