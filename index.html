@@ -1217,6 +1217,9 @@
             otherDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
 
+        // Calculate dynamic last day of the month
+        const lastDay = new Date(y, m, 0).getDate(); 
+
         // 1. HEADER
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
@@ -1281,7 +1284,7 @@
         
         doc.text("al lordo delle eventuali trattenute di Legge dovute (contribuzione previdenziale, di maternità e", 20, finalY + 12);
         doc.text("quella fiscale ove superato l'importo lordo di euro 5.000 per l'esercizio sopra indicato), relative", 20, finalY + 17);
-        doc.text(`a prestazioni di lavoro sportivo svolte nel corso del periodo dal 01/${String(m).padStart(2,'0')}/${y} al 30/${String(m).padStart(2,'0')}/${y}`, 20, finalY + 22);
+        doc.text(`a prestazioni di lavoro sportivo svolte nel corso del periodo dal 01/${String(m).padStart(2,'0')}/${y} al ${lastDay}/${String(m).padStart(2,'0')}/${y}`, 20, finalY + 22);
         doc.text("rese in relazione al contratto o agli accordi in essere.", 20, finalY + 27);
         
         doc.text("Si allega documento di riconoscimento.", 20, finalY + 40);
