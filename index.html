@@ -1314,7 +1314,14 @@
         // Handle Other Income
         const hasOther = document.querySelector('input[name="altri-compensi"]:checked').value === 'si';
         const otherAmount = document.getElementById('auto-altro-importo').value;
-        const otherDate = document.getElementById('auto-altro-data').value;
+        
+        // Date formatting dd/mm/yyyy
+        let otherDate = "";
+        const rawDate = document.getElementById('auto-altro-data').value;
+        if(rawDate) {
+            const parts = rawDate.split('-');
+            otherDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
 
         // 1. HEADER
         doc.setFontSize(10);
@@ -1360,19 +1367,23 @@
         const check2Y = checkY + 10;
         doc.rect(20, check2Y - 4, 4, 4);
         if(hasOther) doc.text("X", 21, check2Y-1);
-        doc.text("Ha percepito compensi della stessa natura da altre società sportive...", 28, check2Y);
+        doc.text("Ha percepito compensi della stessa natura da altre società sportive dalla data della precedente", 28, check2Y);
+        doc.text("autocertificazione rilasciata alla FIN PLUS LOMBARDIA SSD A R.L. pari ad", 28, check2Y + 5);
         
         if(hasOther) {
-             doc.text(`pari ad € ${otherAmount}  ricevuto in data ${otherDate}`, 28, check2Y + 6);
+             doc.text(`€ ${otherAmount}  ricevuto in data ${otherDate}`, 155, check2Y + 5);
+        } else {
+             doc.text(`€ ______  ricevuto in data ______`, 155, check2Y + 5);
         }
 
         // 3. FINAL PART
         const finalY = check2Y + 20;
         doc.text("Quanto sopra al fine di ricevere dalla FIN PLUS LOMBARDIA SSD A R.L., di cui alla presente", 20, finalY);
         doc.text(`autocertificazione, la somma di Euro  ${importo}`, 20, finalY + 7);
-        doc.text("al lordo delle eventuali trattenute di Legge dovute, relative a prestazioni di lavoro sportivo", 20, finalY + 14);
-        doc.text(`svolte nel corso del periodo dal 01/${String(m).padStart(2,'0')}/${y} al 30/${String(m).padStart(2,'0')}/${y}`, 20, finalY + 21); // Approx end date
-        doc.text("rese in relazione al contratto o agli accordi in essere.", 20, finalY + 28);
+        doc.text("al lordo delle eventuali trattenute di Legge dovute (contribuzione previdenziale, di maternità e", 20, finalY + 14);
+        doc.text("quella fiscale ove superato l'importo lordo di euro 5.000 per l'esercizio sopra indicato), relative", 20, finalY + 19);
+        doc.text(`a prestazioni di lavoro sportivo svolte nel corso del periodo dal 01/${String(m).padStart(2,'0')}/${y} al 30/${String(m).padStart(2,'0')}/${y}`, 20, finalY + 24);
+        doc.text("rese in relazione al contratto o agli accordi in essere.", 20, finalY + 29);
         
         doc.text("Si allega documento di riconoscimento.", 20, finalY + 40);
         
