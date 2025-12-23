@@ -1232,46 +1232,50 @@
         const startY = 60;
         const lineHeight = 7;
         
-        // TEXT RECONSTRUCTION TO MATCH ORIGINAL PDF EXACTLY
-        
+        // LINE 1
         doc.text("Ai fini della applicazione della normativa di cui al D.Lgs. n.36/2021 il/la sottoscritto/a", 20, startY);
         
-        doc.text(`Codice Fiscale: ${cf}`, 20, startY + lineHeight);
-        
-        // Name centered/indented under first line
+        // LINE 2: NAME (Indented)
         doc.setFont("helvetica", "bold");
-        doc.text(userName, 20, startY + (lineHeight * 2.5));
+        doc.text(userName, 20, startY + lineHeight);
         doc.setFont("helvetica", "normal");
+        
+        // LINE 3: CF
+        doc.text(`Codice Fiscale: ${cf}`, 20, startY + (lineHeight * 2));
 
+        // LINE 4: DECLARATION
         const today = new Date().toLocaleDateString('it-IT');
         doc.text(`sul proprio onore DICHIARA che alla data odierna del ${today}`, 20, startY + (lineHeight * 4));
         
-        // CHECKBOXES
+        // CHECKBOXES SECTION
         const checkY = startY + (lineHeight * 6);
         
-        // Box 1
+        // Box 1: Non ha percepito
         doc.rect(20, checkY - 4, 4, 4); 
         if(!hasOther) doc.text("X", 21, checkY-1);
         doc.text("Non ha percepito alcun compenso della stessa natura da altre società sportive.", 28, checkY);
         
-        // Box 2
+        // Box 2: Ha percepito
         const check2Y = checkY + 10;
         doc.rect(20, check2Y - 4, 4, 4);
         if(hasOther) doc.text("X", 21, check2Y-1);
         
+        // TEXT SPLIT EXACTLY AS REQUESTED
         doc.text("Ha percepito compensi della stessa natura da altre società sportive dalla data della precedente", 28, check2Y);
         doc.text("autocertificazione rilasciata alla FIN PLUS LOMBARDIA SSD A R.L. pari ad", 28, check2Y + 5);
         
+        // AMOUNT ROW
         if(hasOther) {
              doc.text(`€ ${otherAmount} ricevuto in data ${otherDate}`, 28, check2Y + 10);
         } else {
-             // Leave blank line if not selected, as in original blank form
+             // Blank line simulation if not selected
              doc.text("€ _________________ ricevuto in data _________________", 28, check2Y + 10);
         }
 
         // 3. FINAL PART
         const finalY = check2Y + 25;
         
+        // TEXT SPLIT EXACTLY AS REQUESTED
         doc.text("Quanto sopra al fine di ricevere dalla FIN PLUS LOMBARDIA SSD A R.L., di cui alla presente", 20, finalY);
         doc.text(`autocertificazione, la somma di Euro ${importo}`, 20, finalY + 5);
         
@@ -1290,6 +1294,7 @@
         doc.setFillColor(245, 245, 245);
         doc.rect(20, signY, 170, 30, 'FD');
         
+        // Digital Signature Text
         doc.setFontSize(8);
         doc.setTextColor(80);
         doc.text("DOCUMENTO SOTTOSCRITTO DIGITALMENTE", 25, signY + 6);
