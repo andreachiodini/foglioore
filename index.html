@@ -1213,6 +1213,9 @@
         const knownShift = allTurni.find(t => t.email === detailUserEmail);
         if (knownShift) targetUid = knownShift.uid;
         if (!targetUid) {
+             // Fallback for new users without history: use placeholder or fetch via admin SDK (not possible here).
+             // Workaround: We can't insert a shift without the user's UID for security rules usually. 
+             // But if rules allow, we can query by email. 
              return modal("Info", "Utente nuovo senza storico. L'utente deve fare il primo accesso per attivare l'ID.");
         }
 
@@ -1566,8 +1569,8 @@
         
         doc.text("Si allega documento di riconoscimento.", 20, finalY + 40);
         
-        // 4. DIGITAL SIGNATURE STAMP (Updated Style)
-        const signY = finalY + 40; 
+        // 4. DIGITAL SIGNATURE STAMP (Separated & Aligned)
+        const signY = finalY + 55; // Pushed down to avoid overlap
         
         doc.setDrawColor(150);
         doc.setFillColor(245, 245, 245);
@@ -1582,10 +1585,10 @@
         doc.text(`Utente: ${userName}`, 19, signY + 12);
 
         const timestamp = new Date().toLocaleString('it-IT');
-        doc.text(`Data: ${timestamp}`, 19, signY + 18); // "Data:" instead of "Data/Ora:"
+        doc.text(`Data: ${timestamp}`, 19, signY + 18); // Label "Data:"
 
         const uniqueID = "ID-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-        doc.text(`Hash: ${uniqueID}`, 100, signY + 18); // "Hash:" instead of "Codice Univoco:"
+        doc.text(`Codice Univoco: ${uniqueID}`, 100, signY + 18); // Label "Codice Univoco:"
 
         // Footer text inside the box
         doc.setFontSize(8);
@@ -1789,11 +1792,11 @@
 
         const finalY = doc.lastAutoTable.finalY;
         
-        // DIGITAL SIGNATURE BOX (UPDATED TO MATCH AUTOCERT STYLE)
+        // DIGITAL SIGNATURE BOX (IDENTICAL TO AUTOCERT)
         const signY = finalY + 10;
         doc.setDrawColor(150);
         doc.setFillColor(245, 245, 245);
-        doc.rect(14, signY, 180, 25, 'FD'); // Width 180, x=14
+        doc.rect(14, signY, 180, 25, 'FD'); // Box width 180, x=14
         
         doc.setFontSize(8);
         doc.setTextColor(100);
@@ -1804,15 +1807,14 @@
         doc.text(`Utente: ${userName}`, 19, signY + 12);
         
         const timestamp = new Date().toLocaleString('it-IT');
-        doc.text(`Data: ${timestamp}`, 19, signY + 18);
+        doc.text(`Data: ${timestamp}`, 19, signY + 18); // Label "Data:"
         
         const uniqueID = "ID-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-        doc.text(`Hash: ${uniqueID}`, 100, signY + 18);
+        doc.text(`Codice Univoco: ${uniqueID}`, 100, signY + 18); // Label "Codice Univoco:"
         
-        // Footer text inside box
         doc.setFontSize(8);
         doc.setTextColor(100);
-        doc.text("Generato tramite gestionale interno FIN PLUS LOMBARDIA SSD A R.L.", 105, signY + 28, { align: "center" });
+        doc.text("Generato tramite gestionale interno FIN PLUS LOMBARDIA SSD A R.L.", 105, signY + 28, { align: 'center' });
 
         doc.save(filename);
     }
