@@ -202,20 +202,19 @@
         .cal-dots { display: flex; gap: 3px; margin-top: 2px; height: 6px; justify-content: center; }
         .cal-dot { width: 5px; height: 5px; border-radius: 50%; }
 
-        /* Filtri & Tabella - SINGLE LINE ADMIN FIX */
+        /* Filtri & Tabella */
         .filter-bar { 
             display: flex; gap: 8px; 
-            flex-wrap: nowrap; /* FORZA RIGA SINGOLA */
-            overflow-x: auto; /* Scroll se troppo piccolo */
+            flex-wrap: nowrap; /* FORZA RIGA SINGOLA DESKTOP */
+            overflow-x: auto; 
             background: var(--bg-body); padding: 12px; border-radius: 12px; 
             align-items: center; margin-bottom: 15px; border: 1px solid var(--border-color); 
             -webkit-overflow-scrolling: touch;
         }
         
-        /* Select e Input (ma non checkbox) */
         .filter-bar select, .filter-bar input:not([type="checkbox"]) { 
             flex: 1; 
-            min-width: 70px; /* Più stretto per far stare tutto */
+            min-width: 70px; 
             background: var(--bg-input); 
             border: 1px solid var(--border-color); 
             white-space: nowrap;
@@ -235,6 +234,11 @@
             flex: 0 0 auto; margin: 0 5px; white-space: nowrap;
         }
         #a-show-archived { margin:0; }
+
+        /* Gruppo Bottoni Centrati su Mobile */
+        .filter-buttons {
+            display: flex; gap: 8px; align-items: center;
+        }
 
         .table-wrap { overflow-x: auto; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--bg-card); }
@@ -290,9 +294,14 @@
         @media (max-width: 600px) {
             .container { padding: 15px; box-shadow: none; background: transparent; }
             .time-row { flex-direction: column; gap: 10px; }
-            /* Mobile force wrap for usability */
+            
+            /* Mobile force wrap */
             .filter-bar { flex-wrap: wrap; }
             .filter-bar select, .filter-bar input:not([type="checkbox"]) { min-width: 45%; }
+            
+            /* Bottoni centrati su mobile */
+            .filter-buttons { width: 100%; justify-content: center; margin-top: 5px; }
+
             .stats-container { justify-content: flex-start; }
             thead { display: none; }
             tr { display: block; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
@@ -400,8 +409,10 @@
             <select id="c-filtro-anno" onchange="syncCalFromFilter()">
                 <option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option>
             </select>
-            <button onclick="excelCollab()" class="btn-success">📥 Scarica Excel</button>
-            <button onclick="openPdfSignModal()" class="btn-danger">📄 Scarica PDF</button>
+            <div class="filter-buttons">
+                <button onclick="excelCollab()" class="btn-success">📥 Scarica Excel</button>
+                <button onclick="openPdfSignModal()" class="btn-danger">📄 Scarica PDF</button>
+            </div>
         </div>
         
         <button onclick="openAutocertModal()" class="btn-warning" style="margin-bottom:20px">📝 Autocertificazione</button>
@@ -463,8 +474,11 @@
                 <option value="10">Ottobre</option><option value="11">Novembre</option><option value="12">Dicembre</option>
             </select>
             <select id="a-filtro-anno"><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select>
-            <button onclick="loadAdminData()" class="btn-primary">Aggiorna</button>
-            <button onclick="excelAdminGlobal()" class="btn-success">📥 Scarica Excel</button>
+            
+            <div class="filter-buttons">
+                <button onclick="loadAdminData()" class="btn-primary">Aggiorna</button>
+                <button onclick="excelAdminGlobal()" class="btn-success">📥 Scarica Excel</button>
+            </div>
         </div>
 
         <div id="cards-container" class="cards-grid"></div>
@@ -1651,12 +1665,12 @@
         
         doc.text("Si allega documento di riconoscimento.", 20, finalY + 40);
         
-        // 4. DIGITAL SIGNATURE STAMP (Updated Style - Matching Foglio Ore)
-        const signY = finalY + 55; // Pushed down to match spacing
+        // 4. DIGITAL SIGNATURE STAMP (Separated & Aligned)
+        const signY = finalY + 55; // Pushed down to avoid overlap
         
         doc.setDrawColor(150);
         doc.setFillColor(245, 245, 245);
-        doc.rect(14, signY, 180, 25, 'FD'); // Width 180, x=14, Height 25
+        doc.rect(14, signY, 180, 25, 'FD'); // Width 180, x=14
 
         doc.setFontSize(8);
         doc.setTextColor(100);
@@ -1874,7 +1888,7 @@
 
         const finalY = doc.lastAutoTable.finalY;
         
-        // DIGITAL SIGNATURE BOX (UPDATED: Identical to Autocert Style)
+        // DIGITAL SIGNATURE BOX (IDENTICAL TO AUTOCERT)
         const signY = finalY + 10;
         doc.setDrawColor(150);
         doc.setFillColor(245, 245, 245);
