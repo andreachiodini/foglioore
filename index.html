@@ -205,7 +205,7 @@
         /* Filtri & Tabella */
         .filter-bar { 
             display: flex; gap: 8px; 
-            flex-wrap: nowrap; /* FORZA RIGA SINGOLA DESKTOP */
+            flex-wrap: nowrap; 
             overflow-x: auto; 
             background: var(--bg-body); padding: 12px; border-radius: 12px; 
             align-items: center; margin-bottom: 15px; border: 1px solid var(--border-color); 
@@ -715,6 +715,7 @@
     let selectedDay = null;
     let myTurni = [];
     let currentPdfContext = null;
+    let userUidMap = {}; // Maps Email -> UID
 
     const Mansioni = ["Assistente bagnanti", "Istruttore", "Fitness", "Propaganda", "Lezione individuale", "Segreteria"];
 
@@ -887,12 +888,16 @@
                 let userData = {};
                 userDoc.forEach(d => userData = d.data());
                 
+                // Save UID in Anagrafica if missing (Self-Repair)
+                await setDoc(doc(db, "anagrafica", user.email), { uid: user.uid }, { merge: true });
+
                 snap.forEach(d => {
                     const data = d.data();
                     rubrica[d.id] = { 
                         nome: data.nome || "Senza Nome", 
                         tariffe: data.tariffe || {},
-                        archived: data.archived || false 
+                        archived: data.archived || false,
+                        uid: data.uid || null
                     };
                 });
                 
@@ -1112,7 +1117,7 @@
         const e = document.getElementById('adm-email').value.trim().toLowerCase();
         if(!e) return modal("Errore", "Manca email.");
         try { 
-            await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value, tariffe: {}, archived: false }); 
+            await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value, tariffe: {}, archived: false }, { merge: true }); 
             toast("Salvato in Rubrica"); 
             // Clear inputs
             document.getElementById('adm-email').value = "";
@@ -1194,18 +1199,23 @@
                 nome: data.nome || "Senza Nome", 
                 last: 0, 
                 tariffe: data.tariffe || {},
-                archived: data.archived || false
+                archived: data.archived || false,
+                uid: data.uid || null
             };
         }
 
         // 2. FETCH SHIFTS (and catch ghosts)
         const q = query(collection(db, "turni"), orderBy("data", "desc"));
         const snap = await getDocs(q);
-        allTurni = []; 
+        allTurni = [];
+        userUidMap = {};
 
         snap.forEach(d => {
             const t = d.data(); 
             const date = new Date(t.data);
+            
+            // Map email to uid for everyone
+            if(t.email && t.uid) userUidMap[t.email] = t.uid;
             
             if((m=='all'||(date.getMonth()+1)==m) && date.getFullYear()==y && (role=='all'||t.mansione==role)) {
                 allTurni.push({id:d.id, ...t});
@@ -1305,13 +1315,16 @@
 
     window.saveAdminShift = async () => {
         if(!detailUserEmail) return;
-        let targetUid = null;
-        const knownShift = allTurni.find(t => t.email === detailUserEmail);
-        if (knownShift) targetUid = knownShift.uid;
+        let targetUid = userUidMap[detailUserEmail];
+        
+        // Fallback: Check Rubrica directly
+        if (!targetUid && rubrica[detailUserEmail]?.uid) {
+             targetUid = rubrica[detailUserEmail].uid;
+        }
+
         if (!targetUid) {
-             // Fallback for new users without history: use placeholder or fetch via admin SDK (not possible here).
-             // Workaround: We can't insert a shift without the user's UID for security rules usually. 
-             // But if rules allow, we can query by email. 
+             // Ultimate Fallback: Scan ALL shifts in memory just in case (already done in loadAdminData but double check)
+             // If still null, then user truly never logged in or saved data
              return modal("Info", "Utente nuovo senza storico. L'utente deve fare il primo accesso per attivare l'ID.");
         }
 
