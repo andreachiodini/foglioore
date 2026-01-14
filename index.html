@@ -838,14 +838,18 @@
         try { await sendPasswordResetEmail(auth, e); modal("Inviata", "Controlla la posta."); } catch(err) { modal("Errore", err.message); }
     });
 
-    // AUTO LOGOUT
-    let inactivityTimer;
-    const resetInactivityTimer = () => {
+    // AUTO LOGOUT (HARD LIMIT - 15 MINUTI)
+    let sessionTimer;
+
+    const startSessionTimer = () => {
         if (!currentUser) return;
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => { modal("Sessione Scaduta", "Disconnesso per inattività.", () => signOut(auth)); signOut(auth); }, 600000);
+        clearTimeout(sessionTimer); 
+        // 15 minuti = 900000 ms
+        sessionTimer = setTimeout(() => {
+            modal("Sessione Scaduta", "Tempo massimo di sessione raggiunto (15 min).", () => signOut(auth));
+            signOut(auth);
+        }, 900000);
     };
-    ['click', 'mousemove', 'keypress', 'touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer));
 
     // LOCK LOGIC
     const isLocked = (dateStr) => {
@@ -866,7 +870,10 @@
             currentUser = user;
             document.getElementById('logout-btn').classList.remove('hidden');
             document.getElementById('notice-btn').classList.remove('hidden');
-            resetInactivityTimer();
+            
+            // START HARD TIMER
+            startSessionTimer();
+
             loadNotices();
             
             const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
