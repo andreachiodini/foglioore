@@ -16,7 +16,6 @@
         /* --- 1. RESET & VARIABILI --- */
         :root {
             --primary: #007aff;
-            --primary-light: #e5f1ff; /* Nuovo per evidenziare turni */
             --bg-body: #f2f2f7; 
             --bg-card: #ffffff;
             --bg-input: #ffffff;
@@ -47,7 +46,6 @@
             --border-color: #48484a; 
             --shadow: 0 4px 12px rgba(0,0,0,0.3);
             --hover-btn: #3a3a3c;
-            --primary-light: #0a2a4d; /* Dark mode highlight */
         }
 
         *, *::before, *::after { box-sizing: border-box; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
@@ -71,40 +69,6 @@
 
         h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 5px 0; color: var(--text-main); } 
         h3 { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 25px 0 10px 0; font-weight: 600; }
-
-        /* --- NUOVI STILI PER TABS E PLANNING --- */
-        .tab-container {
-            display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; justify-content: center;
-        }
-        .tab-btn {
-            background: none; border: none; padding: 10px 20px; 
-            font-size: 0.95rem; font-weight: 600; color: var(--text-muted); 
-            cursor: pointer; border-radius: 8px; transition: all 0.2s; width: auto;
-        }
-        .tab-btn:hover { background: var(--hover-btn); }
-        .tab-btn.active { background: var(--primary-light); color: var(--primary); }
-
-        .planning-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--bg-body); padding: 10px; border-radius: 12px; }
-        .week-nav-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--primary); padding: 0 15px; width: auto; }
-        .current-week-label { font-weight: 700; font-size: 1rem; text-align: center; }
-
-        .planning-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-        .day-column { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: var(--bg-card); display: flex; flex-direction: column; }
-        .day-header { background: var(--bg-body); padding: 8px; font-weight: 700; text-align: center; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
-        .day-body { padding: 8px; flex: 1; min-height: 80px; display: flex; flex-direction: column; gap: 8px; }
-        
-        .shift-card { 
-            background: var(--bg-input); border: 1px solid var(--border-color); 
-            padding: 8px; border-radius: 8px; font-size: 0.85rem;
-            border-left: 4px solid var(--text-muted); position: relative;
-        }
-        .shift-card.mine { border-left-color: var(--primary); background: var(--primary-light); }
-        .shift-time { font-weight: 700; display: block; margin-bottom: 2px; }
-        .shift-role { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-top: 2px;}
-        .shift-del-btn { position: absolute; top: 5px; right: 5px; cursor: pointer; font-size: 0.8rem; background: none; border: none; width: auto; padding: 0; color: #ff3b30; }
-
-        .add-shift-btn-day { width: 100%; padding: 8px; border: 2px dashed var(--border-color); background: none; color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: auto; }
-        .add-shift-btn-day:hover { border-color: var(--primary); color: var(--primary); }
 
         /* Form */
         .form-box { 
@@ -344,7 +308,6 @@
             td { display: flex; justify-content: space-between; padding: 5px 0; border: none; text-align: right; }
             td:before { content: attr(data-label); color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; text-align: left; }
             .table-input { text-align: right; width: 60%; }
-            .planning-grid { grid-template-columns: 1fr; } /* Stack days on mobile */
         }
 
         .hidden { display: none !important; }
@@ -386,11 +349,6 @@
         </div>
     </div>
 
-    <div id="tab-nav" class="tab-container hidden">
-        <button class="tab-btn active" onclick="switchTab('registro')">📝 Registro Ore</button>
-        <button class="tab-btn" onclick="switchTab('planning')">📅 Planning Turni</button>
-    </div>
-
     <div id="login-view" class="view-section active">
         <div class="form-box" style="max-width:350px; margin:40px auto; text-align:center;">
             <h2 style="margin-bottom:20px">Accesso</h2>
@@ -399,16 +357,6 @@
             <button id="btn-login" class="btn-primary">Accedi</button>
             <p id="reset-link" style="color:var(--primary); cursor:pointer; font-size:0.85rem; margin-top:15px">Password dimenticata?</p>
         </div>
-    </div>
-
-    <div id="planning-view" class="view-section">
-        <div class="planning-controls">
-            <button class="week-nav-btn" onclick="changePlanningWeek(-7)">❮</button>
-            <span class="current-week-label" id="planning-week-label">...</span>
-            <button class="week-nav-btn" onclick="changePlanningWeek(7)">❯</button>
-        </div>
-        <div id="planning-grid" class="planning-grid">
-            </div>
     </div>
 
     <div id="collaborator-view" class="view-section">
@@ -551,7 +499,7 @@
             <h3 style="margin:0" id="detail-name">Utente</h3>
             <div>
                 <button onclick="openAddShiftModal()" class="btn-primary" style="display:inline-flex; width:auto; margin-right:5px">➕ Aggiungi Turno</button>
-                <button onclick="switchTab('registro')" class="btn-secondary" style="display:inline-flex; width:auto; padding:5px 15px; margin:0">Indietro</button>
+                <button onclick="switchView('admin-view')" class="btn-secondary" style="display:inline-flex; width:auto; padding:5px 15px; margin:0">Indietro</button>
             </div>
         </div>
 
@@ -589,32 +537,6 @@
 
 </div>
 
-<div id="planning-add-modal" class="modal-overlay" style="display:none">
-    <div class="modal-box">
-        <h3>Aggiungi Turno (Planning)</h3>
-        <p id="plan-modal-date" style="color:var(--primary); font-weight:700; margin-bottom:15px"></p>
-        
-        <label>Collaboratore</label>
-        <select id="plan-collab" style="margin-bottom:10px"></select>
-        
-        <label>Ruolo</label>
-        <select id="plan-role" style="margin-bottom:10px">
-            <option value="Assistente bagnanti">Assistente bagnanti</option>
-            <option value="Segreteria">Segreteria</option>
-        </select>
-
-        <div style="display:flex; gap:10px; margin-bottom:15px">
-            <div style="flex:1"><label>Inizio</label><input type="time" id="plan-start"></div>
-            <div style="flex:1"><label>Fine</label><input type="time" id="plan-end"></div>
-        </div>
-
-        <div style="display:flex; gap:10px">
-            <button class="btn-secondary" onclick="document.getElementById('planning-add-modal').style.display='none'">Annulla</button>
-            <button class="btn-primary" onclick="savePlanningShift()">Salva</button>
-        </div>
-    </div>
-</div>
-
 <div id="pwd-modal" class="modal-overlay" style="display:none">
     <div class="modal-box">
         <h3>Nuova Password</h3>
@@ -643,9 +565,16 @@
         <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem">
             Stai per scaricare il foglio ore ufficiale.
         </p>
+        
         <div class="checkbox-group" style="margin-bottom:20px; text-align:left; background:var(--bg-body); padding:10px; border-radius:8px">
-             <label><input type="checkbox" id="pdf-sign-check" onchange="togglePdfSignBtn()"><span style="font-size:0.8rem; color:var(--text-main)">Dichiaro di voler sottoscrivere digitalmente il presente documento.</span></label>
+             <label>
+                 <input type="checkbox" id="pdf-sign-check" onchange="togglePdfSignBtn()">
+                 <span style="font-size:0.8rem; color:var(--text-main)">
+                    Dichiaro di voler sottoscrivere digitalmente il presente documento.
+                 </span>
+             </label>
         </div>
+
         <div style="display:flex; gap:10px">
             <button class="btn-secondary" onclick="document.getElementById('pdf-sign-modal').style.display='none'">Annulla</button>
             <button id="btn-do-pdf-sign" class="btn-danger btn-disabled" onclick="executePdfGeneration()" disabled>📄 Scarica PDF</button>
@@ -657,22 +586,42 @@
     <div class="modal-box" style="max-width:500px; text-align:left">
         <h3 style="margin-bottom:15px; color:var(--primary)">Autocertificazione</h3>
         <div style="margin-bottom:15px">
-            <label>Codice Fiscale</label><input type="text" id="auto-cf" style="text-transform:uppercase" placeholder="RSSMRA...">
+            <label>Codice Fiscale</label>
+            <input type="text" id="auto-cf" style="text-transform:uppercase" placeholder="RSSMRA...">
         </div>
         <div style="margin-bottom:15px">
-            <label>Compenso Lordo (€)</label><input type="text" id="auto-importo" style="font-weight:bold; color:var(--money-color)" readonly>
+            <label>Compenso Lordo (€) - Calcolato</label>
+            <input type="text" id="auto-importo" style="font-weight:bold; color:var(--money-color)" readonly>
         </div>
+        
         <div style="margin-bottom:15px" class="radio-group">
             <label style="margin-bottom:5px; display:block; font-weight:bold">Altri compensi sportivi?</label>
-            <label><input type="radio" name="altri-compensi" value="no" checked>Non ho percepito altro</label>
-            <label><input type="radio" name="altri-compensi" value="si">Ho percepito altro</label>
+            
+            <label>
+                <input type="radio" name="altri-compensi" value="no" checked>
+                Non ho percepito altro
+            </label>
+            
+            <label>
+                <input type="radio" name="altri-compensi" value="si">
+                Ho percepito altro
+            </label>
         </div>
+        
         <div id="altri-compensi-box" class="hidden" style="background:var(--bg-body); padding:10px; border-radius:8px; margin-bottom:15px">
-            <input type="text" id="auto-altro-importo" placeholder="Importo (€)"><input type="date" id="auto-altro-data" style="margin-top:5px">
+            <input type="text" id="auto-altro-importo" placeholder="Importo (€)">
+            <input type="date" id="auto-altro-data" style="margin-top:5px">
         </div>
+        
         <div class="checkbox-group" style="margin-bottom:20px; border-top:1px solid var(--border-color); padding-top:15px">
-             <label><input type="checkbox" id="auto-sign-check" onchange="togglePdfBtn()"><span style="font-size:0.8rem; color:var(--text-main)">Dichiaro di voler sottoscrivere digitalmente il presente documento.</span></label>
+             <label>
+                 <input type="checkbox" id="auto-sign-check" onchange="togglePdfBtn()">
+                 <span style="font-size:0.8rem; color:var(--text-main)">
+                    Dichiaro di voler sottoscrivere digitalmente il presente documento.
+                 </span>
+             </label>
         </div>
+
         <div style="display:flex; gap:10px; margin-top:20px">
             <button class="btn-secondary" onclick="document.getElementById('autocert-modal').style.display='none'">Annulla</button>
             <button id="btn-gen-pdf" class="btn-primary btn-disabled" onclick="generateAutocertPDF()" disabled>📄 Genera PDF</button>
@@ -766,27 +715,19 @@
     let selectedDay = null;
     let myTurni = [];
     let currentPdfContext = null;
-    let userUidMap = {};
-    
-    // PLANNING VARS
-    let currentTab = 'registro';
-    let planningStartDate = new Date();
-    // Adjust to Monday
-    const day = planningStartDate.getDay();
-    const diff = planningStartDate.getDate() - day + (day === 0 ? -6 : 1); 
-    planningStartDate.setDate(diff);
+    let userUidMap = {}; // Maps Email -> UID
 
     const Mansioni = ["Assistente bagnanti", "Istruttore", "Fitness", "Propaganda", "Lezione individuale", "Segreteria"];
 
-    // GLOBAL UI
+    // GLOBAL VARS
     const loginBtn = document.getElementById('btn-login');
     const resetLink = document.getElementById('reset-link');
     const logoutBtn = document.getElementById('logout-btn');
+    const searchInput = document.getElementById('a-search');
     const noticeBtn = document.getElementById('notice-btn');
     const noticeBadge = document.getElementById('notice-badge');
-    const tabNav = document.getElementById('tab-nav');
 
-    // --- DARK MODE ---
+    // --- DARK MODE LOGIC ---
     window.toggleTheme = () => {
         const html = document.documentElement;
         const current = html.getAttribute('data-theme');
@@ -828,6 +769,7 @@
             loadNotices(); toast("Avviso pubblicato");
         } catch(e) { modal("Errore", e.message); }
     };
+
     window.deleteNotice = async (id) => { try { await deleteDoc(doc(db, "avvisi", id)); loadNotices(); } catch(e) { console.error(e); } };
 
     async function loadNotices() {
@@ -837,6 +779,7 @@
         list.innerHTML = "";
         let count = 0;
         const isAdmin = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
         snap.forEach(d => {
             const data = d.data();
             count++;
@@ -844,62 +787,41 @@
             const delBtn = isAdmin ? `<button class="notice-del-btn" onclick="deleteNotice('${d.id}')">🗑️</button>` : '';
             list.innerHTML += `<div class="notice-item"><div class="notice-content"><span class="notice-date">${dateStr}</span><div class="notice-text">${data.text}</div></div>${delBtn}</div>`;
         });
+
+        if(count === 0) list.innerHTML = "<p style='color:var(--text-muted); text-align:center; margin-top:20px'>Nessun avviso recente.</p>";
         if(count > 0) { noticeBadge.innerText = count; noticeBadge.classList.remove('hidden'); } else { noticeBadge.classList.add('hidden'); }
     }
 
-    // --- TAB SYSTEM & NAVIGATION ---
-    window.switchTab = (tab) => {
-        currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        // Find button by text content is tricky, use indexing or assume order
-        if(tab==='registro') document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        else document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    // SWITCH VIEW
+    window.switchView = (viewId) => {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById(viewId);
+        if(target) target.classList.add('active');
         
-        updateViewVisibility();
-        if(tab === 'planning') {
-            loadPlanningData();
+        if(viewId === 'login-view') {
+            logoutBtn.classList.add('hidden');
+            noticeBtn.classList.add('hidden');
+            document.getElementById('welcome-msg').innerText = "Login";
+        } else {
+            logoutBtn.classList.remove('hidden');
+            noticeBtn.classList.remove('hidden');
         }
     };
 
-    function updateViewVisibility() {
-        // Hide all views first
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        
-        if (!currentUser) {
-            document.getElementById('login-view').classList.add('active');
-            tabNav.classList.add('hidden');
-            return;
-        }
-
-        tabNav.classList.remove('hidden');
-        const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-
-        if (currentTab === 'planning') {
-            document.getElementById('planning-view').classList.add('active');
-        } else {
-            // Registro tab
-            if (isAdmin) {
-                // If in detail mode, keep detail view, else show admin main list
-                if(detailUserEmail) document.getElementById('admin-detail').classList.add('active');
-                else document.getElementById('admin-view').classList.add('active');
-            } else {
-                document.getElementById('collaborator-view').classList.add('active');
-            }
-        }
-    }
-
-    // SEARCH & LOGIN
-    const sInput = document.getElementById('a-search');
-    if(sInput) {
-        sInput.addEventListener('input', (e) => {
+    // SEARCH LOGIC
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            document.querySelectorAll('.user-card').forEach(card => {
+            const cards = document.querySelectorAll('.user-card');
+            cards.forEach(card => {
                 const name = card.querySelector('.card-name').innerText.toLowerCase();
-                if(name.includes(term)) card.style.display = "block"; else card.style.display = "none";
+                if(name.includes(term)) card.style.display = "block";
+                else card.style.display = "none";
             });
         });
     }
 
+    // LOGIN LOGIC
     loginBtn.addEventListener('click', async () => {
         const e = document.getElementById('email').value;
         const p = document.getElementById('password').value;
@@ -910,15 +832,35 @@
 
     logoutBtn.addEventListener('click', async () => { try { await signOut(auth); } catch(e) { console.error(e); } });
 
-    // SESSION TIMER (15 MIN)
+    resetLink.addEventListener('click', async () => {
+        const e = document.getElementById('email').value;
+        if(!e) return modal("Info", "Inserisci la tua email nel campo sopra.");
+        try { await sendPasswordResetEmail(auth, e); modal("Inviata", "Controlla la posta."); } catch(err) { modal("Errore", err.message); }
+    });
+
+    // AUTO LOGOUT (HARD LIMIT - 15 MINUTI)
     let sessionTimer;
+
     const startSessionTimer = () => {
         if (!currentUser) return;
         clearTimeout(sessionTimer); 
+        // 15 minuti = 900000 ms
         sessionTimer = setTimeout(() => {
             modal("Sessione Scaduta", "Tempo massimo di sessione raggiunto (15 min).", () => signOut(auth));
             signOut(auth);
         }, 900000);
+    };
+
+    // LOCK LOGIC
+    const isLocked = (dateStr) => {
+        if(currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return false; 
+        const d = new Date(dateStr);
+        const now = new Date();
+        const shiftY = d.getFullYear(); const shiftM = d.getMonth();
+        const curY = now.getFullYear(); const curM = now.getMonth();
+        if (shiftY < curY) return true;
+        if (shiftY === curY && shiftM < curM) return true;
+        return false;
     };
 
     // AUTH STATE
@@ -928,15 +870,32 @@
             currentUser = user;
             document.getElementById('logout-btn').classList.remove('hidden');
             document.getElementById('notice-btn').classList.remove('hidden');
+            
+            // START HARD TIMER
             startSessionTimer();
+
             loadNotices();
+            
+            const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+            if (isAdmin) {
+                const adminBad = document.getElementById('admin-indicator');
+                if(adminBad) adminBad.classList.remove('hidden');
+                switchView('admin-view');
+            } else {
+                const adminBad = document.getElementById('admin-indicator');
+                if(adminBad) adminBad.classList.add('hidden');
+                switchView('collaborator-view');
+            }
 
             try {
                 const snap = await getDocs(collection(db, "anagrafica"));
                 const userDoc = await getDocs(query(collection(db, "anagrafica"), where("__name__", "==", user.email)));
+                
+                // DATA CHECK FOR FORCED PWD CHANGE
                 let userData = {};
                 userDoc.forEach(d => userData = d.data());
                 
+                // Save UID in Anagrafica if missing (Self-Repair)
                 await setDoc(doc(db, "anagrafica", user.email), { uid: user.uid }, { merge: true });
 
                 snap.forEach(d => {
@@ -951,153 +910,43 @@
                 
                 document.getElementById('welcome-msg').innerText = `Ciao, ${rubrica[user.email]?.nome.split(' ')[0] || 'User'}`;
                 
-                // Password check logic...
+                // SECURITY CHECK
                 const lastChange = userData.lastPasswordChange ? userData.lastPasswordChange.toDate() : null;
                 const now = new Date();
-                if (!lastChange || (now - lastChange) > (180 * 24 * 60 * 60 * 1000)) {
-                     document.getElementById('force-pwd-modal').style.display = 'flex';
+                const SIX_MONTHS = 180 * 24 * 60 * 60 * 1000;
+
+                if (!lastChange) {
+                    document.getElementById('force-pwd-title').innerText = "Primo Accesso";
+                    document.getElementById('force-pwd-msg').innerText = "Per sicurezza, imposta una nuova password.";
+                    document.getElementById('force-pwd-modal').style.display = 'flex';
+                } else if ((now - lastChange) > SIX_MONTHS) {
+                    document.getElementById('force-pwd-title').innerText = "Password Scaduta";
+                    document.getElementById('force-pwd-msg').innerText = "Sono passati 6 mesi. Aggiorna la password.";
+                    document.getElementById('force-pwd-modal').style.display = 'flex';
                 }
 
-                // Initial Load
-                const isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-                const adminBad = document.getElementById('admin-indicator');
-                if(isAdmin) adminBad.classList.remove('hidden'); else adminBad.classList.add('hidden');
-                
-                // Set default dates
-                const today = new Date();
                 if(!isAdmin) {
+                    const today = new Date();
                     document.getElementById('c-data').valueAsDate = today;
                     document.getElementById('c-filtro-mese').value = today.getMonth() + 1;
                     document.getElementById('c-filtro-anno').value = today.getFullYear();
                     syncCalFromFilter();
                     loadCollabData();
                 } else {
+                    const today = new Date();
                     document.getElementById('a-filtro-mese').value = today.getMonth() + 1;
                     document.getElementById('a-filtro-anno').value = today.getFullYear();
                     loadAdminData();
                 }
-                
-                updateViewVisibility();
-
             } catch (e) { console.error("Errore dati:", e); }
 
         } else {
             currentUser = null;
-            updateViewVisibility();
+            switchView('login-view');
         }
     });
 
-    // --- PLANNING LOGIC ---
-    window.changePlanningWeek = (days) => {
-        planningStartDate.setDate(planningStartDate.getDate() + days);
-        loadPlanningData();
-    };
-
-    window.openAddPlanningShift = (dateStr) => {
-        const modal = document.getElementById('planning-add-modal');
-        const dateDisplay = new Date(dateStr).toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
-        document.getElementById('plan-modal-date').innerText = dateDisplay;
-        document.getElementById('plan-modal-date').dataset.raw = dateStr;
-        
-        // Populate collab select
-        const sel = document.getElementById('plan-collab');
-        sel.innerHTML = "";
-        Object.entries(rubrica).forEach(([email, data]) => {
-            if(!data.archived) {
-                sel.innerHTML += `<option value="${email}">${data.nome}</option>`;
-            }
-        });
-        
-        document.getElementById('plan-start').value = "";
-        document.getElementById('plan-end').value = "";
-        modal.style.display = 'flex';
-    };
-
-    window.savePlanningShift = async () => {
-        const date = document.getElementById('plan-modal-date').dataset.raw;
-        const email = document.getElementById('plan-collab').value;
-        const role = document.getElementById('plan-role').value;
-        const start = document.getElementById('plan-start').value;
-        const end = document.getElementById('plan-end').value;
-        
-        if(!start || !end) return modal("Errore", "Inserisci orari.");
-
-        try {
-            await addDoc(collection(db, "planning"), {
-                date, email, role, start, end,
-                nome: rubrica[email]?.nome || email
-            });
-            document.getElementById('planning-add-modal').style.display='none';
-            loadPlanningData();
-        } catch(e) { modal("Errore", e.message); }
-    };
-
-    window.deletePlanningShift = async (id) => {
-        if(!confirm("Eliminare turno?")) return;
-        await deleteDoc(doc(db, "planning", id));
-        loadPlanningData();
-    };
-
-    async function loadPlanningData() {
-        // Calculate week end
-        const endDate = new Date(planningStartDate);
-        endDate.setDate(endDate.getDate() + 6);
-        
-        const startStr = planningStartDate.toISOString().split('T')[0];
-        const endStr = endDate.toISOString().split('T')[0];
-        
-        document.getElementById('planning-week-label').innerText = 
-            `Dal ${planningStartDate.getDate()}/${planningStartDate.getMonth()+1} al ${endDate.getDate()}/${endDate.getMonth()+1}`;
-
-        // Query Firestore
-        const q = query(collection(db, "planning"), where("date", ">=", startStr), where("date", "<=", endStr));
-        const snap = await getDocs(q);
-        const shifts = [];
-        snap.forEach(d => shifts.push({id: d.id, ...d.data()}));
-
-        // Render
-        const grid = document.getElementById('planning-grid');
-        grid.innerHTML = "";
-        const isAdmin = currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-
-        for(let i=0; i<7; i++) {
-            const d = new Date(planningStartDate);
-            d.setDate(d.getDate() + i);
-            const dStr = d.toISOString().split('T')[0];
-            const dayName = d.toLocaleDateString('it-IT', { weekday: 'long' });
-            
-            // Filter shifts for this day
-            const dayShifts = shifts.filter(s => s.date === dStr).sort((a,b) => a.start.localeCompare(b.start));
-            
-            let html = `<div class="day-column">
-                <div class="day-header"><span>${dayName} ${d.getDate()}</span></div>
-                <div class="day-body">`;
-            
-            dayShifts.forEach(s => {
-                const isMine = s.email === currentUser.email;
-                const delBtn = isAdmin ? `<button class="shift-del-btn" onclick="deletePlanningShift('${s.id}')">✕</button>` : '';
-                
-                html += `<div class="shift-card ${isMine ? 'mine' : ''}">
-                    <div class="shift-info">
-                        <span class="shift-time">${s.start} - ${s.end}</span>
-                        <strong>${s.nome}</strong><br>
-                        <span class="shift-role">${s.role}</span>
-                    </div>
-                    ${delBtn}
-                </div>`;
-            });
-            
-            if(isAdmin) {
-                html += `<button class="add-shift-btn-day" onclick="openAddPlanningShift('${dStr}')">➕</button>`;
-            }
-            
-            html += `</div></div>`;
-            grid.innerHTML += html;
-        }
-    }
-
-    // --- EXISTING LOGIC (Registro, Admin, Etc) ---
-    // (Pasted from V60 unchanged to ensure functionality)
+    // --- FUNZIONI UTENTE ---
     window.calcDiff = () => {
         const i = document.getElementById('c-inizio').value, f = document.getElementById('c-fine').value;
         if(i && f) {
@@ -1110,10 +959,10 @@
     window.salvaOre = async () => {
         const d=document.getElementById('c-data').value, m=document.getElementById('c-mansione').value, h=parseFloat(document.getElementById('c-ore').value);
         if(!d || !m || !h) return modal("Errore", "Compila i campi.");
-        // Lock logic
-        const date = new Date(d); const now = new Date();
-        if (date.getFullYear() < now.getFullYear() || (date.getFullYear()===now.getFullYear() && date.getMonth() < now.getMonth())) return modal("Stop", "Mese chiuso.");
+        if(isLocked(d)) return modal("Attenzione", "Le modifiche per i mesi passati sono bloccate.");
 
+        const btn = document.getElementById('btn-salva');
+        btn.innerHTML = '<div class="spinner"></div>';
         try {
             await addDoc(collection(db, "turni"), {
                 uid: currentUser.uid, email: currentUser.email, data: d, mansione: m, ore: h,
@@ -1123,6 +972,7 @@
             toast("Salvato!"); loadCollabData();
             document.getElementById('c-ore').value=""; document.getElementById('c-note').value="";
         } catch(e) { modal("Errore", e.message); }
+        btn.innerText = "Registra Turno";
     };
 
     window.duplicaTurno = (id) => {
@@ -1134,9 +984,56 @@
         document.getElementById('c-ore').value = t.ore;
         document.getElementById('c-note').value = t.note;
         window.scrollTo({top:0, behavior:'smooth'});
-        toast("Dati copiati!");
+        toast("Dati copiati! Scegli la data.");
     };
 
+    // CALENDAR
+    const getColor = (m) => {
+        if(m.includes("Assistente")) return "var(--dot-assistente)";
+        if(m.includes("Istruttore")) return "var(--dot-istruttore)";
+        if(m.includes("Fitness")) return "var(--dot-fitness)";
+        if(m.includes("Propaganda")) return "var(--dot-propaganda)";
+        if(m.includes("Lezione")) return "var(--dot-lezione)";
+        if(m.includes("Segreteria")) return "var(--dot-segreteria)";
+        return "#ccc";
+    };
+
+    const monthNames = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+    
+    window.renderCalendar = () => {
+        const m = calDate.getMonth();
+        const y = calDate.getFullYear();
+        document.getElementById('cal-title').innerText = `${monthNames[m]} ${y}`;
+        document.getElementById('c-filtro-mese').value = m + 1;
+        document.getElementById('c-filtro-anno').value = y;
+
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const grid = document.getElementById('cal-grid');
+        grid.innerHTML = "";
+
+        let pad = firstDay === 0 ? 6 : firstDay - 1;
+        for(let i=0; i<pad; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
+
+        const now = new Date();
+        for(let d=1; d<=daysInMonth; d++) {
+            const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const shifts = myTurni.filter(t => t.data === dateStr);
+            let dots = "";
+            shifts.forEach(s => { dots += `<div class="cal-dot" style="background:${getColor(s.mansione)}"></div>`; });
+
+            const isToday = (d === now.getDate() && m === now.getMonth() && y === now.getFullYear());
+            const isSel = (d === selectedDay);
+            
+            const div = document.createElement('div');
+            div.className = `cal-day ${isToday ? 'today' : ''} ${isSel ? 'selected' : ''}`;
+            div.innerHTML = `<span class="cal-num">${d}</span><div class="cal-dots">${dots}</div>`;
+            div.onclick = () => { selectedDay = (selectedDay === d) ? null : d; renderCalendar(); renderCollabTable(); };
+            grid.appendChild(div);
+        }
+    };
+
+    window.changeMonth = (delta) => { calDate.setMonth(calDate.getMonth() + delta); selectedDay = null; renderCalendar(); renderCollabTable(); };
     window.syncCalFromFilter = () => {
         const m = parseInt(document.getElementById('c-filtro-mese').value) - 1;
         const y = parseInt(document.getElementById('c-filtro-anno').value);
@@ -1146,43 +1043,13 @@
         renderCollabTable();
     };
 
-    window.renderCalendar = () => {
-        const m = calDate.getMonth(), y = calDate.getFullYear();
-        document.getElementById('c-filtro-mese').value = m + 1;
-        document.getElementById('c-filtro-anno').value = y;
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const firstDay = new Date(y, m, 1).getDay();
-        const grid = document.getElementById('cal-grid');
-        grid.innerHTML = "";
-        let pad = firstDay === 0 ? 6 : firstDay - 1;
-        for(let i=0; i<pad; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
-        const now = new Date();
-        for(let d=1; d<=daysInMonth; d++) {
-            const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            const shifts = myTurni.filter(t => t.data === dateStr);
-            let dots = "";
-            shifts.forEach(s => { 
-                let c = "#ccc";
-                if(s.mansione.includes("Assistente")) c="var(--dot-assistente)";
-                else if(s.mansione.includes("Segreteria")) c="var(--dot-segreteria)";
-                else c="var(--dot-istruttore)";
-                dots += `<div class="cal-dot" style="background:${c}"></div>`; 
-            });
-            const isToday = (d===now.getDate() && m===now.getMonth() && y===now.getFullYear());
-            const div = document.createElement('div');
-            div.className = `cal-day ${isToday?'today':''} ${selectedDay===d?'selected':''}`;
-            div.innerHTML = `<span class="cal-num">${d}</span><div class="cal-dots">${dots}</div>`;
-            div.onclick = () => { selectedDay = (selectedDay === d) ? null : d; renderCalendar(); renderCollabTable(); };
-            grid.appendChild(div);
-        }
-    };
-
     async function loadCollabData() {
         const q = query(collection(db, "turni"), where("uid", "==", currentUser.uid), orderBy("data", "desc"));
         const snap = await getDocs(q);
         myTurni = [];
         snap.forEach(d => myTurni.push({id: d.id, ...d.data()}));
-        renderCalendar(); renderCollabTable();
+        renderCalendar(); 
+        renderCollabTable();
     }
 
     window.renderCollabTable = () => {
@@ -1190,11 +1057,17 @@
         const r = document.getElementById('c-filtro-mansione').value;
         const tbody = document.getElementById('collab-tbody');
         const statsBox = document.getElementById('c-stats-container');
-        tbody.innerHTML = ""; statsBox.innerHTML = "";
-        let tot = 0, breakdown = {}, totSoldi = 0;
+        tbody.innerHTML = "";
+        statsBox.innerHTML = "";
+        let tot = 0;
+        let breakdown = {};
+        
         const myRates = rubrica[currentUser.email]?.tariffe || {};
+        let totSoldi = 0;
 
+        // --- SORTING LOGIC ---
         const sortOrder = document.getElementById('c-sort-order').value;
+
         const filtered = myTurni.filter(t => {
             const d = new Date(t.data);
             const matchDate = (m == 'all' || (d.getMonth()+1) == m) && d.getFullYear() == y;
@@ -1203,176 +1076,921 @@
             return matchDate && matchRole && matchDay;
         });
 
-        filtered.sort((a, b) => sortOrder === 'recent' ? new Date(b.data) - new Date(a.data) : new Date(a.data) - new Date(b.data));
+        // Apply sorting
+        filtered.sort((a, b) => {
+            const dA = new Date(a.data + 'T' + a.oraInizio);
+            const dB = new Date(b.data + 'T' + b.oraInizio);
+            return sortOrder === 'recent' ? dB - dA : dA - dB;
+        });
 
         filtered.forEach(t => {
             tot += t.ore;
-            totSoldi += (t.ore * (myRates[t.mansione] || 0));
+            const rate = myRates[t.mansione] || 0;
+            totSoldi += (t.ore * rate);
+
             if(!breakdown[t.mansione]) breakdown[t.mansione]=0;
             breakdown[t.mansione] += t.ore;
 
-            const locked = (new Date(t.data).getMonth() < new Date().getMonth()) && (new Date(t.data).getFullYear() <= new Date().getFullYear());
-            const actionHtml = locked ? `<span class="icon-lock">🔒</span>` : `<div class="action-icons"><button class="icon-btn" onclick="duplicaTurno('${t.id}')">📄</button><button class="icon-btn" onclick="editRow('${t.id}')">✏️</button><button class="icon-btn" onclick="delRow('${t.id}')">🗑️</button></div>`;
+            const locked = isLocked(t.data);
+            let actionHtml = '';
+            if (!locked) {
+                actionHtml = `<div class="action-icons"><button class="icon-btn" onclick="duplicaTurno('${t.id}')">📄</button><button class="icon-btn" onclick="editRow('${t.id}')">✏️</button><button class="icon-btn" onclick="delRow('${t.id}')">🗑️</button></div>`;
+            } else {
+                actionHtml = `<span class="icon-lock">🔒</span>`;
+            }
 
-            tbody.innerHTML += `<tr id="row-${t.id}"><td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td><td data-label="Mansione">${t.mansione}</td><td data-label="Orario">${t.oraInizio}-${t.oraFine}</td><td data-label="Ore"><strong>${t.ore}</strong></td><td data-label="Note">${t.note||''}</td><td class="actions-cell">${actionHtml}</td></tr>`;
+            tbody.innerHTML += `
+                <tr id="row-${t.id}">
+                    <td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td>
+                    <td data-label="Mansione">${t.mansione}</td>
+                    <td data-label="Orario">${t.oraInizio}-${t.oraFine}</td>
+                    <td data-label="Ore"><strong>${t.ore}</strong></td>
+                    <td data-label="Note">${t.note||''}</td>
+                    <td class="actions-cell">${actionHtml}</td>
+                </tr>
+            `;
         });
         document.getElementById('c-totale').innerText = tot.toFixed(1);
-        document.getElementById('c-soldi').innerText = totSoldi.toFixed(2);
-        Object.keys(breakdown).forEach(k => { statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(k)}"></div>${k}: ${breakdown[k]}</div>`; });
+        const soldiEl = document.getElementById('c-soldi');
+        if(soldiEl) soldiEl.innerText = totSoldi.toFixed(2);
+        
+        Object.keys(breakdown).forEach(m => {
+            statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`;
+        });
     };
 
-    // ADMIN LOGIC (Registry)
+    // ADMIN
     window.saveAnagrafica = async () => {
         const e = document.getElementById('adm-email').value.trim().toLowerCase();
+        if(!e) return modal("Errore", "Manca email.");
         try { 
             await setDoc(doc(db, "anagrafica", e), { nome: document.getElementById('adm-name').value, tariffe: {}, archived: false }, { merge: true }); 
-            toast("Salvato"); loadAdminData(); 
-        } catch(e) { modal("Errore", e.message); }
-    };
-    
-    window.toggleArchive = async (email, status) => {
-        if(!confirm("Confermi cambio stato?")) return;
-        await setDoc(doc(db, "anagrafica", email), { archived: status }, { merge: true });
-        loadAdminData();
-    };
-
-    window.loadAdminData = async () => {
-        const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
-        const role = document.getElementById('a-filtro-mansione').value, showArch = document.getElementById('a-show-archived').checked;
-        
-        document.getElementById('cards-container').innerHTML = '<p>Caricamento...</p>';
-        const stats = {};
-        for (const [e, d] of Object.entries(rubrica)) { stats[e] = { ore: 0, soldi: 0, nome: d.nome, archived: d.archived || false }; }
-        
-        const q = query(collection(db, "turni"), orderBy("data", "desc"));
-        const snap = await getDocs(q);
-        allTurni = []; userUidMap = {};
-
-        snap.forEach(d => {
-            const t = d.data();
-            if(t.email && t.uid) userUidMap[t.email] = t.uid;
-            const date = new Date(t.data);
-            if((m=='all'||(date.getMonth()+1)==m) && date.getFullYear()==y && (role=='all'||t.mansione==role)) {
-                allTurni.push({id:d.id, ...t});
-                if(!stats[t.email]) stats[t.email] = { ore:0, soldi:0, nome: t.email, archived: false };
-                stats[t.email].ore += t.ore;
-                stats[t.email].soldi += (t.ore * (rubrica[t.email]?.tariffe[t.mansione] || 0));
-            }
-        });
-
-        const grid = document.getElementById('cards-container'); grid.innerHTML = "";
-        Object.entries(stats).filter(([e,d]) => showArch ? d.archived : !d.archived).forEach(([e,d]) => {
-             const btnArch = d.archived ? `<button class="card-action-btn" onclick="event.stopPropagation(); toggleArchive('${e}', false)">♻️</button>` : `<button class="card-action-btn" onclick="event.stopPropagation(); toggleArchive('${e}', true)">📂</button>`;
-             grid.innerHTML += `<div class="user-card ${d.archived?'archived':''}" onclick="openDetail('${e}')">
-                <div class="card-header"><div class="card-name">${d.nome}</div><div class="card-actions-group"><button class="card-action-btn" onclick="event.stopPropagation(); openEditUser('${e}','${d.nome}')">✏️</button>${btnArch}</div></div>
-                <div class="card-sub">${e}</div>
-                <div class="card-stats-row"><div class="stat-group"><span class="stat-label">ORE</span><span class="stat-val-h">${d.ore.toFixed(1)}</span></div><div class="stat-group right"><span class="stat-label">STIMA</span><span class="stat-val-m">€ ${d.soldi.toFixed(2)}</span></div></div>
-             </div>`;
-        });
+            toast("Salvato in Rubrica"); 
+            // Clear inputs
+            document.getElementById('adm-email').value = "";
+            document.getElementById('adm-name').value = "";
+            loadAdminData(); 
+        } 
+        catch(e) { modal("Errore", e.message); }
     };
 
     window.openEditUser = (email, nome) => { 
         currentEditEmail = email; 
         document.getElementById('edit-name-input').value = nome;
-        const container = document.getElementById('rate-inputs-container'); container.innerHTML = "";
+        const container = document.getElementById('rate-inputs-container');
+        container.innerHTML = "";
+        const userRates = rubrica[email]?.tariffe || {};
         Mansioni.forEach(m => {
-            const val = rubrica[email]?.tariffe?.[m] || 0;
-            container.innerHTML += `<div class="rate-matrix-row"><span class="rate-label">${m}</span><input type="number" id="rate-${m}" value="${val}" step="0.5" class="rate-input"></div>`;
+            const val = userRates[m] || 0;
+            container.innerHTML += `<div class="rate-matrix-row"><span class="rate-label">${m}</span><input type="number" id="rate-${m}" value="${val}" step="0.5" class="rate-input" placeholder="0"></div>`;
         });
         document.getElementById('edit-user-modal').style.display='flex'; 
     };
 
     window.saveEditUser = async () => {
-        const n = document.getElementById('edit-name-input').value;
-        const rates = {};
-        Mansioni.forEach(m => rates[m] = parseFloat(document.getElementById(`rate-${m}`).value) || 0);
-        await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n, tariffe: rates }, { merge: true });
-        rubrica[currentEditEmail] = { ...rubrica[currentEditEmail], nome: n, tariffe: rates };
-        toast("Salvato"); document.getElementById('edit-user-modal').style.display='none'; loadAdminData();
+        if(!currentEditEmail) return;
+        try { 
+            const n = document.getElementById('edit-name-input').value;
+            const newRates = {};
+            Mansioni.forEach(m => {
+                const val = parseFloat(document.getElementById(`rate-${m}`).value) || 0;
+                newRates[m] = val;
+            });
+            // Keep archive status
+            await setDoc(doc(db, "anagrafica", currentEditEmail), { nome: n, tariffe: newRates }, { merge: true });
+            
+            // Local update
+            if(rubrica[currentEditEmail]) {
+                rubrica[currentEditEmail].nome = n;
+                rubrica[currentEditEmail].tariffe = newRates;
+            }
+            
+            toast("Aggiornato"); 
+            document.getElementById('edit-user-modal').style.display='none'; 
+            loadAdminData(); 
+        } catch(e) { modal("Errore", e.message); }
+    };
+    
+    // ARCHIVE FUNCTIONALITY
+    window.toggleArchive = async (email, archiveStatus) => {
+        // Confirm action
+        const action = archiveStatus ? "archiviare" : "ripristinare";
+        modal("Conferma", `Vuoi ${action} questo utente?`, async () => {
+             try {
+                await setDoc(doc(db, "anagrafica", email), { archived: archiveStatus }, { merge: true });
+                if(rubrica[email]) rubrica[email].archived = archiveStatus;
+                toast(archiveStatus ? "Utente Archiviato" : "Utente Ripristinato");
+                loadAdminData();
+             } catch(e) {
+                 modal("Errore", e.message);
+             }
+        });
     };
 
-    window.openAddShiftModal = () => { document.getElementById('admin-add-modal').style.display = 'flex'; };
+    window.loadAdminData = async () => {
+        const m = document.getElementById('a-filtro-mese').value, y = document.getElementById('a-filtro-anno').value;
+        const role = document.getElementById('a-filtro-mansione').value, sort = document.getElementById('a-sort-order').value;
+        
+        // GET ARCHIVE TOGGLE STATE
+        const showArchived = document.getElementById('a-show-archived').checked;
+
+        // Show loading state
+        document.getElementById('cards-container').innerHTML = '<p style="text-align:center; width:100%; color:var(--text-muted)">Caricamento...</p>';
+        
+        // 1. INIZIA CON UTENTI IN RUBRICA
+        const stats = {};
+        for (const [email, data] of Object.entries(rubrica)) {
+            stats[email] = { 
+                ore: 0, 
+                soldi: 0, 
+                nome: data.nome || "Senza Nome", 
+                last: 0, 
+                tariffe: data.tariffe || {},
+                archived: data.archived || false,
+                uid: data.uid || null
+            };
+        }
+
+        // 2. FETCH SHIFTS (and catch ghosts)
+        const q = query(collection(db, "turni"), orderBy("data", "desc"));
+        const snap = await getDocs(q);
+        allTurni = [];
+        userUidMap = {};
+
+        snap.forEach(d => {
+            const t = d.data(); 
+            const date = new Date(t.data);
+            
+            // Map email to uid for everyone
+            if(t.email && t.uid) userUidMap[t.email] = t.uid;
+            
+            if((m=='all'||(date.getMonth()+1)==m) && date.getFullYear()==y && (role=='all'||t.mansione==role)) {
+                allTurni.push({id:d.id, ...t});
+                
+                const userEmail = t.email;
+                
+                // GHOST USER FIX: Se l'utente non è in rubrica, inizializzalo
+                if(!stats[userEmail]) {
+                    stats[userEmail] = { 
+                        ore: 0, 
+                        soldi: 0, 
+                        nome: userEmail, // Nome provvisorio
+                        last: 0, 
+                        tariffe: {},
+                        archived: false // Default not archived
+                    };
+                }
+
+                if(stats[userEmail]) {
+                    stats[userEmail].ore += t.ore;
+                    const tariffaOraria = stats[userEmail].tariffe[t.mansione] || 0;
+                    stats[userEmail].soldi += (t.ore * tariffaOraria);
+                    const ts = t.created_at ? t.created_at.seconds : date.getTime()/1000;
+                    if(ts > stats[userEmail].last) stats[userEmail].last = ts;
+                }
+            }
+        });
+
+        // 3. RENDER
+        let cards = Object.entries(stats).map(([e,d]) => ({email:e, ...d}));
+        
+        // FILTER BY ARCHIVE STATUS
+        if (showArchived) {
+            cards = cards.filter(u => u.archived === true);
+        } else {
+            cards = cards.filter(u => u.archived !== true);
+        }
+        
+        if(sort === 'alpha') cards.sort((a,b) => (a.nome || "").localeCompare(b.nome || ""));
+        else cards.sort((a,b) => b.last - a.last);
+
+        const grid = document.getElementById('cards-container'); grid.innerHTML = "";
+        
+        if (cards.length === 0) {
+             grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--text-muted)">Nessun collaboratore trovato.</p>';
+        } else {
+            cards.forEach(u => {
+                // Determine Archive Button Appearance
+                const isArchived = u.archived === true;
+                const archiveAction = isArchived 
+                    ? `<button class="card-action-btn" onclick="event.stopPropagation(); toggleArchive('${u.email}', false)" title="Ripristina">♻️</button>` 
+                    : `<button class="card-action-btn" onclick="event.stopPropagation(); toggleArchive('${u.email}', true)" title="Archivia">📂</button>`;
+                
+                const cardClass = isArchived ? "user-card archived" : "user-card";
+
+                grid.innerHTML += `
+                    <div class="${cardClass}" onclick="openDetail('${u.email}')">
+                        <div class="card-header">
+                            <div class="card-name">${u.nome}</div>
+                            <div class="card-actions-group">
+                                <button class="card-action-btn" onclick="event.stopPropagation(); openEditUser('${u.email}','${u.nome}')">✏️</button>
+                                ${archiveAction}
+                            </div>
+                        </div>
+                        <div class="card-sub">${u.email}</div>
+                        <div class="card-stats-row">
+                            <div class="stat-group"><span class="stat-label">ORE</span><span class="stat-val-h">${u.ore.toFixed(1)}</span></div>
+                            <div class="stat-group right"><span class="stat-label">STIMA</span><span class="stat-val-m">€ ${u.soldi.toFixed(2)}</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        if(document.getElementById('admin-detail').classList.contains('active')) renderAdminDetailTable();
+    };
+
+    // ADMIN ADD SHIFT
+    window.openAddShiftModal = () => {
+        document.getElementById('aa-data').valueAsDate = new Date();
+        document.getElementById('aa-mansione').selectedIndex = 0;
+        document.getElementById('aa-inizio').value = "";
+        document.getElementById('aa-fine').value = "";
+        document.getElementById('aa-ore').value = "";
+        document.getElementById('aa-note').value = "";
+        document.getElementById('admin-add-modal').style.display = 'flex';
+    };
+
     window.calcDiffAdmin = () => {
         const i = document.getElementById('aa-inizio').value, f = document.getElementById('aa-fine').value;
-        if(i && f) { let d = (new Date(`1970-01-01T${f}`) - new Date(`1970-01-01T${i}`))/36e5; if(d<0) d+=24; document.getElementById('aa-ore').value = d.toFixed(2); }
+        if(i && f) {
+            let d = (new Date(`1970-01-01T${f}`) - new Date(`1970-01-01T${i}`))/36e5;
+            if(d<0) d+=24;
+            document.getElementById('aa-ore').value = d.toFixed(2);
+        }
     };
+
     window.saveAdminShift = async () => {
-        let uid = userUidMap[detailUserEmail] || rubrica[detailUserEmail]?.uid;
-        if(!uid) return modal("Info", "Utente mai loggato, impossibile aggiungere turno.");
+        if(!detailUserEmail) return;
+        let targetUid = userUidMap[detailUserEmail];
+        
+        // Fallback: Check Rubrica directly
+        if (!targetUid && rubrica[detailUserEmail]?.uid) {
+             targetUid = rubrica[detailUserEmail].uid;
+        }
+
+        if (!targetUid) {
+             // Ultimate Fallback: Scan ALL shifts in memory just in case (already done in loadAdminData but double check)
+             // If still null, then user truly never logged in or saved data
+             return modal("Info", "Utente nuovo senza storico. L'utente deve fare il primo accesso per attivare l'ID.");
+        }
+
+        const d = document.getElementById('aa-data').value;
+        const m = document.getElementById('aa-mansione').value;
+        const h = parseFloat(document.getElementById('aa-ore').value);
+        if(!d || !m || !h) return modal("Errore", "Dati mancanti.");
+
         try {
             await addDoc(collection(db, "turni"), {
-                uid: uid, email: detailUserEmail, data: document.getElementById('aa-data').value,
-                mansione: document.getElementById('aa-mansione').value, ore: parseFloat(document.getElementById('aa-ore').value),
-                oraInizio: document.getElementById('aa-inizio').value, oraFine: document.getElementById('aa-fine').value,
+                uid: targetUid, email: detailUserEmail, data: d, mansione: m, ore: h,
+                oraInizio: document.getElementById('aa-inizio').value,
+                oraFine: document.getElementById('aa-fine').value,
                 note: document.getElementById('aa-note').value, created_at: new Date()
             });
-            toast("Aggiunto"); document.getElementById('admin-add-modal').style.display='none'; loadAdminData();
+            toast("Turno aggiunto!");
+            document.getElementById('admin-add-modal').style.display='none';
+            loadAdminData(); 
         } catch(e) { modal("Errore", e.message); }
     };
 
-    window.openDetail = (e) => { detailUserEmail=e; switchTab('registro'); updateViewVisibility(); renderAdminDetailTable(); };
+    // Shared Edit
+    window.editRow = (id, isAdmin=false) => {
+        const tr = document.getElementById((isAdmin?'arow-':'row-')+id);
+        const src = isAdmin ? allTurni : myTurni;
+        const t = src.find(x => x.id === id);
+        tr.innerHTML = `
+            <td data-label="Data"><input type="date" id="ed-d-${id}" value="${t.data}" class="table-input"></td>
+            <td data-label="Mansione"><select id="ed-m-${id}" class="table-input">${Mansioni.map(m=>`<option ${m==t.mansione?'selected':''}>${m}</option>`).join('')}</select></td>
+            <td data-label="Orario"><div style="display:flex; gap:2px"><input type="time" id="ed-i-${id}" value="${t.oraInizio}" class="table-input"><input type="time" id="ed-f-${id}" value="${t.oraFine}" class="table-input"></div></td>
+            <td data-label="Ore"><input type="number" id="ed-h-${id}" value="${t.ore}" step="0.5" class="table-input" style="width:50px"></td>
+            <td data-label="Note"><input type="text" id="ed-n-${id}" value="${t.note}" class="table-input"></td>
+            <td class="actions-cell"><button class="btn-success" onclick="saveEdit('${id}', ${isAdmin})" style="padding:5px">OK</button></td>
+        `;
+    };
+    window.saveEdit = async (id, isAdmin) => {
+        try {
+            await updateDoc(doc(db, "turni", id), {
+                data: document.getElementById(`ed-d-${id}`).value,
+                mansione: document.getElementById(`ed-m-${id}`).value,
+                ore: parseFloat(document.getElementById(`ed-h-${id}`).value),
+                oraInizio: document.getElementById(`ed-i-${id}`).value,
+                oraFine: document.getElementById(`ed-f-${id}`).value,
+                note: document.getElementById(`ed-n-${id}`).value
+            });
+            toast("Modificato"); isAdmin ? loadAdminData() : loadCollabData();
+        } catch(e) { modal("Errore", e.message); }
+    };
+    window.delRow = (id, isAdmin=false) => { modal("Eliminare?", "Confermi?", async () => { await deleteDoc(doc(db, "turni", id)); toast("Eliminato"); isAdmin ? loadAdminData() : loadCollabData(); }); };
+
+    // Detail & Export
+    window.openDetail = (e) => { 
+        detailUserEmail = e; 
+        switchView('admin-detail'); 
+        document.getElementById('detail-name').innerText = rubrica[e]?.nome || e;
+        
+        // SET DEFAULT FILTERS TO CURRENT MONTH
+        const today = new Date();
+        document.getElementById('d-filtro-mese').value = today.getMonth() + 1;
+        document.getElementById('d-filtro-anno').value = today.getFullYear();
+        document.getElementById('d-sort-order').value = 'recent';
+
+        renderAdminDetailTable(); 
+    };
+    window.closeDetail = () => { detailUserEmail=null; switchView('admin-view'); };
+
     window.renderAdminDetailTable = () => {
-        const tbody = document.getElementById('detail-tbody'); tbody.innerHTML="";
-        const m = document.getElementById('d-filtro-mese').value, y = document.getElementById('d-filtro-anno').value;
-        const shifts = allTurni.filter(t => t.email === detailUserEmail && (m=='all' || (new Date(t.data).getMonth()+1)==m) && new Date(t.data).getFullYear()==y);
-        let tot=0, totS=0;
-        shifts.forEach(t => {
-             tot+=t.ore; totS+=(t.ore*(rubrica[detailUserEmail]?.tariffe[t.mansione]||0));
-             tbody.innerHTML += `<tr><td>${t.data}</td><td>${t.mansione}</td><td>${t.oraInizio}-${t.oraFine}</td><td>${t.ore}</td><td>${t.note}</td><td><button onclick="editRow('${t.id}',true)">✏️</button><button onclick="delRow('${t.id}',true)">🗑️</button></td></tr>`;
+        const tbody = document.getElementById('detail-tbody'); tbody.innerHTML=""; 
+        const statsBox = document.getElementById('d-stats-container'); statsBox.innerHTML="";
+        
+        // GET FILTERS
+        const sort = document.getElementById('d-sort-order').value;
+        const m = document.getElementById('d-filtro-mese').value;
+        const y = document.getElementById('d-filtro-anno').value;
+
+        // FILTER USER SHIFTS
+        let userShifts = allTurni.filter(t => t.email === detailUserEmail);
+
+        // DATE FILTER
+        if (m !== 'all') {
+            userShifts = userShifts.filter(t => {
+                const d = new Date(t.data);
+                return (d.getMonth() + 1) == m && d.getFullYear() == y;
+            });
+        }
+
+        // SORT
+        userShifts.sort((a,b) => {
+            const dA = new Date(a.data); const dB = new Date(b.data);
+            return sort === 'recent' ? dB - dA : dA - dB;
         });
+
+        let tot=0; let totSoldi=0; let breakdown={};
+        const userRates = rubrica[detailUserEmail]?.tariffe || {};
+
+        userShifts.forEach(t => {
+            tot += t.ore;
+            const rate = userRates[t.mansione] || 0;
+            totSoldi += (t.ore * rate);
+
+            if(!breakdown[t.mansione]) breakdown[t.mansione]=0;
+            breakdown[t.mansione] += t.ore;
+
+            tbody.innerHTML += `
+                <tr id="arow-${t.id}">
+                    <td data-label="Data">${new Date(t.data).toLocaleDateString('it-IT')}</td>
+                    <td data-label="Mansione">${t.mansione}</td>
+                    <td data-label="Orario">${t.oraInizio}-${t.oraFine}</td>
+                    <td data-label="Ore"><strong>${t.ore}</strong></td>
+                    <td data-label="Note">${t.note||''}</td>
+                    <td class="actions-cell"><div class="action-icons"><button class="icon-btn" onclick="editRow('${t.id}', true)">✏️</button><button class="icon-btn" onclick="delRow('${t.id}', true)">🗑️</button></div></td>
+                </tr>
+            `;
+        });
+        
         document.getElementById('d-totale').innerText = tot.toFixed(1);
-        document.getElementById('d-soldi').innerText = totS.toFixed(2);
+        document.getElementById('d-soldi').innerText = totSoldi.toFixed(2);
+        
+        Object.keys(breakdown).forEach(m => { statsBox.innerHTML += `<div class="stat-pill"><div class="stat-dot" style="background:${getColor(m)}"></div>${m}: ${breakdown[m].toFixed(1)}</div>`; });
     };
 
-    // SHARED EDIT/DEL
-    window.editRow = (id, isAdmin) => {
-        const t = (isAdmin ? allTurni : myTurni).find(x => x.id === id);
-        const tr = document.getElementById((isAdmin?'arow-':'row-')+id) || document.querySelector(`#detail-tbody tr:has(button[onclick*='${id}'])`) || document.getElementById(`row-${id}`);
-        // Simple prompt fallback for stability
-        const newOre = prompt("Nuove ore:", t.ore);
-        if(newOre) { updateDoc(doc(db,"turni",id), {ore: parseFloat(newOre)}); toast("Aggiornato"); isAdmin ? loadAdminData() : loadCollabData(); }
-    };
-    window.delRow = async (id, isAdmin) => { if(confirm("Eliminare?")) { await deleteDoc(doc(db,"turni",id)); isAdmin ? loadAdminData() : loadCollabData(); } };
+    // CHANGE PASSWORD WITH REAUTH
+    window.changePwd = async (isForced = false) => { 
+        const oldId = isForced ? 'old-pwd-2' : 'old-pwd-1';
+        const newId = isForced ? 'force-new-pwd' : 'new-pwd';
+        
+        const oldP = document.getElementById(oldId).value;
+        const newP = document.getElementById(newId).value;
 
-    // PDF & EXCEL IMPORTS (Kept from V61 - No changes)
-    window.excelCollab = () => window.generateCsv(myTurni, "Export.csv");
-    window.excelAdminGlobal = () => window.generateCsv(allTurni, "Global.csv");
-    window.excelAdminDetail = () => window.generateCsv(allTurni.filter(t=>t.email===detailUserEmail), "Detail.csv");
-    
-    window.openPdfSignModal = (isAdmin) => { currentPdfContext = isAdmin ? 'admin' : 'collab'; document.getElementById('pdf-sign-modal').style.display='flex'; };
-    window.togglePdfSignBtn = () => { const c = document.getElementById('pdf-sign-check'); document.getElementById('btn-do-pdf-sign').disabled = !c.checked; document.getElementById('btn-do-pdf-sign').classList.toggle('btn-disabled', !c.checked); };
+        if (!oldP) return modal("Errore", "Inserisci la vecchia password per sicurezza.");
+        if (!newP || newP.length < 6) return modal("Errore", "La nuova password deve avere almeno 6 caratteri.");
+
+        const btn = document.querySelector(isForced ? '#force-pwd-modal .btn-primary' : '#pwd-modal .btn-primary');
+        const originalText = btn.innerText;
+        btn.innerText = "Attendere...";
+
+        try { 
+            // 1. RE-AUTHENTICATE
+            const credential = EmailAuthProvider.credential(currentUser.email, oldP);
+            await reauthenticateWithCredential(currentUser, credential);
+            
+            // 2. UPDATE PASSWORD
+            await updatePassword(currentUser, newP); 
+            
+            // 3. TRY UPDATE DB (Graceful fail)
+            try {
+                // Ensure lowercase ID to match rule
+                await setDoc(doc(db, "anagrafica", currentUser.email.toLowerCase()), { lastPasswordChange: new Date() }, { merge: true });
+                toast("Password Aggiornata!"); 
+            } catch (dbError) {
+                console.error("DB Error:", dbError);
+                toast("Password cambiata (errore data)"); // Warn but success
+            }
+            
+            document.getElementById('pwd-modal').style.display='none'; 
+            document.getElementById('force-pwd-modal').style.display='none'; 
+            
+            // Clear fields
+            document.getElementById(oldId).value = "";
+            document.getElementById(newId).value = "";
+
+        } catch(e){ 
+            console.error(e);
+            if(e.code === 'auth/invalid-credential') modal("Errore", "Vecchia password errata.");
+            else modal("Errore", e.message); 
+        } finally {
+            btn.innerText = originalText;
+        }
+    };
+
+    // UI HELPERS FOR CONFIRMATION
+    window.togglePdfBtn = () => {
+        const check = document.getElementById('auto-sign-check');
+        const btn = document.getElementById('btn-gen-pdf');
+        if(check.checked) {
+            btn.classList.remove('btn-disabled');
+            btn.disabled = false;
+        } else {
+            btn.classList.add('btn-disabled');
+            btn.disabled = true;
+        }
+    };
+
+    window.togglePdfSignBtn = () => {
+        const check = document.getElementById('pdf-sign-check');
+        const btn = document.getElementById('btn-do-pdf-sign');
+        if(check.checked) {
+            btn.classList.remove('btn-disabled');
+            btn.disabled = false;
+        } else {
+            btn.classList.add('btn-disabled');
+            btn.disabled = true;
+        }
+    };
+
+    // PDF FOGLIO ORE - CONFIRMATION
+    window.openPdfSignModal = (isAdminDetail = false) => {
+        // Store context
+        currentPdfContext = isAdminDetail ? 'admin' : 'collab';
+        
+        // Reset checkbox
+        document.getElementById('pdf-sign-check').checked = false;
+        togglePdfSignBtn();
+        
+        document.getElementById('pdf-sign-modal').style.display = 'flex';
+    };
+
     window.executePdfGeneration = () => {
-         document.getElementById('pdf-sign-modal').style.display='none';
-         const data = currentPdfContext === 'admin' ? allTurni.filter(t=>t.email===detailUserEmail) : myTurni;
-         const name = currentPdfContext === 'admin' ? (rubrica[detailUserEmail]?.nome || detailUserEmail) : (rubrica[currentUser.email]?.nome || currentUser.email);
-         window.generatePdf(data, "FoglioOre.pdf", new Date().getMonth()+1, new Date().getFullYear(), name);
+        document.getElementById('pdf-sign-modal').style.display = 'none';
+        if (currentPdfContext === 'collab') {
+            window.pdfCollab();
+        } else {
+            window.pdfAdminDetail();
+        }
     };
 
-    window.openAutocertModal = () => { document.getElementById('autocert-modal').style.display='flex'; };
-    window.togglePdfBtn = () => { const c = document.getElementById('auto-sign-check'); document.getElementById('btn-gen-pdf').disabled = !c.checked; document.getElementById('btn-gen-pdf').classList.toggle('btn-disabled', !c.checked); };
+    // AUTOCERT MODAL LOGIC
+    window.openAutocertModal = (isAdminDetail = false) => {
+        const idPrefix = isAdminDetail ? 'd' : 'c'; 
+        const m = document.getElementById(`${idPrefix}-filtro-mese`).value;
+        const y = document.getElementById(`${idPrefix}-filtro-anno`).value;
+
+        // Grab total amount from DOM (already calculated by renderTable)
+        const totalStr = document.getElementById(`${idPrefix}-soldi`).innerText;
+        
+        if (!m || !y) return modal("Errore", "Seleziona mese e anno.");
+
+        // Pre-fill
+        document.getElementById('auto-importo').value = totalStr;
+        
+        // Show/Hide Other Income
+        document.querySelectorAll('input[name="altri-compensi"]').forEach(r => {
+            r.onchange = (e) => {
+                 document.getElementById('altri-compensi-box').className = e.target.value === 'si' ? '' : 'hidden';
+            };
+        });
+        
+        // Reset checkbox and button
+        document.getElementById('auto-sign-check').checked = false;
+        togglePdfBtn();
+
+        document.getElementById('autocert-modal').style.display = 'flex';
+    };
+
     window.generateAutocertPDF = () => {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.text("AUTOCERTIFICAZIONE", 105, 20, {align:"center"});
-        doc.text(`Io sottoscritto ${rubrica[currentUser.email]?.nome}`, 20, 40);
-        doc.text(`Codice Fiscale: ${document.getElementById('auto-cf').value.toUpperCase()}`, 20, 50);
-        doc.text(`Dichiaro di aver percepito: € ${document.getElementById('auto-importo').value}`, 20, 60);
-        doc.text(`Hash: ID-${Math.random().toString(36).substr(2,9).toUpperCase()}`, 20, 80);
-        doc.save("Autocertificazione.pdf");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Data Retrieval
+        const cf = document.getElementById('auto-cf').value.toUpperCase();
+        if(!cf) return modal("Errore", "Inserisci il Codice Fiscale");
+
+        const importo = document.getElementById('auto-importo').value;
+        
+        // Determine Context (Admin vs User) to get Name and Date
+        let userName = "";
+        let m, y;
+        
+        // Simple check: if admin-detail is active, use detailUserEmail, else currentUser
+        if(document.getElementById('admin-detail').classList.contains('active')) {
+             userName = rubrica[detailUserEmail]?.nome || detailUserEmail;
+             m = document.getElementById('d-filtro-mese').value;
+             y = document.getElementById('d-filtro-anno').value;
+        } else {
+             userName = rubrica[currentUser.email]?.nome || currentUser.email.split('@')[0];
+             m = document.getElementById('c-filtro-mese').value;
+             y = document.getElementById('c-filtro-anno').value;
+        }
+        
+        // Handle Other Income
+        const hasOther = document.querySelector('input[name="altri-compensi"]:checked').value === 'si';
+        const otherAmount = document.getElementById('auto-altro-importo').value;
+        
+        // Date formatting dd/mm/yyyy
+        let otherDate = "";
+        const rawDate = document.getElementById('auto-altro-data').value;
+        if(rawDate) {
+            const parts = rawDate.split('-');
+            otherDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        // Calculate dynamic last day of the month
+        const lastDay = new Date(y, m, 0).getDate(); 
+
+        // 1. HEADER
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("SOCIETÀ SPORTIVA FIN PLUS LOMBARDIA SSD A R.L.", 105, 20, { align: "center" });
+        
+        doc.setFontSize(12);
+        doc.text("AUTOCERTIFICAZIONE", 105, 35, { align: "center" });
+        doc.text(`COMPENSI DA LAVORO SPORTIVO PERCEPITI ANNO DI IMPOSTA ${y}`, 105, 42, { align: "center" });
+
+        // 2. BODY TEXT
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        const startY = 60;
+        const lineHeight = 7;
+        
+        // LINE 1
+        doc.text("Ai fini della applicazione della normativa di cui al D.Lgs. n.36/2021 il/la sottoscritto/a", 20, startY);
+        
+        // LINE 2: NAME (Indented)
+        doc.setFont("helvetica", "bold");
+        doc.text(userName, 20, startY + lineHeight);
+        doc.setFont("helvetica", "normal");
+        
+        // LINE 3: CF
+        doc.text(`Codice Fiscale: ${cf}`, 20, startY + (lineHeight * 2));
+
+        // LINE 4: DECLARATION
+        const today = new Date().toLocaleDateString('it-IT');
+        doc.text(`sul proprio onore DICHIARA che alla data odierna del ${today}`, 20, startY + (lineHeight * 4));
+        
+        // CHECKBOXES SECTION
+        const checkY = startY + (lineHeight * 6);
+        
+        // Box 1: Non ha percepito
+        doc.rect(20, checkY - 4, 4, 4); 
+        if(!hasOther) doc.text("X", 21, checkY-1);
+        doc.text("Non ha percepito alcun compenso della stessa natura da altre società sportive.", 28, checkY);
+        
+        // Box 2: Ha percepito
+        const check2Y = checkY + 10;
+        doc.rect(20, check2Y - 4, 4, 4);
+        if(hasOther) doc.text("X", 21, check2Y-1);
+        
+        // TEXT SPLIT EXACTLY AS REQUESTED
+        doc.text("Ha percepito compensi della stessa natura da altre società sportive dalla data della precedente", 28, check2Y);
+        doc.text("autocertificazione rilasciata alla FIN PLUS LOMBARDIA SSD A R.L. pari ad", 28, check2Y + 5);
+        
+        // AMOUNT ROW
+        if(hasOther) {
+             doc.text(`€ ${otherAmount} ricevuto in data ${otherDate}`, 28, check2Y + 10);
+        } else {
+             // Blank line simulation if not selected
+             doc.text("€ _________________ ricevuto in data _________________", 28, check2Y + 10);
+        }
+
+        // 3. FINAL PART
+        const finalY = check2Y + 25;
+        
+        // TEXT SPLIT EXACTLY AS REQUESTED
+        doc.text("Quanto sopra al fine di ricevere dalla FIN PLUS LOMBARDIA SSD A R.L., di cui alla presente", 20, finalY);
+        doc.text(`autocertificazione, la somma di Euro ${importo}`, 20, finalY + 5);
+        
+        doc.text("al lordo delle eventuali trattenute di Legge dovute (contribuzione previdenziale, di maternità e", 20, finalY + 12);
+        doc.text("quella fiscale ove superato l'importo lordo di euro 5.000 per l'esercizio sopra indicato), relative", 20, finalY + 17);
+        doc.text(`a prestazioni di lavoro sportivo svolte nel corso del periodo dal 01/${String(m).padStart(2,'0')}/${y} al ${lastDay}/${String(m).padStart(2,'0')}/${y}`, 20, finalY + 22);
+        doc.text("rese in relazione al contratto o agli accordi in essere.", 20, finalY + 27);
+        
+        doc.text("Si allega documento di riconoscimento.", 20, finalY + 40);
+        
+        // 4. DIGITAL SIGNATURE STAMP (Separated & Aligned)
+        const signY = finalY + 55; // Pushed down to avoid overlap
+        
+        doc.setDrawColor(150);
+        doc.setFillColor(245, 245, 245);
+        doc.rect(14, signY, 180, 25, 'FD'); // Width 180, x=14
+
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text("DOCUMENTO SOTTOSCRITTO DIGITALMENTE", 19, signY + 6); // x=19 inside box
+
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        doc.text(`Utente: ${userName}`, 19, signY + 12);
+
+        const timestamp = new Date().toLocaleString('it-IT');
+        doc.text(`Data: ${timestamp}`, 19, signY + 18); // Label "Data:"
+
+        const uniqueID = "ID-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+        doc.text(`Codice Univoco: ${uniqueID}`, 100, signY + 18); // Label "Codice Univoco:"
+
+        // Footer text inside the box
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text("Generato tramite gestionale interno FIN PLUS LOMBARDIA SSD A R.L.", 105, signY + 28, { align: "center" });
+
+        doc.save(`Autocertificazione_${userName.replace(/\s+/g,'')}_${m}_${y}.pdf`);
         document.getElementById('autocert-modal').style.display='none';
     };
 
-    window.generatePdf = (data, name, m, y, user) => {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.text(`FOGLIO ORE: ${user}`, 14, 20);
-        const body = data.map(t => [t.data, t.mansione, t.ore, t.note]);
-        doc.autoTable({ head: [['Data','Mansione','Ore','Note']], body: body, startY: 30 });
-        doc.save(name);
+    window.excelAdminGlobal = () => {
+        const sm = document.getElementById('a-filtro-mese'); 
+        const mTxt = sm.options[sm.selectedIndex].text;
+        
+        let csv = "Collaboratore;" + Mansioni.join(";") + ";TOTALE\n";
+        const report = {};
+        
+        allTurni.forEach(t => {
+            if (!report[t.email]) {
+                report[t.email] = { nome: rubrica[t.email]?.nome || t.email, hours: {}, total: 0 };
+                Mansioni.forEach(m => report[t.email].hours[m] = 0);
+            }
+            if (report[t.email].hours[t.mansione] !== undefined) {
+                report[t.email].hours[t.mansione] += t.ore;
+                report[t.email].total += t.ore;
+            }
+        });
+
+        const sortedUsers = Object.values(report).sort((a,b) => a.nome.localeCompare(b.nome));
+        sortedUsers.forEach(u => {
+            let row = [u.nome];
+            Mansioni.forEach(m => {
+                let h = u.hours[m];
+                row.push(h > 0 ? h.toString().replace('.', ',') : "0");
+            });
+            row.push(u.total.toString().replace('.', ','));
+            csv += row.join(";") + "\n";
+        });
+
+        const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; 
+        a.download = `Report_Globale_Pivot_${mTxt}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
     };
-    window.generateCsv = (data, name) => {
-        let csv = "Data;Mansione;Ore;Note\n" + data.map(t => `${t.data};${t.mansione};${t.ore};${t.note}`).join("\n");
-        const blob = new Blob([csv], {type:'text/csv'});
-        const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+
+    window.excelCollab = () => {
+        const sm = document.getElementById('c-filtro-mese'); const sy = document.getElementById('c-filtro-anno');
+        const n = (rubrica[currentUser.email]?.nome||currentUser.email.split('@')[0]).replace(/\s+/g,'');
+        generateCsv(myTurni, `Presenze_${n}_${sm.options[sm.selectedIndex].text}_${sy.value}.csv`, parseInt(sm.value), parseInt(sy.value));
     };
+    
+    // UPDATED EXCEL DETAIL TO USE NEW FILTERS
+    window.excelAdminDetail = () => {
+        const sm = document.getElementById('d-filtro-mese'); 
+        const sy = document.getElementById('d-filtro-anno');
+        const n = (rubrica[detailUserEmail]?.nome||detailUserEmail).replace(/\s+/g,'');
+        
+        // Filter logic inside export to match visual
+        const m = sm.value;
+        const y = sy.value;
+        let dataToExport = allTurni.filter(t => t.email === detailUserEmail);
+        
+        if (m !== 'all') {
+            dataToExport = dataToExport.filter(t => {
+                const d = new Date(t.data);
+                return (d.getMonth() + 1) == m && d.getFullYear() == y;
+            });
+        }
+        
+        const label = m === 'all' ? 'Tutto_Anno' : sm.options[sm.selectedIndex].text;
+        generateCsv(dataToExport, `Presenze_${n}_${label}_${sy.value}.csv`, parseInt(m), parseInt(y));
+    };
+
+    // GENERATE PDF
+    window.pdfCollab = () => {
+        const sm = document.getElementById('c-filtro-mese');
+        const sy = document.getElementById('c-filtro-anno');
+        const n = (rubrica[currentUser.email]?.nome||currentUser.email.split('@')[0]).replace(/\s+/g,'');
+        generatePdf(myTurni, `Presenze_${n}_${sm.options[sm.selectedIndex].text}_${sy.value}.pdf`, parseInt(sm.value), parseInt(sy.value), rubrica[currentUser.email]?.nome || currentUser.email);
+    };
+
+    window.pdfAdminDetail = () => {
+        const sm = document.getElementById('d-filtro-mese'); 
+        const sy = document.getElementById('d-filtro-anno');
+        const n = (rubrica[detailUserEmail]?.nome||detailUserEmail).replace(/\s+/g,'');
+        
+        const m = sm.value;
+        const y = sy.value;
+        let dataToExport = allTurni.filter(t => t.email === detailUserEmail);
+        
+        if (m !== 'all') {
+            dataToExport = dataToExport.filter(t => {
+                const d = new Date(t.data);
+                return (d.getMonth() + 1) == m && d.getFullYear() == y;
+            });
+        }
+        
+        const label = m === 'all' ? 'Tutto_Anno' : sm.options[sm.selectedIndex].text;
+        generatePdf(dataToExport, `Presenze_${n}_${label}_${sy.value}.pdf`, parseInt(m), parseInt(y), rubrica[detailUserEmail]?.nome || detailUserEmail);
+    };
+
+    function generatePdf(data, filename, selectedMonth, selectedYear, userName) {
+        if (!window.jspdf) {
+            alert("Libreria PDF non caricata. Ricarica la pagina.");
+            return;
+        }
+        
+        if (!selectedMonth || isNaN(selectedMonth) || !selectedYear || isNaN(selectedYear)) {
+             if (!selectedMonth) return alert("Seleziona un mese specifico per scaricare il PDF.");
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        const monthNames = ["", "GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"];
+        
+        // Header
+        doc.setFontSize(14);
+        doc.text("FOGLIO ORE COLLABORATORE", 14, 20);
+        doc.setFontSize(11);
+        doc.text(`Nome: ${userName}`, 14, 28);
+        doc.text(`Periodo: ${monthNames[selectedMonth]} ${selectedYear}`, 14, 34);
+
+        const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+        const roleKeys = ["Assistente", "Istruttore", "Fitness", "Propaganda", "Lezione", "Segreteria"];
+        
+        // UPDATED LABELS FOR PDF
+        const tableHead = [["Giorno", "IN", "OUT", "ASS. BAG.", "ISTRUTT.", "FITNESS", "PROPAG.", "LEZ. IND.", "SEGRET.", "NOTE"]];
+        
+        const tableBody = [];
+        const totals = [0, 0, 0, 0, 0, 0]; // One for each role
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dailyShifts = data.filter(t => t.data === dateStr);
+            
+            // DATE WITH WEEKDAY
+            const dateObj = new Date(selectedYear, selectedMonth - 1, day);
+            const weekday = dateObj.toLocaleDateString('it-IT', { weekday: 'short' });
+            let row = [`${day} ${weekday}`, "", "", "", "", "", "", "", "", ""];
+
+            if (dailyShifts.length > 0) {
+                dailyShifts.sort((a,b) => a.oraInizio.localeCompare(b.oraInizio));
+                row[1] = dailyShifts[0].oraInizio;
+                row[2] = dailyShifts[dailyShifts.length - 1].oraFine;
+                
+                roleKeys.forEach((key, index) => {
+                    const hours = dailyShifts
+                        .filter(t => t.mansione.includes(key))
+                        .reduce((sum, t) => sum + t.ore, 0);
+                    if (hours > 0) {
+                        row[index + 3] = hours.toString();
+                        totals[index] += hours;
+                    }
+                });
+                row[9] = dailyShifts.map(t => t.note).filter(n => n).join(" ").substring(0, 20);
+            }
+            tableBody.push(row);
+        }
+
+        // Totals Row
+        const totalRow = ["TOTALE", "", "", ...totals.map(t => t > 0 ? t.toString() : ""), ""];
+        tableBody.push(totalRow);
+
+        doc.autoTable({
+            head: tableHead,
+            body: tableBody,
+            startY: 40,
+            theme: 'grid',
+            headStyles: { fillColor: [220, 220, 220], textColor: 20, fontSize: 8, fontStyle: 'bold', lineColor: [200, 200, 200], lineWidth: 0.1 },
+            bodyStyles: { fontSize: 8, cellPadding: 1, textColor: 20 },
+            columnStyles: {
+                0: { cellWidth: 20, fillColor: [245, 245, 245], fontStyle: 'bold' }, // Giorno wider + light gray
+                1: { cellWidth: 12 }, // IN
+                2: { cellWidth: 12 }, // OUT
+                9: { cellWidth: 'auto' } // Note
+            },
+            didDrawCell: function(data) {
+                // Thicker right border for OUT column (index 2)
+                if (data.column.index === 2 && data.section === 'body') {
+                     const doc = data.doc;
+                     doc.setLineWidth(0.5);
+                     doc.setDrawColor(150);
+                     doc.line(
+                         data.cell.x + data.cell.width,
+                         data.cell.y,
+                         data.cell.x + data.cell.width,
+                         data.cell.y + data.cell.height
+                     );
+                }
+            },
+            didParseCell: function(data) {
+                // Totals row styling (last row)
+                if (data.row.index === tableBody.length - 1) {
+                    data.cell.styles.fillColor = [224, 224, 224]; // Slightly darker gray for totals
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            }
+        });
+
+        const finalY = doc.lastAutoTable.finalY;
+        
+        // DIGITAL SIGNATURE BOX (IDENTICAL TO AUTOCERT)
+        const signY = finalY + 10;
+        doc.setDrawColor(150);
+        doc.setFillColor(245, 245, 245);
+        doc.rect(14, signY, 180, 25, 'FD'); // Width 180, x=14
+        
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text("DOCUMENTO SOTTOSCRITTO DIGITALMENTE", 19, signY + 6); // x=19 inside box
+        
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        doc.text(`Utente: ${userName}`, 19, signY + 12);
+        
+        const timestamp = new Date().toLocaleString('it-IT');
+        doc.text(`Data: ${timestamp}`, 19, signY + 18); // Label "Data:"
+        
+        const uniqueID = "ID-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+        doc.text(`Codice Univoco: ${uniqueID}`, 100, signY + 18); // Label "Codice Univoco:"
+        
+        // Footer text inside box
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text("Generato tramite gestionale interno FIN PLUS LOMBARDIA SSD A R.L.", 105, signY + 28, { align: "center" });
+
+        doc.save(filename);
+    }
+
+    // Standard CSV Generator
+    function generateCsv(data, filename, selectedMonth, selectedYear) {
+        if (!selectedMonth || isNaN(selectedMonth) || !selectedYear || isNaN(selectedYear)) {
+             if (!selectedMonth) return alert("Seleziona un mese specifico per scaricare il foglio presenze ufficiale.");
+        }
+
+        const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+        const cols = ["Giorno","IN","OUT","ASS. BAG.","ISTRUTTORE","AQUAFIT.","PROPAG.","LEZ. INDIV.","SEGRETERIA","NOTE"];
+        const roleKeys = ["Assistente", "Istruttore", "Fitness", "Propaganda", "Lezione", "Segreteria"];
+        
+        let csv = cols.join(";") + "\n";
+        
+        const totals = {};
+        for(let i=3; i<cols.length-1; i++) totals[cols[i]] = 0;
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dailyShifts = data.filter(t => t.data === dateStr);
+            let row = [day]; 
+            
+            if (dailyShifts.length > 0) {
+                dailyShifts.sort((a,b) => a.oraInizio.localeCompare(b.oraInizio));
+                row.push(dailyShifts[0].oraInizio); 
+                row.push(dailyShifts[dailyShifts.length - 1].oraFine);
+                
+                roleKeys.forEach((key, index) => {
+                    const hours = dailyShifts.filter(t => t.mansione.includes(key)).reduce((sum, t) => sum + t.ore, 0);
+                    if (hours > 0) {
+                        row.push(hours.toString().replace('.', ','));
+                        totals[cols[index+3]] += hours;
+                    } else {
+                        row.push("");
+                    }
+                });
+                const notes = dailyShifts.map(t => t.note).filter(n => n).join(" | ").replace(/;/g, " ");
+                row.push(notes);
+            } else {
+                row.push("", "", "", "", "", "", "", "", "");
+            }
+            csv += row.join(";") + "\n";
+        }
+        
+        let totalRow = ["TOTALE", "", ""];
+        for(let i=3; i<cols.length-1; i++) {
+            totalRow.push(totals[cols[i]] > 0 ? totals[cols[i]].toString().replace('.', ',') : "");
+        }
+        totalRow.push("");
+        csv += "\n" + totalRow.join(";") + "\n";
+        csv += "\n\nFIRMA: __________________________\n";
+
+        const blob = new Blob(["\uFEFF"+csv], {type: 'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
 </script>
 </body>
 </html>
