@@ -188,8 +188,15 @@
         }
         .action-btn:hover { background: white; color: var(--primary); border-color: var(--primary); }
         .action-btn.del:hover { color: #ff3b30; border-color: #ff3b30; }
+        .action-btn.sub:hover { color: #ff9500; border-color: #ff9500; } /* Stile per tasto sostituzione */
         
         [data-theme="dark"] .action-btn { background: rgba(30,30,30, 0.8); border-color: rgba(255,255,255,0.2); }
+
+        /* Stili per Sostituzione */
+        .user-info-box { margin-top: 2px; line-height: 1.1; }
+        .original-user.has-sub { text-decoration: line-through; color: var(--text-muted); font-size: 0.75rem; }
+        .sub-user { font-weight: 700; color: #ff9500; display: block; font-size: 0.85rem; }
+        .sub-icon { margin-right: 3px; }
 
         /* MODALE */
         .modal-overlay { 
@@ -265,7 +272,7 @@
     </div>
 </div>
 
-<!-- MODALE DUPLICAZIONE SETTIMANA (Nuovo) -->
+<!-- MODALE DUPLICAZIONE SETTIMANA -->
 <div id="dup-week-modal" class="modal-overlay">
     <div class="modal-box">
         <h3 style="margin-bottom:15px; color:var(--primary)">📑 Duplica Settimana</h3>
@@ -280,6 +287,29 @@
             <button class="btn-secondary" onclick="closeModal('dup-week-modal')" style="flex:1">Annulla</button>
             <button class="btn-warning" onclick="executeDuplication()" style="flex:1">Copia Turni</button>
         </div>
+    </div>
+</div>
+
+<!-- MODALE SOSTITUZIONE (Nuovo) -->
+<div id="sub-shift-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="margin-bottom:15px; color:var(--primary)">🔄 Sostituisci Collaboratore</h3>
+        <input type="hidden" id="sub-id">
+        
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">
+            Turno attuale: <b id="sub-current-user"></b><br>
+            <span id="sub-details"></span>
+        </p>
+
+        <label>Seleziona Sostituto</label>
+        <select id="sub-select-user" style="margin-bottom:20px"></select>
+
+        <div style="display:flex; gap:10px">
+            <button class="btn-secondary" onclick="closeModal('sub-shift-modal')" style="flex:1">Annulla</button>
+            <button class="btn-warning" onclick="saveSubstitution()" style="flex:1">Conferma Sostituzione</button>
+        </div>
+        
+        <button onclick="removeSubstitution()" class="btn-danger" style="margin-top:10px; width:100%; font-size:0.8rem">Rimuovi Sostituzione (Ripristina Originale)</button>
     </div>
 </div>
 
@@ -363,7 +393,7 @@
     let isAdmin = false;
     let currentWeekStart = getMonday(new Date()); 
     let rubrica = []; 
-    let allShiftsData = []; // Memorizza i dati grezzi per la duplicazione
+    let allShiftsData = []; 
 
     // --- DARK MODE ---
     window.toggleTheme = () => {
@@ -429,7 +459,7 @@
             
             if (isAdmin) {
                 document.getElementById('btn-add-shift').classList.remove('hidden');
-                document.getElementById('btn-dup-week').classList.remove('hidden'); // Mostra bottone duplica
+                document.getElementById('btn-dup-week').classList.remove('hidden');
                 await loadUsers();
             }
             
@@ -462,12 +492,12 @@
         endOfWeek.setDate(endOfWeek.getDate() + 6);
         document.getElementById('week-range-label').innerText = `${currentWeekStart.toLocaleDateString('it-IT', options)} - ${endOfWeek.toLocaleDateString('it-IT', options)} ${endOfWeek.getFullYear()}`;
 
-        // Definizione delle 4 griglie (3 categorie + 1 unificata)
+        // Definizione delle 4 griglie
         const grids = ['grid-assistenti', 'grid-segreteria', 'grid-altri', 'grid-tutti'];
 
         grids.forEach(gridId => {
             const gridEl = document.getElementById(gridId);
-            gridEl.innerHTML = ""; // Pulisci griglia
+            gridEl.innerHTML = ""; 
 
             for (let i = 0; i < 7; i++) {
                 const dayDate = new Date(currentWeekStart);
@@ -475,7 +505,6 @@
                 const dateStr = formatDate(dayDate);
                 const isToday = (dateStr === todayStr);
 
-                // ID colonna univoco: es. col-2024-01-01-assistenti
                 const suffix = gridId.replace('grid-', ''); 
                 const colId = `col-${dateStr}-${suffix}`;
 
@@ -517,7 +546,11 @@
     }
 
     function createCard(s, showRole) {
-        const isMyShift = (currentUser && s.email === currentUser.email);
+        // Logica estesa per verificare se il turno è "mio" (originale o come sostituto)
+        const isOriginalMe = (currentUser && s.email === currentUser.email);
+        const isSubMe = (currentUser && s.sostituto && s.sostituto.email === currentUser.email);
+        const isMyShift = isOriginalMe || isSubMe;
+
         const colorVar = getRoleColor(s.role);
         
         const card = document.createElement('div');
@@ -527,10 +560,12 @@
 
         let actions = "";
         if(isAdmin) {
+            // Aggiunto pulsante Sostituzione (🔄)
             actions = `
                 <div class="card-actions">
-                    <button class="action-btn" onclick="window.openEditModal('${s.id}', '${s.email}', '${s.date}', '${s.role}', '${s.start}', '${s.end}')">✏️</button>
-                    <button class="action-btn del" onclick="window.deletePlanned('${s.id}')">×</button>
+                    <button class="action-btn sub" onclick="window.openSubModal('${s.id}', '${s.userName.replace(/'/g, "\\'")}', '${s.date}', '${s.start}-${s.end}')" title="Sostituisci">🔄</button>
+                    <button class="action-btn" onclick="window.openEditModal('${s.id}', '${s.email}', '${s.date}', '${s.role}', '${s.start}', '${s.end}')" title="Modifica">✏️</button>
+                    <button class="action-btn del" onclick="window.deletePlanned('${s.id}')" title="Elimina">×</button>
                 </div>
             `;
         }
@@ -540,10 +575,21 @@
             roleHtml = `<span class="shift-role" style="color:${colorVar}">${s.role}</span>`;
         }
 
+        // Logica visualizzazione Utente vs Sostituto
+        let userHtml = `<span class="shift-user">${s.userName}</span>`;
+        if (s.sostituto && s.sostituto.nome) {
+            userHtml = `
+                <div class="user-info-box">
+                    <span class="original-user has-sub">${s.userName}</span>
+                    <span class="sub-user"><span class="sub-icon">🔄</span>${s.sostituto.nome}</span>
+                </div>
+            `;
+        }
+
         card.innerHTML = `
             ${actions}
             <span class="shift-time">${s.start} - ${s.end}</span>
-            <span class="shift-user">${s.userName}</span>
+            ${userHtml}
             ${roleHtml}
         `;
         return card;
@@ -689,7 +735,6 @@
         if (targetMondayStr === sourceMondayStr) return alert("Non puoi duplicare sulla stessa settimana!");
 
         // 1. Trova i turni della settimana corrente (Source)
-        // Usiamo allShiftsData filtrando per date
         const sourceEnd = new Date(currentWeekStart);
         sourceEnd.setDate(sourceEnd.getDate() + 6);
         const sourceEndStr = formatDate(sourceEnd);
@@ -730,7 +775,6 @@
             window.toast(`Copiati ${shiftsToCopy.length} turni!`);
             window.closeModal('dup-week-modal');
             
-            // Opzionale: spostati alla settimana target per vedere il risultato
             currentWeekStart = targetMonday;
             renderWeek();
             loadPlannedShifts();
@@ -738,6 +782,71 @@
         } catch (e) {
             console.error(e);
             alert("Errore duplicazione: " + e.message);
+        }
+    };
+
+    // --- NUOVE FUNZIONI PER SOSTITUZIONE ---
+    
+    // Popola la select dei sostituti (simile a loadUsers ma riutilizzabile)
+    function populateSubSelect() {
+        const select = document.getElementById('sub-select-user');
+        select.innerHTML = '<option value="">-- Seleziona --</option>';
+        rubrica.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.email; // Usiamo email come ID
+            opt.innerText = u.nome;
+            select.appendChild(opt);
+        });
+    }
+
+    window.openSubModal = (id, currentName, date, time) => {
+        document.getElementById('sub-id').value = id;
+        document.getElementById('sub-current-user').innerText = currentName;
+        document.getElementById('sub-details').innerText = `${new Date(date).toLocaleDateString('it-IT')} | ${time}`;
+        
+        populateSubSelect(); // Assicura che la lista sia aggiornata
+        
+        document.getElementById('sub-shift-modal').style.display = 'flex';
+    };
+
+    window.saveSubstitution = async () => {
+        const id = document.getElementById('sub-id').value;
+        const subEmail = document.getElementById('sub-select-user').value;
+        
+        if (!subEmail) return alert("Seleziona un sostituto dalla lista.");
+
+        const subObj = rubrica.find(u => u.email === subEmail);
+        const subName = subObj ? subObj.nome : subEmail;
+
+        try {
+            await updateDoc(doc(db, "programmazione_turni", id), {
+                sostituto: {
+                    nome: subName,
+                    email: subEmail,
+                    dataInserimento: new Date()
+                }
+            });
+            window.toast("Sostituzione registrata");
+            window.closeModal('sub-shift-modal');
+        } catch(e) {
+            console.error(e);
+            alert("Errore salvataggio: " + e.message);
+        }
+    };
+
+    window.removeSubstitution = async () => {
+        const id = document.getElementById('sub-id').value;
+        if(!confirm("Rimuovere il sostituto e ripristinare il titolare originale?")) return;
+
+        try {
+            await updateDoc(doc(db, "programmazione_turni", id), {
+                sostituto: null 
+            });
+            
+            window.toast("Sostituzione rimossa");
+            window.closeModal('sub-shift-modal');
+        } catch(e) {
+            alert("Errore: " + e.message);
         }
     };
 
