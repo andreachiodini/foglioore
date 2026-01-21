@@ -670,7 +670,7 @@
         const options = { day: 'numeric', month: 'short' };
         const endOfWeek = new Date(currentWeekStart);
         endOfWeek.setDate(endOfWeek.getDate() + 6);
-        document.getElementById('week-range-label').innerText = `Settimana ${weekNum} | ${currentWeekStart.toLocaleDateString('it-IT', options)} - ${endOfWeek.toLocaleDateString('it-IT', options)} ${endOfWeek.getFullYear()}`;
+        document.getElementById('week-range-label').innerText = `Week ${weekNum} | ${currentWeekStart.toLocaleDateString('it-IT', options)} - ${endOfWeek.toLocaleDateString('it-IT', options)} ${endOfWeek.getFullYear()}`;
 
         // Definizione delle 4 griglie
         const grids = ['grid-assistenti', 'grid-segreteria', 'grid-altri', 'grid-tutti'];
