@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- STILI BASE (Identici a index.html) --- */
+        /* --- STILI BASE --- */
         :root {
             --primary: #007aff;
             --bg-body: #f2f2f7; 
@@ -52,7 +52,7 @@
         }
 
         .container { 
-            max-width: 1300px; margin: 0 auto; background: var(--bg-card); 
+            max-width: 1400px; margin: 0 auto; background: var(--bg-card); 
             padding: 20px; border-radius: 20px; box-shadow: var(--shadow); 
             min-height: 85vh;
         }
@@ -83,90 +83,101 @@
         .week-nav { display: flex; align-items: center; gap: 10px; background: var(--bg-body); padding: 5px; border-radius: 12px; }
         .week-nav button { background: none; border: none; font-size: 1.2rem; padding: 5px 10px; color: var(--primary); }
         
+        /* SEZIONI GRIGLIE */
+        .grid-section-title {
+            margin: 30px 0 10px 0;
+            padding-left: 10px;
+            border-left: 5px solid var(--primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .grid-section-title.ass { border-color: var(--dot-assistente); }
+        .grid-section-title.seg { border-color: var(--dot-segreteria); }
+        .grid-section-title.alt { border-color: var(--dot-istruttore); }
+
         /* GRID LAYOUT */
         .week-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+            gap: 8px;
             overflow-x: auto;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .day-column {
             background: var(--bg-body);
             border-radius: 12px;
-            min-height: 400px;
+            min-height: 150px; /* Altezza minima ridotta per compattezza */
             display: flex; flex-direction: column;
             border: 1px solid var(--border-color);
         }
 
         .day-header {
-            padding: 12px 5px;
+            padding: 8px 5px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-card);
             border-radius: 12px 12px 0 0;
-            position: sticky; top: 0; z-index: 10;
+            /* Sticky rimosso per le griglie multiple per evitare confusione */
         }
         .day-name { font-weight: 700; text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted); }
-        .day-date { font-weight: 700; font-size: 1.2rem; margin-top: 4px; }
+        .day-date { font-weight: 700; font-size: 1rem; margin-top: 2px; }
         .day-date.today { color: var(--primary); text-decoration: underline; text-decoration-thickness: 3px; }
 
         .shifts-container {
-            padding: 8px;
+            padding: 6px;
             flex: 1;
-            display: flex; flex-direction: column; gap: 8px;
+            display: flex; flex-direction: column; gap: 6px;
         }
 
         /* SHIFT CARD */
         .shift-card {
             background: var(--bg-card);
             border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border-left: 5px solid #ccc; /* Colore ruolo */
-            font-size: 0.85rem;
+            padding: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-left: 4px solid #ccc; /* Colore ruolo */
+            font-size: 0.8rem;
             position: relative;
             cursor: default;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .shift-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
-        /* STILE PER I MIEI TURNI (Evidenziati) */
         .shift-card.is-mine {
-            background-color: rgba(0, 122, 255, 0.08); /* Azzurro chiaro */
+            background-color: rgba(0, 122, 255, 0.08);
             border: 1px solid var(--primary);
-            border-left-width: 5px; /* Mantiene larghezza ruolo */
+            border-left-width: 4px;
         }
-        /* Dark mode fix per is-mine */
         [data-theme="dark"] .shift-card.is-mine {
             background-color: rgba(10, 132, 255, 0.15);
             border-color: #0a84ff;
         }
 
-        .shift-time { font-weight: 800; margin-bottom: 3px; display: block; font-size: 0.9rem; }
-        .shift-user { font-weight: 600; color: var(--text-main); margin-bottom: 2px; display: block; }
-        .shift-role { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
+        .shift-time { font-weight: 800; margin-bottom: 2px; display: block; font-size: 0.85rem; }
+        .shift-user { font-weight: 600; color: var(--text-main); margin-bottom: 0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .shift-role { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; display: block; margin-top: 2px; }
         
-        /* STILI BOTTONI AZIONE CARD */
+        /* Azioni Card */
         .card-actions {
-            position: absolute; top: 5px; right: 5px;
-            display: flex; gap: 4px; z-index: 5;
+            position: absolute; top: 4px; right: 4px;
+            display: flex; gap: 2px; z-index: 5;
         }
         .action-btn {
-            background: rgba(255, 255, 255, 0.8); 
+            background: rgba(255, 255, 255, 0.9); 
             border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 6px; 
+            border-radius: 4px; 
             color: var(--text-muted);
-            cursor: pointer; padding: 2px 6px; font-size: 0.9rem;
-            line-height: 1; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; padding: 2px 4px; font-size: 0.8rem;
+            line-height: 1;
         }
-        .action-btn:hover { background: white; color: var(--primary); border-color: var(--primary); transform: scale(1.1); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .action-btn:hover { background: white; color: var(--primary); border-color: var(--primary); }
         .action-btn.del:hover { color: #ff3b30; border-color: #ff3b30; }
         
         [data-theme="dark"] .action-btn { background: rgba(30,30,30, 0.8); border-color: rgba(255,255,255,0.2); }
-        [data-theme="dark"] .action-btn:hover { background: #333; }
 
         /* MODALE */
         .modal-overlay { 
@@ -182,12 +193,11 @@
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} } @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
         @media (max-width: 900px) {
-            .week-grid { 
-                grid-template-columns: 1fr; /* Colonna singola su mobile */
-                gap: 15px; 
-            }
-            .day-column { min-height: auto; border: 1px solid var(--border-color); }
-            .day-header { position: static; background: var(--bg-input); }
+            .week-grid { grid-template-columns: 1fr; gap: 10px; }
+            .day-column { min-height: auto; border: 1px solid var(--border-color); flex-direction: row; align-items: center; }
+            .day-header { width: 80px; flex-shrink: 0; border-bottom: none; border-right: 1px solid var(--border-color); border-radius: 12px 0 0 12px; display: flex; flex-direction: column; justify-content: center; }
+            .shifts-container { flex-direction: row; flex-wrap: wrap; }
+            .shift-card { width: 100%; max-width: 200px; }
         }
 
         /* Link torna indietro */
@@ -203,11 +213,11 @@
 
 <div id="toast">Notifica</div>
 
-<!-- MODALE AGGIUNTA/MODIFICA TURNO (Solo Admin) -->
+<!-- MODALE AGGIUNTA/MODIFICA TURNO -->
 <div id="add-shift-modal" class="modal-overlay">
     <div class="modal-box">
-        <h3 id="modal-title" style="margin-bottom:15px; color:var(--primary)">Nuovo Turno in Programma</h3>
-        <input type="hidden" id="p-id"> <!-- ID nascosto per le modifiche -->
+        <h3 id="modal-title" style="margin-bottom:15px; color:var(--primary)">Nuovo Turno</h3>
+        <input type="hidden" id="p-id">
         
         <label>Collaboratore</label>
         <select id="p-user"></select>
@@ -218,11 +228,11 @@
         <label>Mansione</label>
         <select id="p-role">
             <option value="Assistente bagnanti">Assistente bagnanti</option>
+            <option value="Segreteria">Segreteria</option>
             <option value="Istruttore">Istruttore</option>
             <option value="Fitness">Fitness</option>
             <option value="Propaganda">Propaganda</option>
             <option value="Lezione individuale">Lezione individuale</option>
-            <option value="Segreteria">Segreteria</option>
         </select>
 
         <div style="display:flex; gap:10px; margin-bottom:20px">
@@ -245,7 +255,6 @@
 
 <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:center">
-        <!-- Bottone per tornare alla home -->
         <a onclick="tryGoHome()" class="back-link">❮ Torna al Foglio Ore</a>
         <button id="theme-btn" class="btn-secondary" onclick="toggleTheme()" style="padding: 5px 10px;">🌙</button>
     </div>
@@ -262,16 +271,23 @@
                 <button onclick="goToToday()" style="font-size:0.9rem; font-weight:600">Oggi</button>
                 <button onclick="changeWeek(1)">❯</button>
             </div>
-            <!-- Solo Admin vedrà questo bottone -->
             <button id="btn-add-shift" class="btn-primary hidden" onclick="openAddModal()">➕ Aggiungi</button>
         </div>
     </div>
 
     <div id="loader" style="text-align:center; padding:20px; color:var(--text-muted)">Caricamento turni...</div>
 
-    <div class="week-grid" id="week-grid" style="display:none">
-        <!-- Generato via JS: 7 colonne -->
-    </div>
+    <!-- SEZIONE 1: ASSISTENTI BAGNANTI -->
+    <div class="grid-section-title ass">🏊 Assistenti Bagnanti</div>
+    <div id="grid-assistenti" class="week-grid"></div>
+
+    <!-- SEZIONE 2: SEGRETERIA -->
+    <div class="grid-section-title seg">💼 Segreteria</div>
+    <div id="grid-segreteria" class="week-grid"></div>
+
+    <!-- SEZIONE 3: ISTRUTTORI & ALTRI -->
+    <div class="grid-section-title alt">🏋️ Istruttori & Altri</div>
+    <div id="grid-altri" class="week-grid"></div>
 
 </div>
 
@@ -332,7 +348,7 @@
             window.location.href = "index.html";
         } catch(e) {
             console.warn("Navigazione bloccata:", e);
-            alert("Impossibile tornare indietro automaticamente in questa anteprima. Clicca 'Indietro' nel browser o apri index.html manualmente.");
+            alert("Usa il tasto Indietro del browser.");
         }
     };
 
@@ -342,29 +358,15 @@
             currentUser = user;
             isAdmin = (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
             
-            // Solo admin vede il bottone aggiungi
             if (isAdmin) {
                 document.getElementById('btn-add-shift').classList.remove('hidden');
-                await loadUsers(); // Carica lista utenti per dropdown
+                await loadUsers();
             }
             
             renderWeek();
-            loadPlannedShifts(); // Carica i turni di tutti
+            loadPlannedShifts(); 
         } else {
-            // Se non loggato, prova a tornare a index.html
-            try {
-                window.location.href = "index.html"; 
-            } catch (e) {
-                console.warn("Reindirizzamento bloccato dall'ambiente:", e);
-                document.body.innerHTML = `
-                    <div style="padding:40px; text-align:center; font-family:sans-serif;">
-                        <h2>Accesso Richiesto</h2>
-                        <p>Per visualizzare i turni devi effettuare il login.</p>
-                        <button onclick="tryGoHome()" style="padding:10px 20px; background:#007aff; color:white; border:none; border-radius:8px; cursor:pointer;">
-                            Vai al Login (index.html)
-                        </button>
-                    </div>`;
-            }
+            try { window.location.href = "index.html"; } catch (e) {}
         }
     });
 
@@ -382,39 +384,44 @@
     };
 
     function renderWeek() {
-        const grid = document.getElementById('week-grid');
-        grid.innerHTML = "";
-        
-        const endOfWeek = new Date(currentWeekStart);
-        endOfWeek.setDate(endOfWeek.getDate() + 6);
-        
-        const options = { day: 'numeric', month: 'short' };
-        document.getElementById('week-range-label').innerText = 
-            `${currentWeekStart.toLocaleDateString('it-IT', options)} - ${endOfWeek.toLocaleDateString('it-IT', options)} ${endOfWeek.getFullYear()}`;
-
         const days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         const todayStr = formatDate(new Date());
+        
+        const options = { day: 'numeric', month: 'short' };
+        const endOfWeek = new Date(currentWeekStart);
+        endOfWeek.setDate(endOfWeek.getDate() + 6);
+        document.getElementById('week-range-label').innerText = `${currentWeekStart.toLocaleDateString('it-IT', options)} - ${endOfWeek.toLocaleDateString('it-IT', options)} ${endOfWeek.getFullYear()}`;
 
-        for (let i = 0; i < 7; i++) {
-            const dayDate = new Date(currentWeekStart);
-            dayDate.setDate(dayDate.getDate() + i);
-            const dateStr = formatDate(dayDate);
-            const isToday = (dateStr === todayStr);
+        // Definizione delle 3 griglie
+        const grids = ['grid-assistenti', 'grid-segreteria', 'grid-altri'];
 
-            const col = document.createElement('div');
-            col.className = 'day-column';
-            col.innerHTML = `
-                <div class="day-header">
-                    <div class="day-name">${days[i]}</div>
-                    <div class="day-date ${isToday ? 'today' : ''}">${dayDate.getDate()}</div>
-                </div>
-                <div class="shifts-container" id="col-${dateStr}">
-                    <!-- Shifts injected here -->
-                </div>
-            `;
-            grid.appendChild(col);
-        }
-        grid.style.display = "grid";
+        grids.forEach(gridId => {
+            const gridEl = document.getElementById(gridId);
+            gridEl.innerHTML = ""; // Pulisci griglia
+
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(currentWeekStart);
+                dayDate.setDate(dayDate.getDate() + i);
+                const dateStr = formatDate(dayDate);
+                const isToday = (dateStr === todayStr);
+
+                // ID colonna univoco: es. col-2024-01-01-assistenti
+                const suffix = gridId.replace('grid-', ''); 
+                const colId = `col-${dateStr}-${suffix}`;
+
+                const col = document.createElement('div');
+                col.className = 'day-column';
+                col.innerHTML = `
+                    <div class="day-header">
+                        <div class="day-name">${days[i]}</div>
+                        <div class="day-date ${isToday ? 'today' : ''}">${dayDate.getDate()}</div>
+                    </div>
+                    <div class="shifts-container" id="${colId}"></div>
+                `;
+                gridEl.appendChild(col);
+            }
+        });
+        
         document.getElementById('loader').style.display = "none";
     }
 
@@ -436,15 +443,14 @@
                     select.appendChild(opt);
                 }
             });
-        } catch(e) {
-            console.error("Errore caricamento utenti:", e);
-        }
+        } catch(e) { console.error(e); }
     }
 
     function loadPlannedShifts() {
         const q = query(collection(db, "programmazione_turni"));
         
         onSnapshot(q, (snap) => {
+            // Pulisci tutte le colonne in tutte le griglie
             document.querySelectorAll('.shifts-container').forEach(el => el.innerHTML = "");
 
             const shifts = [];
@@ -453,7 +459,13 @@
             shifts.sort((a,b) => a.start.localeCompare(b.start));
 
             shifts.forEach(s => {
-                const col = document.getElementById(`col-${s.date}`);
+                // Determina la griglia di destinazione
+                let suffix = 'altri';
+                if (s.role === 'Assistente bagnanti') suffix = 'assistenti';
+                else if (s.role === 'Segreteria') suffix = 'segreteria';
+                
+                const colId = `col-${s.date}-${suffix}`;
+                const col = document.getElementById(colId);
                 
                 if (col) {
                     const isMyShift = (currentUser && s.email === currentUser.email);
@@ -466,7 +478,6 @@
 
                     let actions = "";
                     if(isAdmin) {
-                        // Passiamo i parametri come stringhe safe
                         actions = `
                             <div class="card-actions">
                                 <button class="action-btn" onclick="window.openEditModal('${s.id}', '${s.email}', '${s.date}', '${s.role}', '${s.start}', '${s.end}')">✏️</button>
@@ -486,18 +497,8 @@
             });
         }, (error) => {
             console.error("Errore lettura turni:", error);
-            const loader = document.getElementById('loader');
-            loader.style.display = 'block';
-            
-            if (error.code === 'permission-denied') {
-                loader.innerHTML = `
-                    <div style="color:#721c24; background-color:#f8d7da; border:1px solid #f5c6cb; padding:15px; border-radius:8px; max-width:500px; margin:0 auto; text-align:left;">
-                        <strong>⚠️ Accesso Negato al Database</strong><br>
-                        Mancano le regole di sicurezza per visualizzare i turni.
-                    </div>
-                `;
-            } else {
-                loader.innerText = "Errore caricamento: " + error.message;
+            if(error.code === 'permission-denied') {
+               alert("Errore Permessi: Non puoi leggere i turni. Controlla le regole Firestore.");
             }
         });
     }
@@ -514,26 +515,22 @@
 
     // --- AZIONI ADMIN ---
     window.openAddModal = () => {
-        document.getElementById('modal-title').innerText = "Nuovo Turno in Programma";
-        document.getElementById('p-id').value = ""; // Resetta ID
-        
+        document.getElementById('modal-title').innerText = "Nuovo Turno";
+        document.getElementById('p-id').value = ""; 
         document.getElementById('add-shift-modal').style.display = 'flex';
         document.getElementById('p-date').value = formatDate(currentWeekStart);
         document.getElementById('p-start').value = "";
         document.getElementById('p-end').value = "";
     };
 
-    // Funzione per aprire la modale in modalità modifica
     window.openEditModal = (id, email, date, role, start, end) => {
         document.getElementById('modal-title').innerText = "Modifica Turno";
-        document.getElementById('p-id').value = id; // Imposta ID
-        
+        document.getElementById('p-id').value = id; 
         document.getElementById('p-user').value = email;
         document.getElementById('p-date').value = date;
         document.getElementById('p-role').value = role;
         document.getElementById('p-start').value = start;
         document.getElementById('p-end').value = end;
-        
         document.getElementById('add-shift-modal').style.display = 'flex';
     };
 
@@ -542,7 +539,7 @@
     };
 
     window.savePlannedShift = async () => {
-        const id = document.getElementById('p-id').value; // Recupera ID (vuoto se nuovo)
+        const id = document.getElementById('p-id').value;
         const email = document.getElementById('p-user').value;
         const date = document.getElementById('p-date').value;
         const role = document.getElementById('p-role').value;
@@ -556,32 +553,20 @@
 
         try {
             if (id) {
-                // MODIFICA ESISTENTE
-                await updateDoc(doc(db, "programmazione_turni", id), {
-                    email, userName, date, role, start, end
-                });
-                window.toast("Turno modificato");
+                await updateDoc(doc(db, "programmazione_turni", id), { email, userName, date, role, start, end });
+                window.toast("Modificato");
             } else {
-                // CREAZIONE NUOVO
-                await addDoc(collection(db, "programmazione_turni"), {
-                    email, userName, date, role, start, end,
-                    created_at: new Date()
-                });
-                window.toast("Turno pianificato");
+                await addDoc(collection(db, "programmazione_turni"), { email, userName, date, role, start, end, created_at: new Date() });
+                window.toast("Creato");
             }
             window.closeModal();
-        } catch(e) {
-            console.error(e);
-            alert("Errore salvataggio: " + e.message);
-        }
+        } catch(e) { alert("Errore: " + e.message); }
     };
 
     window.deletePlanned = async (id) => {
-        if(confirm("Eliminare questo turno pianificato?")) {
-            try {
-                await deleteDoc(doc(db, "programmazione_turni", id));
-                window.toast("Turno rimosso");
-            } catch(e) { alert("Errore eliminazione: " + e.message); }
+        if(confirm("Eliminare turno?")) {
+            try { await deleteDoc(doc(db, "programmazione_turni", id)); window.toast("Eliminato"); } 
+            catch(e) { alert("Errore: " + e.message); }
         }
     };
 
