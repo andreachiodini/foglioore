@@ -84,9 +84,22 @@
         .week-nav { display: flex; align-items: center; gap: 10px; background: var(--bg-body); padding: 5px; border-radius: 12px; }
         .week-nav button { background: none; border: none; font-size: 1.2rem; padding: 5px 10px; color: var(--primary); }
         
+        /* EVIDENZA SETTIMANA */
+        #week-range-label {
+            display: inline-block;
+            margin: 5px 0 10px 0;
+            padding: 6px 12px;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            font-weight: 700;
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
         /* VIEW SWITCHER & FILTERS */
         .controls-row {
-            display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap;
+            display: flex; gap: 10px; align-items: center; margin-top: 5px; flex-wrap: wrap;
         }
         .view-switcher {
             display: flex; background: var(--bg-body); padding: 4px; border-radius: 10px;
@@ -225,12 +238,80 @@
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} } @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
+        /* --- MOBILE OPTIMIZATIONS (Max 900px e 600px) --- */
         @media (max-width: 900px) {
             .week-grid { grid-template-columns: 1fr; gap: 10px; }
             .day-column { min-height: auto; border: 1px solid var(--border-color); flex-direction: row; align-items: center; }
             .day-header { width: 80px; flex-shrink: 0; border-bottom: none; border-right: 1px solid var(--border-color); border-radius: 12px 0 0 12px; display: flex; flex-direction: column; justify-content: center; }
             .shifts-container { flex-direction: row; flex-wrap: wrap; }
             .shift-card { width: 100%; max-width: 200px; }
+        }
+
+        /* Ottimizzazioni specifiche Header Mobile */
+        @media (max-width: 600px) {
+            .container { padding: 10px 10px 80px 10px; }
+            
+            .week-header {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+
+            /* Titolo compatto */
+            h2 { font-size: 1.2rem; margin-bottom: 2px; }
+
+            /* Settimana evidenziata forte su mobile */
+            #week-range-label {
+                width: 100%;
+                text-align: center;
+                background-color: var(--primary);
+                color: #fff;
+                border: none;
+                margin: 5px 0;
+            }
+
+            /* Riga controlli compatti */
+            .controls-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr; /* Switcher a sinistra, Filtri a destra */
+                gap: 5px;
+                width: 100%;
+                margin-top: 0;
+            }
+            
+            .view-switcher { margin-top: 0; width: 100%; }
+            .view-switcher button { padding: 6px 0; font-size: 0.75rem; width: 50%; text-align: center; }
+            
+            .filter-container { width: 100%; }
+            .filter-container select, .checkbox-filter {
+                width: 100%;
+                padding: 6px;
+                font-size: 0.75rem;
+                height: 100%; 
+                box-sizing: border-box;
+                margin: 0;
+                justify-content: center; /* Per checkbox */
+            }
+
+            /* Navigazione settimane in basso, full width */
+            .week-nav {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 5px;
+            }
+            .week-nav button { padding: 8px 15px; }
+            
+            /* Sposta i bottoni azione (Add/Dup) in una riga separata o integrati */
+            .week-header > div:last-child {
+                width: 100%;
+                display: flex;
+                gap: 5px;
+                flex-wrap: wrap;
+            }
+            #btn-dup-week, #btn-add-shift { flex: 1; justify-content: center; }
+
+            .back-link { font-size: 0.8rem; margin-bottom: 10px; padding: 6px 10px; }
         }
 
         /* Link torna indietro */
@@ -338,7 +419,8 @@
     <div class="week-header">
         <div style="flex: 1;">
             <h2 style="margin:0">Programmazione Turni</h2>
-            <p id="week-range-label" style="margin:5px 0 0 0; color:var(--text-muted)">...</p>
+            <!-- ETICHETTA SETTIMANA (STYLE MIGLIORATO VIA CSS) -->
+            <div id="week-range-label">...</div>
             
             <div class="controls-row">
                 <!-- VIEW SWITCHER -->
@@ -369,7 +451,7 @@
                 <button onclick="goToToday()" style="font-size:0.9rem; font-weight:600">Oggi</button>
                 <button onclick="changeWeek(1)">❯</button>
             </div>
-            <div style="display:flex; gap:5px">
+            <div style="display:flex; gap:5px; flex-wrap:wrap;">
                 <!-- Bottone Duplica (Admin) -->
                 <button id="btn-dup-week" class="btn-secondary hidden" onclick="openDupModal()" title="Duplica Settimana">📑</button>
                 <button id="btn-add-shift" class="btn-primary hidden" onclick="openAddModal()">➕ Aggiungi</button>
