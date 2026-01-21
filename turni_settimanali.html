@@ -234,7 +234,7 @@
 <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:center">
         <!-- Bottone per tornare alla home -->
-        <a onclick="window.location.href='index.html'" class="back-link">❮ Torna al Foglio Ore</a>
+        <a href="index.html" class="back-link">❮ Torna al Foglio Ore</a>
         <button id="theme-btn" class="btn-secondary" onclick="toggleTheme()" style="padding: 5px 10px;">🌙</button>
     </div>
 
@@ -329,8 +329,15 @@
             renderWeek();
             loadPlannedShifts(); // Carica i turni di tutti
         } else {
-            // Se non loggato, torna a index.html
-            window.location.href = "index.html"; 
+            // Se non loggato, prova a tornare a index.html
+            // Usiamo try-catch per evitare crash nelle preview
+            try {
+                window.location.href = "index.html"; 
+            } catch (e) {
+                console.warn("Reindirizzamento bloccato dall'ambiente:", e);
+                // Fallback visivo se il redirect fallisce
+                document.body.innerHTML = '<div style="padding:20px; text-align:center;"><h2>Accesso Richiesto</h2><p>Torna alla <a href="index.html">Pagina Principale</a> per accedere.</p></div>';
+            }
         }
     });
 
