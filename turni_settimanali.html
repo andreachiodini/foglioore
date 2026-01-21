@@ -76,27 +76,46 @@
             width: 100%; font-family: inherit; margin-bottom: 10px;
         }
 
-        /* --- CALENDARIO SETTIMANALE --- */
+        /* --- HEADER & NAVIGAZIONE --- */
         .week-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
         }
-        .week-nav { display: flex; align-items: center; gap: 10px; background: var(--bg-body); padding: 5px; border-radius: 12px; }
-        .week-nav button { background: none; border: none; font-size: 1.2rem; padding: 5px 10px; color: var(--primary); }
-        
-        /* EVIDENZA SETTIMANA */
-        #week-range-label {
-            display: inline-block;
-            margin: 5px 0 10px 0;
-            padding: 6px 12px;
-            background-color: var(--bg-body);
-            border-radius: 8px;
-            font-weight: 700;
-            color: var(--primary);
-            border: 1px solid var(--border-color);
-            font-size: 0.95rem;
-        }
 
+        /* Navigatore Integrato (Box Blu) */
+        .week-navigator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 12px;
+            padding: 5px;
+            margin: 5px 0 10px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-width: 280px;
+        }
+        .week-navigator button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            padding: 0;
+            font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .week-navigator button:hover { background: rgba(255, 255, 255, 0.4); }
+        
+        #week-range-label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: center;
+            flex: 1;
+            padding: 0 10px;
+            white-space: nowrap;
+        }
+        
         /* VIEW SWITCHER & FILTERS */
         .controls-row {
             display: flex; gap: 10px; align-items: center; margin-top: 5px; flex-wrap: wrap;
@@ -172,7 +191,7 @@
             display: flex; flex-direction: column; gap: 6px;
         }
 
-        /* SHIFT CARD */
+        /* SHIFT CARD (Layout Modificato) */
         .shift-card {
             background: var(--bg-card);
             border-radius: 8px;
@@ -183,6 +202,7 @@
             position: relative;
             cursor: default;
             transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 4px;
         }
         .shift-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
@@ -196,34 +216,72 @@
             border-color: #0a84ff;
         }
 
-        .shift-time { font-weight: 800; margin-bottom: 2px; display: block; font-size: 0.85rem; }
-        .shift-user { font-weight: 600; color: var(--text-main); margin-bottom: 0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .shift-role { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; display: block; margin-top: 2px; }
+        /* Layout Riga Unica: Orario + Nome */
+        .shift-content-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        /* Badge Orario */
+        .shift-time-badge {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        [data-theme="dark"] .shift-time-badge { background-color: #333; border-color: #555; }
+
+        /* Nome Collaboratore */
+        .shift-user-inline {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1; /* Prende lo spazio rimanente */
+        }
+
+        .shift-role { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; display: block; margin-top: 4px; }
         
         /* Azioni Card */
         .card-actions {
-            position: absolute; top: 4px; right: 4px;
+            position: absolute; top: -6px; right: -6px;
             display: flex; gap: 2px; z-index: 5;
+            opacity: 0; transition: opacity 0.2s; /* Nascosto finché hover */
+            background: var(--bg-card); border-radius: 8px; padding: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        .shift-card:hover .card-actions { opacity: 1; top: 2px; right: 2px; }
+
+        /* Su mobile le azioni sono sempre visibili o gestite diversamente, qui le lasciamo sempre accessibili se admin */
+        @media (max-width: 900px) {
+            .card-actions { opacity: 1; position: static; margin-bottom: 4px; justify-content: flex-end; background: transparent; box-shadow: none; }
+        }
+
         .action-btn {
-            background: rgba(255, 255, 255, 0.9); 
-            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--bg-input); 
+            border: 1px solid var(--border-color);
             border-radius: 4px; 
             color: var(--text-muted);
-            cursor: pointer; padding: 2px 4px; font-size: 0.8rem;
+            cursor: pointer; padding: 3px 6px; font-size: 0.8rem;
             line-height: 1;
         }
-        .action-btn:hover { background: white; color: var(--primary); border-color: var(--primary); }
-        .action-btn.del:hover { color: #ff3b30; border-color: #ff3b30; }
-        .action-btn.sub:hover { color: #ff9500; border-color: #ff9500; } /* Stile per tasto sostituzione */
-        
-        [data-theme="dark"] .action-btn { background: rgba(30,30,30, 0.8); border-color: rgba(255,255,255,0.2); }
+        .action-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .action-btn.del:hover { background: #ff3b30; border-color: #ff3b30; }
+        .action-btn.sub:hover { background: #ff9500; border-color: #ff9500; } 
 
-        /* Stili per Sostituzione */
-        .user-info-box { margin-top: 2px; line-height: 1.1; }
-        .original-user.has-sub { text-decoration: line-through; color: var(--text-muted); font-size: 0.75rem; }
-        .sub-user { font-weight: 700; color: #ff9500; display: block; font-size: 0.85rem; }
-        .sub-icon { margin-right: 3px; }
+        /* Stili per Sostituzione Inline */
+        .user-sub-wrapper { display: flex; flex-direction: column; line-height: 1.1; overflow: hidden; }
+        .original-user-strike { text-decoration: line-through; color: var(--text-muted); font-size: 0.7rem; }
+        .sub-user-highlight { color: #ff9500; font-weight: 700; font-size: 0.85rem; }
 
         /* MODALE */
         .modal-overlay { 
@@ -244,7 +302,7 @@
             .day-column { min-height: auto; border: 1px solid var(--border-color); flex-direction: row; align-items: center; }
             .day-header { width: 80px; flex-shrink: 0; border-bottom: none; border-right: 1px solid var(--border-color); border-radius: 12px 0 0 12px; display: flex; flex-direction: column; justify-content: center; }
             .shifts-container { flex-direction: row; flex-wrap: wrap; }
-            .shift-card { width: 100%; max-width: 200px; }
+            .shift-card { width: 100%; max-width: 250px; margin-right: 5px; }
         }
 
         /* Ottimizzazioni specifiche Header Mobile */
@@ -256,26 +314,18 @@
                 flex-direction: column;
                 gap: 5px;
                 margin-bottom: 10px;
-                align-items: stretch; /* FIX: Allinea a sinistra anziché al centro */
+                align-items: stretch; 
             }
 
-            /* Titolo compatto */
             h2 { font-size: 1.2rem; margin-bottom: 2px; }
 
-            /* Settimana evidenziata forte su mobile */
-            #week-range-label {
-                width: 100%;
-                text-align: center;
-                background-color: var(--primary);
-                color: #fff;
-                border: none;
-                margin: 5px 0;
-            }
+            /* Il navigatore diventa full width su mobile */
+            .week-navigator { width: 100%; margin: 5px 0; }
 
             /* Riga controlli compatti */
             .controls-row {
                 display: grid;
-                grid-template-columns: 1fr 1fr; /* Switcher a sinistra, Filtri a destra */
+                grid-template-columns: 1fr 1fr; 
                 gap: 5px;
                 width: 100%;
                 margin-top: 0;
@@ -292,26 +342,12 @@
                 height: 100%; 
                 box-sizing: border-box;
                 margin: 0;
-                justify-content: center; /* Per checkbox */
+                justify-content: center; 
             }
-
-            /* Navigazione settimane compatta e centrata */
-            .week-nav {
-                width: auto;
-                justify-content: center;
-                margin: 5px auto;
-                display: flex;
-                padding: 4px;
-            }
-            .week-nav button { padding: 5px 10px; font-size: 1.1rem; }
             
-            /* Sposta i bottoni azione (Add/Dup) in una riga separata o integrati */
-            .week-header > div:last-child {
-                width: 100%;
-                display: flex;
-                gap: 5px;
-                flex-wrap: wrap;
-                justify-content: center; /* Centra i bottoni azione */
+            /* Action Buttons Row */
+            .action-buttons-container {
+                display: flex; gap: 5px; margin-top: 5px;
             }
             #btn-dup-week, #btn-add-shift { flex: 1; justify-content: center; }
 
@@ -423,8 +459,13 @@
     <div class="week-header">
         <div style="flex: 1;">
             <h2 style="margin:0">Programmazione Turni</h2>
-            <!-- ETICHETTA SETTIMANA (STYLE MIGLIORATO VIA CSS) -->
-            <div id="week-range-label">...</div>
+            
+            <!-- NAVIGATORE SETTIMANA INTEGRATO (BOX BLU) -->
+            <div class="week-navigator">
+                <button onclick="changeWeek(-1)">❮</button>
+                <div id="week-range-label">...</div>
+                <button onclick="changeWeek(1)">❯</button>
+            </div>
             
             <div class="controls-row">
                 <!-- VIEW SWITCHER -->
@@ -449,15 +490,12 @@
             </div>
         </div>
         
-        <div style="display:flex; gap:10px; align-items:center; margin-top:10px;">
-            <div class="week-nav">
-                <button onclick="changeWeek(-1)">❮</button>
-                <button onclick="goToToday()" style="font-size:0.9rem; font-weight:600">Oggi</button>
-                <button onclick="changeWeek(1)">❯</button>
-            </div>
-            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:5px; margin-top:10px;">
+            <button onclick="goToToday()" style="background:var(--bg-body); color:var(--text-main); font-size:0.8rem;">Oggi</button>
+            
+            <div class="action-buttons-container">
                 <!-- Bottone Duplica (Admin) -->
-                <button id="btn-dup-week" class="btn-secondary hidden" onclick="openDupModal()" title="Duplica Settimana">📑</button>
+                <button id="btn-dup-week" class="btn-secondary hidden" onclick="openDupModal()" title="Duplica Settimana">📑 Duplica</button>
                 <button id="btn-add-shift" class="btn-primary hidden" onclick="openAddModal()">➕ Aggiungi</button>
             </div>
         </div>
@@ -509,11 +547,10 @@
     let isAdmin = false;
     let currentWeekStart = getMonday(new Date()); 
     let rubrica = []; 
-    let allShiftsData = []; // Dati grezzi per filtraggio client-side
+    let allShiftsData = []; 
     
-    // VARIABILI FILTRO
-    let activeUserFilter = ""; // Email utente selezionato (Admin)
-    let onlyMyShifts = false;  // Toggle (Collaboratore)
+    let activeUserFilter = ""; 
+    let onlyMyShifts = false;
 
     // --- DARK MODE ---
     window.toggleTheme = () => {
@@ -599,13 +636,9 @@
             if (isAdmin) {
                 document.getElementById('btn-add-shift').classList.remove('hidden');
                 document.getElementById('btn-dup-week').classList.remove('hidden');
-                
-                // Mostra filtro admin
                 document.getElementById('admin-user-filter').classList.remove('hidden');
-                
                 await loadUsers();
             } else {
-                // Mostra filtro collaboratore
                 document.getElementById('collab-filter-container').classList.remove('hidden');
             }
             
@@ -677,13 +710,9 @@
             const q = query(collection(db, "anagrafica"), orderBy("nome"));
             const snap = await getDocs(q);
             
-            // Popola Select modale
             const modalSelect = document.getElementById('p-user');
             modalSelect.innerHTML = "";
-            
-            // Popola Select Filtro Admin
             const filterSelect = document.getElementById('admin-user-filter');
-            // Mantieni l'opzione "Tutti"
             filterSelect.innerHTML = '<option value="">Tutti i collaboratori</option>';
 
             rubrica = [];
@@ -691,13 +720,9 @@
                 const u = d.data();
                 if(!u.archived) {
                     rubrica.push({email: d.id, nome: u.nome});
-                    
-                    // Option Modale
                     const optM = document.createElement('option');
                     optM.value = d.id; optM.innerText = u.nome;
                     modalSelect.appendChild(optM);
-
-                    // Option Filtro
                     const optF = document.createElement('option');
                     optF.value = d.id; optF.innerText = u.nome;
                     filterSelect.appendChild(optF);
@@ -720,7 +745,6 @@
 
         let actions = "";
         if(isAdmin) {
-            // Aggiunto pulsante Sostituzione (🔄)
             actions = `
                 <div class="card-actions">
                     <button class="action-btn sub" onclick="window.openSubModal('${s.id}', '${s.userName.replace(/'/g, "\\'")}', '${s.date}', '${s.start}-${s.end}')" title="Sostituisci">🔄</button>
@@ -735,21 +759,22 @@
             roleHtml = `<span class="shift-role" style="color:${colorVar}">${s.role}</span>`;
         }
 
-        // Logica visualizzazione Utente vs Sostituto
-        let userHtml = `<span class="shift-user">${s.userName}</span>`;
+        let userHtml = `<span class="shift-user-inline">${s.userName}</span>`;
         if (s.sostituto && s.sostituto.nome) {
             userHtml = `
-                <div class="user-info-box">
-                    <span class="original-user has-sub">${s.userName}</span>
-                    <span class="sub-user"><span class="sub-icon">🔄</span>${s.sostituto.nome}</span>
+                <div class="user-sub-wrapper">
+                    <span class="original-user-strike">${s.userName}</span>
+                    <span class="sub-user-highlight">🔄 ${s.sostituto.nome}</span>
                 </div>
             `;
         }
 
         card.innerHTML = `
             ${actions}
-            <span class="shift-time">${s.start} - ${s.end}</span>
-            ${userHtml}
+            <div class="shift-content-row">
+                <span class="shift-time-badge">${s.start} - ${s.end}</span>
+                ${userHtml}
+            </div>
             ${roleHtml}
         `;
         return card;
@@ -761,13 +786,8 @@
         onSnapshot(q, (snap) => {
             allShiftsData = []; 
             snap.forEach(docSnap => allShiftsData.push({ id: docSnap.id, ...docSnap.data() }));
-            
-            // Ordina globalmente
             allShiftsData.sort((a,b) => a.start.localeCompare(b.start));
-
-            // Chiama la funzione di rendering con i filtri attuali
             renderShiftsFromData();
-
         }, (error) => {
             console.error("Errore lettura turni:", error);
             if(error.code === 'permission-denied') {
@@ -776,45 +796,29 @@
         });
     }
 
-    // NUOVA FUNZIONE DI RENDERING (Separata dal caricamento)
     function renderShiftsFromData() {
-        // 1. Pulisci tutte le colonne
         document.querySelectorAll('.shifts-container').forEach(el => el.innerHTML = "");
 
-        // 2. Filtra i dati
         const filteredShifts = allShiftsData.filter(s => {
-            // Filtro Admin (Singolo Utente)
             if (activeUserFilter) {
-                // Mostra se l'utente è titolare O sostituto
                 const isOwner = s.email === activeUserFilter;
                 const isSub = s.sostituto && s.sostituto.email === activeUserFilter;
                 if (!isOwner && !isSub) return false;
             }
-
-            // Filtro Collaboratore (Solo i miei)
             if (onlyMyShifts && currentUser) {
                 const isMine = s.email === currentUser.email;
                 const isSubMine = s.sostituto && s.sostituto.email === currentUser.email;
                 if (!isMine && !isSubMine) return false;
             }
-
             return true;
         });
 
-        // 3. Renderizza
         filteredShifts.forEach(s => {
-            // A. Categoria Specifica
             let suffix = 'altri';
             let showRole = true; 
 
-            if (s.role === 'Assistente bagnanti') {
-                suffix = 'assistenti';
-                showRole = false; 
-            } 
-            else if (s.role === 'Segreteria') {
-                suffix = 'segreteria';
-                showRole = false; 
-            }
+            if (s.role === 'Assistente bagnanti') { suffix = 'assistenti'; showRole = false; } 
+            else if (s.role === 'Segreteria') { suffix = 'segreteria'; showRole = false; }
             
             const colIdSpecific = `col-${s.date}-${suffix}`;
             const colSpecific = document.getElementById(colIdSpecific);
@@ -822,7 +826,6 @@
                 colSpecific.appendChild(createCard(s, showRole));
             }
 
-            // B. Vista Unificata
             const colIdUnified = `col-${s.date}-tutti`;
             const colUnified = document.getElementById(colIdUnified);
             if (colUnified) {
@@ -916,14 +919,12 @@
         if (!targetDateStr) return alert("Seleziona una data.");
 
         const targetDate = new Date(targetDateStr);
-        // Forza a lunedì se non lo è (opzionale, ma sicuro)
         const targetMonday = getMonday(targetDate);
         const targetMondayStr = formatDate(targetMonday);
         const sourceMondayStr = formatDate(currentWeekStart);
 
         if (targetMondayStr === sourceMondayStr) return alert("Non puoi duplicare sulla stessa settimana!");
 
-        // 1. Trova i turni della settimana corrente (Source)
         const sourceEnd = new Date(currentWeekStart);
         sourceEnd.setDate(sourceEnd.getDate() + 6);
         const sourceEndStr = formatDate(sourceEnd);
@@ -934,12 +935,10 @@
 
         if (!confirm(`Copiare ${shiftsToCopy.length} turni nella settimana del ${targetMonday.toLocaleDateString('it-IT')}?`)) return;
 
-        // 2. Calcola offset giorni
         const diffTime = targetMonday.getTime() - currentWeekStart.getTime();
         const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
 
         try {
-            // 3. Batch Write
             const batch = writeBatch(db);
             
             shiftsToCopy.forEach(s => {
@@ -975,14 +974,12 @@
     };
 
     // --- NUOVE FUNZIONI PER SOSTITUZIONE ---
-    
-    // Popola la select dei sostituti (simile a loadUsers ma riutilizzabile)
     function populateSubSelect() {
         const select = document.getElementById('sub-select-user');
         select.innerHTML = '<option value="">-- Seleziona --</option>';
         rubrica.forEach(u => {
             const opt = document.createElement('option');
-            opt.value = u.email; // Usiamo email come ID
+            opt.value = u.email;
             opt.innerText = u.nome;
             select.appendChild(opt);
         });
@@ -992,9 +989,7 @@
         document.getElementById('sub-id').value = id;
         document.getElementById('sub-current-user').innerText = currentName;
         document.getElementById('sub-details').innerText = `${new Date(date).toLocaleDateString('it-IT')} | ${time}`;
-        
-        populateSubSelect(); // Assicura che la lista sia aggiornata
-        
+        populateSubSelect();
         document.getElementById('sub-shift-modal').style.display = 'flex';
     };
 
