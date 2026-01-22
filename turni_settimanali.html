@@ -94,13 +94,9 @@
             padding: 5px 10px;
             margin: 5px 0 10px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            
-            /* FIX LARGHEZZA SFASATA SU DESKTOP */
-            width: auto; 
-            min-width: 580px; /* Larghezza minima sufficiente per tutti gli elementi */
-            max-width: 100%;
+            width: 100%; 
+            max-width: 600px;
             gap: 10px;
-            flex-wrap: nowrap; /* Evita a capo indesiderati su desktop */
         }
         
         .nav-arrows {
@@ -123,7 +119,6 @@
             display: flex; align-items: center; gap: 5px;
             border-left: 1px solid rgba(255,255,255,0.3);
             padding-left: 10px;
-            flex-shrink: 0; /* Impedisce che si rimpicciolisca troppo */
         }
         
         .date-picker-input {
@@ -304,6 +299,17 @@
             cursor: pointer; color: var(--text-muted); line-height: 1; background: none; border: none;
         }
 
+        /* STILE LISTA SUMMARY GIORNALIERO */
+        .daily-summary-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .daily-summary-item:last-child { border-bottom: none; }
+        .ds-time { font-weight: 700; font-size: 0.9rem; min-width: 80px; }
+        .ds-user { font-weight: 600; font-size: 0.95rem; }
+        .ds-role { font-size: 0.75rem; color: var(--text-muted); margin-left: auto; text-transform: uppercase; }
+
         .hidden { display: none !important; }
         #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3000; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
@@ -463,6 +469,17 @@
     </div>
 </div>
 
+<!-- MODALE RIEPILOGO GIORNALIERO (Nuovo) -->
+<div id="daily-summary-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:500px;">
+        <button class="modal-close-x" onclick="closeModal('daily-summary-modal')">×</button>
+        <h3 style="margin-bottom:15px; color:var(--primary)" id="daily-summary-title">Riepilogo</h3>
+        <div id="daily-summary-content" style="max-height:400px; overflow-y:auto;">
+            <!-- Contenuto dinamico -->
+        </div>
+    </div>
+</div>
+
 <!-- MODALE SOSTITUZIONE -->
 <div id="sub-shift-modal" class="modal-overlay">
     <div class="modal-box">
@@ -497,7 +514,8 @@
                 </div>
                 <div class="nav-tools">
                     <input type="date" id="nav-date-picker" class="date-picker-input" onchange="goToDate(this.value)">
-                    <button onclick="goToToday()" class="btn-today-nav">Oggi</button>
+                    <button onclick="handleTodayClick()" class="btn-today-nav">Oggi</button>
+                    <button onclick="handleTomorrowClick()" class="btn-today-nav">Domani</button>
                 </div>
             </div>
             <div class="controls-row">
@@ -637,6 +655,58 @@
     window.goToToday = () => { currentWeekStart = getMonday(new Date()); renderWeek(); loadPlannedShifts(); };
     window.goToDate = (val) => { if(!val) return; currentWeekStart = getMonday(new Date(val)); renderWeek(); loadPlannedShifts(); };
 
+    // --- NUOVA LOGICA OGGI/DOMANI ---
+    window.handleTodayClick = () => {
+        const today = new Date();
+        currentWeekStart = getMonday(today);
+        renderWeek();
+        // loadPlannedShifts() è già attivo, non serve chiamarlo di nuovo se onSnapshot è live
+        // ma per sicurezza aggiorniamo la UI se necessario
+        openDailySummary(today);
+    };
+
+    window.handleTomorrowClick = () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        currentWeekStart = getMonday(tomorrow);
+        renderWeek();
+        openDailySummary(tomorrow);
+    };
+
+    window.openDailySummary = (dateObj) => {
+        const dateStr = formatDate(dateObj);
+        document.getElementById('daily-summary-title').innerText = `Turni del ${dateObj.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long'})}`;
+        
+        const container = document.getElementById('daily-summary-content');
+        container.innerHTML = "";
+
+        // Filtra turni del giorno
+        const dailyShifts = allShiftsData.filter(s => s.date === dateStr);
+        dailyShifts.sort((a,b) => a.start.localeCompare(b.start));
+
+        if (dailyShifts.length === 0) {
+            container.innerHTML = "<p style='color:#999; text-align:center;'>Nessun turno previsto.</p>";
+        } else {
+            // Raggruppa per categoria (opzionale, qui lista semplice ordinata per ora)
+            dailyShifts.forEach(s => {
+                const style = getRoleColor(s.role); // Riusa funzione colori
+                const user = s.sostituto ? `<span style='text-decoration:line-through; color:#999'>${s.userName}</span> <span style='color:#ff9500; font-weight:700'>🔄 ${s.sostituto.nome}</span>` : s.userName;
+                
+                const item = document.createElement('div');
+                item.className = 'daily-summary-item';
+                item.innerHTML = `
+                    <div class="ds-time">${s.start} - ${s.end}</div>
+                    <div class="ds-user">${user}</div>
+                    <div class="ds-role" style="color:${style}">${s.role}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        document.getElementById('daily-summary-modal').style.display = 'flex';
+    };
+
+
     function renderWeek() {
         const days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         const todayStr = formatDate(new Date());
@@ -663,10 +733,10 @@
                 col.className = 'day-column';
                 col.innerHTML = `
                     <div class="day-header">
-                        <div class="day-name">${days[i]}</div>
                         <div class="day-date-box">
-                             <span class="day-date ${isToday ? 'today' : ''}">${dayDate.getDate()}</span>
-                             <span id="note-icon-${dateStr}-${suffix}" class="note-icon-container"></span>
+                            <span class="day-name">${days[i]}</span>
+                            <span class="day-date ${isToday ? 'today' : ''}">${dayDate.getDate()}</span>
+                            <span id="note-icon-${dateStr}-${suffix}" class="note-icon-container"></span>
                         </div>
                         ${isAdmin ? `<button class="day-note-btn" onclick="window.openNoteModal('${dateStr}')">📝</button>` : ''}
                     </div>
