@@ -94,9 +94,13 @@
             padding: 5px 10px;
             margin: 5px 0 10px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 400px; 
+            
+            /* FIX LARGHEZZA SFASATA SU DESKTOP */
+            width: auto; 
+            min-width: 580px; /* Larghezza minima sufficiente per tutti gli elementi */
             max-width: 100%;
             gap: 10px;
+            flex-wrap: nowrap; /* Evita a capo indesiderati su desktop */
         }
         
         .nav-arrows {
@@ -119,6 +123,7 @@
             display: flex; align-items: center; gap: 5px;
             border-left: 1px solid rgba(255,255,255,0.3);
             padding-left: 10px;
+            flex-shrink: 0; /* Impedisce che si rimpicciolisca troppo */
         }
         
         .date-picker-input {
@@ -353,6 +358,8 @@
             
             /* Pulsante nota su mobile in day-header */
             .day-note-btn { position: absolute; top: 2px; right: 2px; }
+            /* Indicatore nota su mobile */
+            .note-indicator { position: absolute; bottom: 5px; right: 5px; width: 12px; height: 12px; margin: 0; }
         }
 
         /* Ottimizzazioni specifiche Header Mobile */
