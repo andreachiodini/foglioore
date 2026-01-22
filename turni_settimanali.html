@@ -200,6 +200,7 @@
             background: var(--bg-card); border-radius: 12px 12px 0 0; position: relative;
         }
         
+        /* Flex wrapper per data e icona nota affiancate */
         .day-date-box {
             display: flex;
             align-items: center;
@@ -381,7 +382,15 @@
 
             h2 { font-size: 1.2rem; margin-bottom: 2px; }
 
-            .week-navigator { width: 100%; margin: 5px 0; flex-direction: column; gap: 10px; padding: 10px; }
+            .week-navigator { 
+                width: 100%; 
+                margin: 5px 0; 
+                flex-direction: column; 
+                gap: 10px; 
+                padding: 10px; 
+                /* FIX: Reset min-width per evitare overflow su mobile */
+                min-width: 0;
+            }
             /* Frecce e Label su una riga */
             .nav-arrows { width: 100%; display: flex; justify-content: space-between; align-items: center; }
             /* Strumenti sotto */
