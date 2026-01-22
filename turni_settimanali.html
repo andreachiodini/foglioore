@@ -382,6 +382,11 @@
                 justify-content: center; 
                 padding: 10px 5px;
             }
+            /* MODIFICA: Su mobile la data e il numero sono uno sopra l'altro */
+            .day-date-box { 
+                flex-direction: column; 
+                gap: 2px; 
+            }
             .shifts-container { 
                 flex-direction: row; 
                 flex-wrap: wrap; 
@@ -497,7 +502,7 @@
     </div>
 </div>
 
-<!-- MODALE NOTA GIORNALIERA -->
+<!-- MODALE NOTA GIORNALIERA (LETTURA/SCRITTURA) -->
 <div id="note-day-modal" class="modal-overlay">
     <div class="modal-box">
         <button class="modal-close-x" onclick="closeModal('note-day-modal')">×</button>
@@ -751,8 +756,9 @@
         document.getElementById('daily-summary-modal').style.display = 'flex';
     };
 
+
     function renderWeek() {
-        const days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+        const days = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
         const todayStr = formatDate(new Date());
         const weekNum = getWeekNumber(currentWeekStart);
         const options = { day: 'numeric', month: 'short' };
