@@ -94,10 +94,8 @@
             padding: 5px;
             margin: 5px 0 10px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            
-            /* MODIFICA: Larghezza fissa a 400px come richiesto */
             width: 400px; 
-            max-width: 100%; /* Per evitare overflow su schermi piccolissimi */
+            max-width: 100%;
         }
         .week-navigator button {
             background: rgba(255, 255, 255, 0.2);
@@ -156,12 +154,32 @@
             font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-main);
-            display: flex; align-items: center; gap: 10px;
+            display: flex; align-items: center; justify-content: space-between; /* Spazio per bottone duplica */
+            padding-right: 10px;
         }
         .grid-section-title.ass { border-color: var(--dot-assistente); }
         .grid-section-title.seg { border-color: var(--dot-segreteria); }
         .grid-section-title.alt { border-color: var(--dot-istruttore); }
         .grid-section-title.uni { border-color: var(--text-main); }
+
+        /* Bottone Duplica Categoria */
+        .btn-dup-cat {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+        .btn-dup-cat:hover {
+            background: var(--bg-input);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
 
         /* GRID LAYOUT */
         .week-grid {
@@ -268,7 +286,7 @@
         }
         .shift-card:hover .card-actions { opacity: 1; top: 2px; right: 2px; }
 
-        /* Su mobile le azioni sono sempre visibili o gestite diversamente, qui le lasciamo sempre accessibili se admin */
+        /* Su mobile le azioni sono sempre visibili o gestite diversamente */
         @media (max-width: 900px) {
             .card-actions { opacity: 1; position: static; margin-bottom: 4px; justify-content: flex-end; background: transparent; box-shadow: none; }
         }
@@ -326,8 +344,8 @@
 
             h2 { font-size: 1.2rem; margin-bottom: 2px; }
 
-            /* Il navigatore diventa full width su mobile */
-            .week-navigator { width: 100%; margin: 5px 0; }
+            /* Il navigatore ridiventa compatto su mobile */
+            .week-navigator { width: auto; margin: 5px auto; justify-content: center; }
 
             /* Riga controlli compatti */
             .controls-row {
@@ -356,7 +374,7 @@
             .action-buttons-container {
                 display: flex; gap: 5px; margin-top: 5px;
             }
-            #btn-dup-week, #btn-add-shift { flex: 1; justify-content: center; }
+            #btn-add-shift { flex: 1; justify-content: center; }
 
             .back-link { font-size: 0.8rem; margin-bottom: 10px; padding: 6px 10px; }
         }
@@ -414,20 +432,20 @@
     </div>
 </div>
 
-<!-- MODALE DUPLICAZIONE SETTIMANA -->
+<!-- MODALE DUPLICAZIONE SETTIMANA (CAT) -->
 <div id="dup-week-modal" class="modal-overlay">
     <div class="modal-box">
-        <h3 style="margin-bottom:15px; color:var(--primary)">📑 Duplica Settimana</h3>
+        <h3 style="margin-bottom:15px; color:var(--primary)">📑 Duplica Categoria</h3>
         <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px">
-            Stai per copiare tutti i turni della settimana visualizzata (<span id="dup-source-label" style="font-weight:bold"></span>).
+            Stai copiando i turni di <b><span id="dup-cat-name"></span></b> dalla settimana visualizzata.
         </p>
         
-        <label>Seleziona il Lunedì di destinazione:</label>
+        <label>Lunedì di destinazione:</label>
         <input type="date" id="dup-target-date" style="margin-bottom:20px">
 
         <div style="display:flex; gap:10px">
             <button class="btn-secondary" onclick="closeModal('dup-week-modal')" style="flex:1">Annulla</button>
-            <button class="btn-warning" onclick="executeDuplication()" style="flex:1">Copia Turni</button>
+            <button class="btn-warning" onclick="executeDuplication()" style="flex:1">Copia</button>
         </div>
     </div>
 </div>
@@ -467,7 +485,7 @@
         <div style="flex: 1;">
             <h2 style="margin:0">Programmazione Turni</h2>
             
-            <!-- NAVIGATORE SETTIMANA INTEGRATO (BOX BLU) -->
+            <!-- NAVIGATORE SETTIMANA INTEGRATO -->
             <div class="week-navigator">
                 <button onclick="changeWeek(-1)">❮</button>
                 <div id="week-range-label">...</div>
@@ -501,8 +519,7 @@
             <button onclick="goToToday()" style="background:var(--bg-body); color:var(--text-main); font-size:0.8rem;">Oggi</button>
             
             <div class="action-buttons-container">
-                <!-- Bottone Duplica (Admin) -->
-                <button id="btn-dup-week" class="btn-secondary hidden" onclick="openDupModal()" title="Duplica Settimana">📑 Duplica</button>
+                <!-- Solo Bottone Aggiungi qui, duplicazione spostata nelle categorie -->
                 <button id="btn-add-shift" class="btn-primary hidden" onclick="openAddModal()">➕ Aggiungi</button>
             </div>
         </div>
@@ -512,13 +529,22 @@
 
     <!-- MODALITÀ: CATEGORIE (DEFAULT) -->
     <div id="view-mode-categories">
-        <div class="grid-section-title ass">🏊 Assistenti Bagnanti</div>
+        <div class="grid-section-title ass">
+            <span>🏊 Assistenti Bagnanti</span>
+            <button class="btn-dup-cat hidden admin-dup-btn" onclick="openDupModal('assistenti')">📑</button>
+        </div>
         <div id="grid-assistenti" class="week-grid"></div>
 
-        <div class="grid-section-title seg">💼 Segreteria</div>
+        <div class="grid-section-title seg">
+            <span>💼 Segreteria</span>
+            <button class="btn-dup-cat hidden admin-dup-btn" onclick="openDupModal('segreteria')">📑</button>
+        </div>
         <div id="grid-segreteria" class="week-grid"></div>
 
-        <div class="grid-section-title alt">🏋️ Istruttori & Altri</div>
+        <div class="grid-section-title alt">
+            <span>🏋️ Istruttori & Altri</span>
+            <button class="btn-dup-cat hidden admin-dup-btn" onclick="openDupModal('altri')">📑</button>
+        </div>
         <div id="grid-altri" class="week-grid"></div>
     </div>
 
@@ -558,6 +584,7 @@
     
     let activeUserFilter = ""; 
     let onlyMyShifts = false;
+    let currentDupCategory = ""; // Variabile per tracciare quale categoria si sta duplicando
 
     // --- DARK MODE ---
     window.toggleTheme = () => {
@@ -642,8 +669,11 @@
             
             if (isAdmin) {
                 document.getElementById('btn-add-shift').classList.remove('hidden');
-                document.getElementById('btn-dup-week').classList.remove('hidden');
                 document.getElementById('admin-user-filter').classList.remove('hidden');
+                
+                // Mostra tutti i pulsanti duplica per categoria
+                document.querySelectorAll('.admin-dup-btn').forEach(btn => btn.classList.remove('hidden'));
+                
                 await loadUsers();
             } else {
                 document.getElementById('collab-filter-container').classList.remove('hidden');
@@ -908,10 +938,13 @@
         }
     };
 
-    // --- DUPLICAZIONE SETTIMANA ---
-    window.openDupModal = () => {
-        const options = { day: 'numeric', month: 'short' };
-        document.getElementById('dup-source-label').innerText = currentWeekStart.toLocaleDateString('it-IT', options);
+    // --- DUPLICAZIONE SETTIMANA PER CATEGORIA ---
+    window.openDupModal = (category) => {
+        currentDupCategory = category;
+        const catName = category === 'assistenti' ? "Assistenti Bagnanti" :
+                        category === 'segreteria' ? "Segreteria" : "Istruttori & Altri";
+        
+        document.getElementById('dup-cat-name').innerText = catName;
         
         // Imposta di default il lunedì successivo
         const nextMonday = new Date(currentWeekStart);
@@ -926,30 +959,37 @@
         if (!targetDateStr) return alert("Seleziona una data.");
 
         const targetDate = new Date(targetDateStr);
-        // Forza a lunedì se non lo è (opzionale, ma sicuro)
         const targetMonday = getMonday(targetDate);
         const targetMondayStr = formatDate(targetMonday);
         const sourceMondayStr = formatDate(currentWeekStart);
 
         if (targetMondayStr === sourceMondayStr) return alert("Non puoi duplicare sulla stessa settimana!");
 
-        // 1. Trova i turni della settimana corrente (Source)
         const sourceEnd = new Date(currentWeekStart);
         sourceEnd.setDate(sourceEnd.getDate() + 6);
         const sourceEndStr = formatDate(sourceEnd);
 
-        const shiftsToCopy = allShiftsData.filter(s => s.date >= sourceMondayStr && s.date <= sourceEndStr);
+        // FILTRA TURNI PER DATA E CATEGORIA
+        const shiftsToCopy = allShiftsData.filter(s => {
+            const inDate = s.date >= sourceMondayStr && s.date <= sourceEndStr;
+            if (!inDate) return false;
 
-        if (shiftsToCopy.length === 0) return alert("Nessun turno da copiare nella settimana visualizzata.");
+            if (currentDupCategory === 'assistenti') return s.role === 'Assistente bagnanti';
+            if (currentDupCategory === 'segreteria') return s.role === 'Segreteria';
+            if (currentDupCategory === 'altri') return s.role !== 'Assistente bagnanti' && s.role !== 'Segreteria';
+            
+            return false;
+        });
+
+        if (shiftsToCopy.length === 0) return alert("Nessun turno da copiare per questa categoria.");
 
         if (!confirm(`Copiare ${shiftsToCopy.length} turni nella settimana del ${targetMonday.toLocaleDateString('it-IT')}?`)) return;
 
-        // 2. Calcola offset giorni
+        // Calcola offset giorni
         const diffTime = targetMonday.getTime() - currentWeekStart.getTime();
         const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
 
         try {
-            // 3. Batch Write
             const batch = writeBatch(db);
             
             shiftsToCopy.forEach(s => {
@@ -974,9 +1014,10 @@
             window.toast(`Copiati ${shiftsToCopy.length} turni!`);
             window.closeModal('dup-week-modal');
             
-            currentWeekStart = targetMonday;
-            renderWeek();
-            loadPlannedShifts();
+            // Opzionale: vai alla settimana target
+            // currentWeekStart = targetMonday;
+            // renderWeek();
+            // loadPlannedShifts();
 
         } catch (e) {
             console.error(e);
