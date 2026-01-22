@@ -159,7 +159,7 @@
         }
         .checkbox-filter input { width: 16px; height: 16px; margin: 0; }
 
-        /* MULTI-DAY SELECTOR (Nuovo Stile) */
+        /* SELEZIONE MULTIPLA GIORNI (MODALE) */
         .day-toggle-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -217,7 +217,7 @@
 
         .day-column {
             background: var(--bg-body); border-radius: 12px; min-height: 150px; 
-            display: flex; flex-direction: column; 
+            display: flex; flex-direction: column; /* Verticale su desktop */
             border: 1px solid var(--border-color);
         }
 
@@ -363,12 +363,42 @@
         /* --- MOBILE OPTIMIZATIONS (Max 900px e 600px) --- */
         @media (max-width: 900px) {
             .week-grid { grid-template-columns: 1fr; gap: 10px; }
-            .day-column { min-height: auto; border: 1px solid var(--border-color); flex-direction: row; align-items: center; flex-wrap: wrap; }
-            .day-header { width: 100%; border-bottom: 1px solid var(--border-color); border-right: none; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; }
-            .shifts-container { flex-direction: row; flex-wrap: wrap; width: 100%; padding: 5px; }
-            .shift-card { width: 100%; max-width: 100%; margin-right: 0; margin-bottom: 5px; }
+            .day-column { 
+                min-height: auto; 
+                border: 1px solid var(--border-color); 
+                /* RIPRISTINATO: Data a sinistra, turni a destra sulla stessa riga */
+                flex-direction: row; 
+                align-items: stretch; /* Stretch per occupare l'altezza */
+                flex-wrap: nowrap; /* Impedisce che vadano a capo */
+            }
+            .day-header { 
+                width: 90px; /* Larghezza fissa data */
+                flex-shrink: 0; 
+                border-bottom: none; 
+                border-right: 1px solid var(--border-color); 
+                border-radius: 12px 0 0 12px; 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: center; 
+                padding: 10px 5px;
+            }
+            .shifts-container { 
+                flex-direction: row; 
+                flex-wrap: wrap; 
+                width: 100%; 
+                padding: 5px; 
+                align-content: flex-start;
+            }
+            .shift-card { 
+                width: auto; 
+                min-width: 140px; 
+                max-width: 100%; 
+                margin-right: 5px; 
+                margin-bottom: 5px; 
+                flex-grow: 1; /* Si espande */
+            }
             .card-actions { opacity: 1; position: static; margin-bottom: 4px; justify-content: flex-end; background: transparent; box-shadow: none; }
-            .day-note-btn { position: static; margin-left: 10px; font-size: 1.1rem; }
+            .day-note-btn { position: absolute; top: 2px; right: 2px; }
             .day-note-box { width: 100%; margin: 5px 10px; }
         }
 
@@ -443,9 +473,13 @@
             <div style="flex:1"><label>Fine</label><input type="time" id="p-end"></div>
         </div>
 
-        <div style="display:flex; gap:10px">
-            <button class="btn-secondary" onclick="closeModal('add-shift-modal')" style="flex:1">Annulla</button>
-            <button class="btn-primary" onclick="savePlannedShift()" style="flex:1">Salva</button>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; gap:10px;">
+                <button class="btn-secondary" onclick="closeModal('add-shift-modal')" style="flex:1">Annulla</button>
+                <button class="btn-primary" onclick="savePlannedShift(false)" style="flex:1">Salva</button>
+            </div>
+            <!-- Bottone Salva e Continua (Visibile solo in Nuovo) -->
+            <button id="btn-save-continue" class="btn-warning hidden" onclick="savePlannedShift(true)" style="width:100%;">Salva e Continua</button>
         </div>
     </div>
 </div>
@@ -567,7 +601,6 @@
         <div id="grid-tutti" class="week-grid"></div>
     </div>
 
-    <!-- SEZIONE RIEPILOGO SETTIMANALE (SOLO ADMIN) -->
     <div id="weekly-summary-section" class="hidden">
         <div class="grid-section-title sum">📊 Riepilogo Ore Settimanale</div>
         <div id="weekly-summary-grid" class="summary-grid"></div>
