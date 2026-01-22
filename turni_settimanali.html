@@ -378,11 +378,11 @@
                 min-height: auto; 
                 border: 1px solid var(--border-color); 
                 flex-direction: row; 
-                align-items: stretch; /* Stretch per occupare l'altezza */
-                flex-wrap: nowrap; /* Impedisce che vadano a capo */
+                align-items: stretch; 
+                flex-wrap: nowrap; 
             }
             .day-header { 
-                width: 90px; /* Larghezza fissa data */
+                width: 90px; 
                 flex-shrink: 0; 
                 border-bottom: none; 
                 border-right: 1px solid var(--border-color); 
@@ -392,7 +392,6 @@
                 justify-content: center; 
                 padding: 10px 5px;
             }
-            /* MODIFICA: Su mobile la data e il numero sono uno sopra l'altro */
             .day-date-box { 
                 flex-direction: column; 
                 gap: 2px; 
@@ -402,15 +401,17 @@
                 flex-wrap: wrap; 
                 width: 100%; 
                 padding: 5px; 
-                align-content: flex-start;
+                align-content: center;
+                align-items: center; /* CENTRATURA VERTICALE SU MOBILE */
+                justify-content: flex-start;
+                gap: 6px;
             }
             .shift-card { 
                 width: auto; 
                 min-width: 140px; 
                 max-width: 100%; 
-                margin-right: 5px; 
-                margin-bottom: 5px; 
-                flex-grow: 1; /* Si espande */
+                margin: 0; /* Rimosso margin extra per usare gap */
+                flex-grow: 1; 
             }
             .card-actions { opacity: 1; position: static; margin-bottom: 4px; justify-content: flex-end; background: transparent; box-shadow: none; }
             .day-note-btn { position: absolute; top: 2px; right: 2px; }
