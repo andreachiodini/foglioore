@@ -94,9 +94,12 @@
             padding: 5px 10px;
             margin: 5px 0 10px 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 400px; 
+            
+            /* MODIFICA: Larghezza fissa su desktop per contenere i nuovi pulsanti */
+            width: 650px; 
             max-width: 100%;
             gap: 10px;
+            flex-wrap: nowrap; 
         }
         
         .nav-arrows {
@@ -147,6 +150,7 @@
             background: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
+        /* Nuovi Stili Filtri */
         .filter-container select {
             padding: 8px 12px; margin: 0; font-size: 0.85rem; border-radius: 8px; max-width: 200px;
         }
@@ -197,6 +201,7 @@
             background: var(--bg-card); border-radius: 12px 12px 0 0; position: relative;
         }
         
+        /* Flex wrapper per data e icona nota affiancate */
         .day-date-box {
             display: flex;
             align-items: center;
@@ -217,6 +222,12 @@
         }
         .note-indicator:hover { transform: scale(1.2); }
         
+        .admin-note-edit {
+            position: absolute; top: 2px; right: 2px; font-size: 0.8rem; cursor: pointer; opacity: 0.5;
+        }
+        .admin-note-edit:hover { opacity: 1; }
+
+        /* NOTE BUTTON IN HEADER (MATITA) */
         .day-note-btn {
             position: absolute; top: 5px; right: 5px; background: none; border: none; font-size: 0.9rem; cursor: pointer; padding: 2px;
             opacity: 0.5; transition: 0.2s;
@@ -278,32 +289,6 @@
         .original-user-strike { text-decoration: line-through; color: var(--text-muted); font-size: 0.7rem; }
         .sub-user-highlight { color: #ff9500; font-weight: 700; font-size: 0.85rem; }
 
-        /* MULTI-DAY SELECTOR (Nuovo) */
-        .day-toggle-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .day-toggle-btn {
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-input);
-            border-radius: 8px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            color: var(--text-main);
-        }
-        .day-toggle-btn.selected {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            font-weight: 700;
-        }
-        .day-toggle-btn:hover:not(.selected) { background: var(--hover-btn); }
-
         /* MODALE POP-UP */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -337,15 +322,56 @@
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} } @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
         /* --- MOBILE OPTIMIZATIONS (Max 900px e 600px) --- */
+        
+        /* Layout Riga Unica su Mobile (Giorno a Sx, Turni a Dx) */
         @media (max-width: 900px) {
             .week-grid { grid-template-columns: 1fr; gap: 10px; }
-            .day-column { min-height: auto; border: 1px solid var(--border-color); flex-direction: row; align-items: center; flex-wrap: wrap; }
-            .day-header { width: 100%; border-bottom: 1px solid var(--border-color); border-right: none; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; }
-            .shifts-container { flex-direction: row; flex-wrap: wrap; width: 100%; padding: 5px; }
-            .shift-card { width: 100%; max-width: 100%; margin-right: 0; margin-bottom: 5px; }
+            
+            .day-column { 
+                min-height: auto; 
+                border: 1px solid var(--border-color); 
+                flex-direction: row; /* DATA A SINISTRA, TURNI A DESTRA */
+                align-items: stretch; 
+            }
+            
+            .day-header { 
+                width: 90px; /* Larghezza fissa data */
+                flex-shrink: 0; 
+                border-bottom: none; 
+                border-right: 1px solid var(--border-color); 
+                border-radius: 12px 0 0 12px; 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: center; 
+                padding: 10px 5px;
+            }
+            
+            .day-date-box { flex-direction: column; gap: 2px; } /* Data e nota verticali su mobile per spazio */
+
+            .shifts-container { 
+                flex-direction: row; 
+                flex-wrap: wrap; 
+                width: 100%; 
+                padding: 5px; 
+                align-items: center; 
+            }
+            
+            .shift-card { 
+                width: auto; 
+                min-width: 140px; 
+                max-width: 100%; 
+                margin-right: 5px; 
+                margin-bottom: 5px; 
+                flex-grow: 1; 
+            }
+
+            /* Su mobile le azioni sono sempre visibili o gestite diversamente */
             .card-actions { opacity: 1; position: static; margin-bottom: 4px; justify-content: flex-end; background: transparent; box-shadow: none; }
-            .day-note-btn { position: static; margin-left: 10px; font-size: 1.1rem; }
-            .day-note-box { width: 100%; margin: 5px 10px; }
+            
+            /* Pulsante nota su mobile in day-header */
+            .day-note-btn { position: absolute; top: 2px; right: 2px; }
+            /* Indicatore nota su mobile */
+            .note-indicator { position: absolute; bottom: 5px; right: 5px; width: 12px; height: 12px; margin: 0; }
         }
 
         /* Ottimizzazioni specifiche Header Mobile */
@@ -353,18 +379,33 @@
             .container { padding: 10px 10px 80px 10px; }
             
             .week-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 5px; align-items: stretch; }
+            
+            /* Titolo sezione ridotto su mobile */
             .grid-section-title { margin-top: 15px; margin-bottom: 5px; }
+
             h2 { font-size: 1.2rem; margin-bottom: 2px; }
 
-            .week-navigator { width: 100%; margin: 5px 0; flex-direction: column; gap: 10px; padding: 10px; min-width: 0; }
+            /* MODIFICA: Su mobile il navigatore è full width */
+            .week-navigator { 
+                width: 100%; 
+                margin: 5px 0; 
+                flex-direction: column; 
+                gap: 10px; 
+                padding: 10px; 
+                min-width: 0; /* Reset */
+            }
+            /* Frecce e Label su una riga */
             .nav-arrows { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+            /* Strumenti sotto */
             .nav-tools { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 10px; padding-left: 0; justify-content: center; }
 
             .controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; margin-top: 0; }
             .view-switcher { margin-top: 0; width: 100%; }
             .view-switcher button { padding: 6px 0; font-size: 0.75rem; width: 50%; text-align: center; }
+            
             .filter-container { width: 100%; }
             .filter-container select, .checkbox-filter { width: 100%; padding: 6px; font-size: 0.75rem; height: 100%; box-sizing: border-box; margin: 0; justify-content: center; }
+            
             .action-buttons-container { display: flex; gap: 5px; margin-top: 5px; }
             #btn-add-shift { flex: 1; justify-content: center; }
 
@@ -384,24 +425,8 @@
     <div class="modal-box">
         <h3 id="modal-title" style="margin-bottom:15px; color:var(--primary)">Nuovo Turno</h3>
         <input type="hidden" id="p-id">
-        
-        <label>Collaboratore</label>
-        <select id="p-user"></select>
-
-        <!-- SEZIONE GIORNI (VISIBILE SOLO IN NUOVO) -->
-        <div id="multi-day-section">
-            <label>Giorni della settimana</label>
-            <div id="day-toggles-container" class="day-toggle-container">
-                <!-- Generato via JS -->
-            </div>
-        </div>
-
-        <!-- SEZIONE DATA SINGOLA (VISIBILE SOLO IN EDIT) -->
-        <div id="single-date-section" class="hidden">
-            <label>Data</label>
-            <input type="date" id="p-date">
-        </div>
-
+        <label>Collaboratore</label><select id="p-user"></select>
+        <label>Data</label><input type="date" id="p-date">
         <label>Mansione</label>
         <select id="p-role">
             <option value="Assistente bagnanti">Assistente bagnanti</option>
@@ -411,20 +436,13 @@
             <option value="Propaganda">Propaganda</option>
             <option value="Lezione individuale">Lezione individuale</option>
         </select>
-
         <div style="display:flex; gap:10px; margin-bottom:20px">
             <div style="flex:1"><label>Inizio</label><input type="time" id="p-start"></div>
             <div style="flex:1"><label>Fine</label><input type="time" id="p-end"></div>
         </div>
-
-        <!-- BOTTONI AZIONE -->
-        <div style="display:flex; flex-direction:column; gap:10px;">
-            <div style="display:flex; gap:10px;">
-                <button class="btn-secondary" onclick="closeModal('add-shift-modal')" style="flex:1">Annulla</button>
-                <button class="btn-primary" onclick="savePlannedShift(false)" style="flex:1">Salva</button>
-            </div>
-            <!-- Bottone Salva e Continua (Visibile solo in Nuovo) -->
-            <button id="btn-save-continue" class="btn-warning" onclick="savePlannedShift(true)" style="width:100%;">Salva e Continua</button>
+        <div style="display:flex; gap:10px">
+            <button class="btn-secondary" onclick="closeModal('add-shift-modal')" style="flex:1">Annulla</button>
+            <button class="btn-primary" onclick="savePlannedShift()" style="flex:1">Salva</button>
         </div>
     </div>
 </div>
@@ -450,8 +468,10 @@
         <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px; font-weight:600;" id="note-day-label"></p>
         <input type="hidden" id="note-day-date">
         
+        <!-- Area visibile a tutti (Lettura) -->
         <div id="note-read-area" style="background:#fff9c4; padding:15px; border-radius:8px; margin-bottom:15px; line-height:1.5; color:#444;"></div>
 
+        <!-- Area modifica (Solo Admin) -->
         <div id="note-write-area" class="hidden">
             <textarea id="note-day-text" rows="4" placeholder="Scrivi una nota..." style="width:100%; margin-bottom:15px"></textarea>
             <div style="display:flex; gap:10px">
@@ -463,12 +483,14 @@
     </div>
 </div>
 
-<!-- MODALE RIEPILOGO GIORNALIERO -->
+<!-- MODALE RIEPILOGO GIORNALIERO (Nuovo) -->
 <div id="daily-summary-modal" class="modal-overlay">
     <div class="modal-box" style="max-width:500px;">
         <button class="modal-close-x" onclick="closeModal('daily-summary-modal')">×</button>
         <h3 style="margin-bottom:15px; color:var(--primary)" id="daily-summary-title">Riepilogo</h3>
-        <div id="daily-summary-content" style="max-height:400px; overflow-y:auto;"></div>
+        <div id="daily-summary-content" style="max-height:400px; overflow-y:auto;">
+            <!-- Contenuto dinamico -->
+        </div>
     </div>
 </div>
 
@@ -647,6 +669,7 @@
     window.goToToday = () => { currentWeekStart = getMonday(new Date()); renderWeek(); renderShiftsFromData(); };
     window.goToDate = (val) => { if(!val) return; currentWeekStart = getMonday(new Date(val)); renderWeek(); renderShiftsFromData(); };
 
+    // --- NUOVA LOGICA OGGI/DOMANI ---
     window.handleTodayClick = () => {
         const today = new Date();
         currentWeekStart = getMonday(today);
@@ -691,6 +714,7 @@
         }
         document.getElementById('daily-summary-modal').style.display = 'flex';
     };
+
 
     function renderWeek() {
         const days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
@@ -901,38 +925,11 @@
         try { await deleteDoc(doc(db, "note_giornaliere", dateStr)); window.toast("Nota rimossa"); window.closeModal('note-day-modal'); } catch(e) { alert(e.message); }
     };
 
-    // --- AZIONI MODALE NUOVO TURNO (COMPLETA) ---
     window.openAddModal = () => {
         document.getElementById('modal-title').innerText = "Nuovo Turno";
         document.getElementById('p-id').value = ""; 
         document.getElementById('add-shift-modal').style.display = 'flex';
-        
-        // MOSTRA SELEZIONE MULTIPLA, NASCONDI DATA SINGOLA
-        document.getElementById('multi-day-section').classList.remove('hidden');
-        document.getElementById('single-date-section').classList.add('hidden');
-        document.getElementById('btn-save-continue').classList.remove('hidden'); // Mostra tasto continua
-
-        // Genera toggle buttons per la settimana corrente
-        const togglesContainer = document.getElementById('day-toggles-container');
-        togglesContainer.innerHTML = "";
-        
-        const days = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
-        
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(currentWeekStart);
-            d.setDate(d.getDate() + i);
-            const dateStr = formatDate(d);
-            const dayName = days[d.getDay()];
-            
-            const btn = document.createElement('div');
-            btn.className = 'day-toggle-btn';
-            btn.innerText = `${dayName} ${d.getDate()}`;
-            btn.dataset.date = dateStr;
-            btn.onclick = () => btn.classList.toggle('selected');
-            togglesContainer.appendChild(btn);
-        }
-        
-        // Pulisci orari
+        document.getElementById('p-date').value = formatDate(currentWeekStart);
         document.getElementById('p-start').value = "";
         document.getElementById('p-end').value = "";
     };
@@ -941,12 +938,6 @@
         document.getElementById('modal-title').innerText = "Modifica Turno";
         document.getElementById('p-id').value = id; 
         document.getElementById('p-user').value = email;
-        
-        // MOSTRA DATA SINGOLA, NASCONDI MULTIPLA
-        document.getElementById('multi-day-section').classList.add('hidden');
-        document.getElementById('single-date-section').classList.remove('hidden');
-        document.getElementById('btn-save-continue').classList.add('hidden'); // Nascondi tasto continua
-
         document.getElementById('p-date').value = date;
         document.getElementById('p-role').value = role;
         document.getElementById('p-start').value = start;
@@ -956,48 +947,21 @@
 
     window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
 
-    window.savePlannedShift = async (keepOpen = false) => {
+    window.savePlannedShift = async () => {
         const id = document.getElementById('p-id').value;
         const email = document.getElementById('p-user').value;
+        const date = document.getElementById('p-date').value;
         const role = document.getElementById('p-role').value;
         const start = document.getElementById('p-start').value;
         const end = document.getElementById('p-end').value;
-
-        if(!email || !start || !end) return alert("Compila collaboratore e orari.");
-
+        if(!email || !date || !start || !end) return alert("Compila tutti i campi");
         const userObj = rubrica.find(u => u.email === email);
         const userName = userObj ? userObj.nome : email;
-
         try {
-            if (id) {
-                // MODIFICA (Singolo giorno)
-                const date = document.getElementById('p-date').value;
-                if(!date) return alert("Data mancante.");
-                await updateDoc(doc(db, "programmazione_turni", id), { email, userName, date, role, start, end });
-                window.toast("Modificato");
-                window.closeModal('add-shift-modal');
-            } else {
-                // NUOVO (Multi-giorno)
-                const selectedBtns = document.querySelectorAll('.day-toggle-btn.selected');
-                if (selectedBtns.length === 0) return alert("Seleziona almeno un giorno.");
-
-                const batch = writeBatch(db);
-                selectedBtns.forEach(btn => {
-                    const date = btn.dataset.date;
-                    const newRef = doc(collection(db, "programmazione_turni"));
-                    batch.set(newRef, { email, userName, date, role, start, end, created_at: new Date() });
-                });
-                
-                await batch.commit();
-                window.toast(`Creati ${selectedBtns.length} turni`);
-                
-                if (!keepOpen) {
-                    window.closeModal('add-shift-modal');
-                } else {
-                    // Reset solo giorni per inserimento rapido
-                    document.querySelectorAll('.day-toggle-btn.selected').forEach(b => b.classList.remove('selected'));
-                }
-            }
+            if (id) await updateDoc(doc(db, "programmazione_turni", id), { email, userName, date, role, start, end });
+            else await addDoc(collection(db, "programmazione_turni"), { email, userName, date, role, start, end, created_at: new Date() });
+            window.toast(id ? "Modificato" : "Creato");
+            window.closeModal('add-shift-modal');
         } catch(e) { alert("Errore: " + e.message); }
     };
 
