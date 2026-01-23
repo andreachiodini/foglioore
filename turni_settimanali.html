@@ -1069,6 +1069,7 @@
         try { await deleteDoc(doc(db, "note_giornaliere", dateStr)); window.toast("Nota rimossa"); window.closeModal('note-day-modal'); } catch(e) { alert(e.message); }
     };
 
+    // --- LOGICA EXCEL MODE ---
     window.openExcelModal = () => {
         document.getElementById('excel-mode-modal').style.display = 'flex';
         const body = document.getElementById('excel-body');
@@ -1381,19 +1382,52 @@
             return a.start.localeCompare(b.start);
         });
 
-        weeklyShifts.forEach(s => {
-            const dateObj = new Date(s.date);
-            const dateLabel = dateObj.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'numeric' });
-            const name = s.sostituto ? `${s.sostituto.nome} (Sost. ${s.userName})` : s.userName;
-            tableBody.push([dateLabel, `${s.start} - ${s.end}`, name, s.role]);
-        });
+        // Loop per aggiungere i dati raggruppati per giorno con intestazione
+        for (let i = 0; i < 7; i++) {
+            const dayDate = new Date(currentWeekStart);
+            dayDate.setDate(dayDate.getDate() + i);
+            const dateStr = formatDate(dayDate);
+            
+            const dailyShifts = weeklyShifts.filter(s => s.date === dateStr);
+            const dailyNote = allNotesData.find(n => n.id === dateStr);
+
+            if (dailyShifts.length > 0 || (dailyNote && dailyNote.text)) {
+                // Header Giorno
+                const dayLabel = dayDate.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+                const capDayLabel = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1);
+                
+                tableBody.push([{ content: capDayLabel, colSpan: 3, styles: { fillColor: [240, 242, 245], textColor: [0, 122, 255], fontStyle: 'bold', halign: 'left' } }]);
+
+                // Nota
+                if (dailyNote && dailyNote.text) {
+                    tableBody.push([{ content: `Nota: ${dailyNote.text}`, colSpan: 3, styles: { fillColor: [255, 250, 225], textColor: [100, 100, 100], fontStyle: 'italic', fontSize: 9 } }]);
+                }
+
+                // Turni
+                dailyShifts.forEach(s => {
+                    const name = s.sostituto ? `${s.sostituto.nome} (Sost. ${s.userName})` : s.userName;
+                    tableBody.push([
+                        `${s.start} - ${s.end}`,
+                        name,
+                        s.role
+                    ]);
+                });
+            }
+        }
+        
+        if (tableBody.length === 0) {
+            tableBody.push([{ content: "Nessun turno inserito.", colSpan: 3, styles: { halign: 'center' } }]);
+        }
 
         doc.autoTable({
-            head: [['Giorno', 'Orario', 'Collaboratore', 'Mansione']],
+            head: [['Orario', 'Collaboratore', 'Mansione']],
             body: tableBody,
             startY: 30,
-            theme: 'grid',
-            headStyles: { fillColor: [0, 122, 255] }
+            theme: 'plain',
+            styles: { font: 'helvetica', fontSize: 10, cellPadding: 4, lineColor: [230, 230, 230], lineWidth: 0.1 },
+            headStyles: { fillColor: [0, 122, 255], textColor: 255, fontStyle: 'bold', halign: 'left' },
+            columnStyles: { 0: { cellWidth: 35, fontStyle: 'bold' }, 1: { cellWidth: 'auto' }, 2: { cellWidth: 50, textColor: [100,100,100] } },
+            alternateRowStyles: { fillColor: [255, 255, 255] }
         });
 
         doc.save(`Turni_${dateRange.replace(/\s/g,'_')}.pdf`);
