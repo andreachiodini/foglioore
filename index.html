@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Librerie PDF necessarie -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
@@ -28,7 +27,7 @@
             --money-color: #34c759;
             --hover-btn: #e5e5ea;
 
-            /* PALLINI (Mantenuti per il calendario) */
+            /* PALLINI */
             --dot-assistente: #ff3b30;
             --dot-istruttore: #34c759;
             --dot-propaganda: #af52de;
@@ -255,10 +254,9 @@
         
         /* Celle tabella (Card look) */
         td { 
-            padding: 8px 12px; /* Più compatto */
+            padding: 8px 12px; 
             color: var(--text-main); 
             vertical-align: middle; 
-            /* Rimuovo i bordi per un look più pulito */
             border: none;
         }
         td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
@@ -269,109 +267,40 @@
         .icon-btn:hover { background: white; transform: scale(1.1); }
         .icon-lock { font-size: 1rem; color: var(--text-muted); cursor: not-allowed; padding: 4px;}
 
-        /* Stats */
-        .stats-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
-        .stat-pill { background: var(--bg-input); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: var(--text-main); font-weight: 500; }
-        .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-        /* Admin Cards - COMPACT STYLE */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 20px; }
-        
-        .user-card { 
-            background: var(--bg-card); 
-            border: 1px solid var(--border-color); 
-            border-radius: 14px; 
-            padding: 12px 16px; /* Padding ridotto per compattezza */
-            cursor: pointer; 
-            transition: transform 0.2s, box-shadow 0.2s; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-            position: relative; 
-        }
-        
-        .user-card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 15px rgba(0,0,0,0.08); 
-        }
-        
-        .user-card.archived { 
-            opacity: 0.6; 
-            border-style: dashed; 
-        }
-        
-        .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 2px; 
-        }
-        
-        .card-name { 
-            font-weight: 700; 
-            font-size: 1rem; /* Font leggermente ridotto */
-            color: var(--text-main); 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            white-space: nowrap; 
-            margin-right: 10px; 
-        }
-        
-        .card-actions-group { 
-            display: flex; 
-            gap: 4px; 
-            flex-shrink: 0; 
-            align-items: center; 
-        }
-        
-        .card-action-btn { 
-            background: none; 
+        /* Stats Compatti */
+        .stats-container { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; margin-top: 10px; }
+        .stat-pill { 
+            background: var(--bg-input); 
             border: none; 
-            padding: 2px 4px; 
-            font-size: 1rem; 
-            cursor: pointer; 
-            line-height: 1; 
-            width: auto; 
-            margin: 0; 
-        }
-        
-        .card-sub { 
-            color: var(--text-muted); 
+            padding: 4px 10px; 
+            border-radius: 8px; 
             font-size: 0.75rem; 
-            margin-bottom: 10px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            color: var(--text-main); 
+            font-weight: 600;
         }
+        .stat-dot { display: none; }
+
+        /* Admin Cards (Ripristinato stile originale) */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; margin-top: 20px; }
+        .user-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.03); position: relative; }
+        .user-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .user-card.archived { opacity: 0.6; border-style: dashed; }
         
-        .card-stats-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-end; 
-            border-top: 1px solid var(--bg-body); 
-            padding-top: 8px; 
-        }
-        
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .card-name { font-weight: 700; font-size: 1.1rem; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; }
+        .card-actions-group { display: flex; gap: 5px; flex-shrink: 0; align-items: center; }
+        .card-action-btn { background: none; border: none; padding: 4px; font-size: 1.1rem; cursor: pointer; line-height: 1; width: auto; margin:0; }
+
+        .card-sub { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 15px; }
+        .card-stats-row { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--bg-body); padding-top: 10px; }
         .stat-group { text-align: left; }
         .stat-group.right { text-align: right; }
-        
-        .stat-label { 
-            font-size: 0.6rem; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            font-weight: 600; 
-            display: block; 
-            margin-bottom: 1px; 
-        }
-        
-        .stat-val-h { 
-            font-size: 1.1rem; /* Font ridotto */
-            font-weight: 800; 
-            color: var(--primary); 
-            line-height: 1; 
-        }
-        
-        .stat-val-m { 
-            font-size: 1.1rem; /* Font ridotto */
-            font-weight: 800; 
-            color: var(--money-color); 
-            line-height: 1; 
-        }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px; }
+        .stat-val-h { font-size: 1.4rem; font-weight: 800; color: var(--primary); line-height: 1; }
+        .stat-val-m { font-size: 1.4rem; font-weight: 800; color: var(--money-color); line-height: 1; }
 
         .edit-user-btn { background: var(--bg-body); border:none; border-radius: 4px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); margin: 0; padding: 0; }
         .edit-user-btn:hover { background: var(--border-color); color: var(--primary); }
@@ -958,17 +887,28 @@
         try { await sendPasswordResetEmail(auth, e); modal("Inviata", "Controlla la posta."); } catch(err) { modal("Errore", err.message); }
     });
 
-    // AUTO LOGOUT (HARD LIMIT - 15 MINUTI)
+    // AUTO LOGOUT (INATTIVITÀ 15 MINUTI)
     let sessionTimer;
+    const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 Minuti
 
-    const startSessionTimer = () => {
+    const resetSessionTimer = () => {
         if (!currentUser) return;
-        clearTimeout(sessionTimer); 
-        // 15 minuti = 900000 ms
+        clearTimeout(sessionTimer);
         sessionTimer = setTimeout(() => {
-            modal("Sessione Scaduta", "Tempo massimo di sessione raggiunto (15 min).", () => signOut(auth));
-            signOut(auth);
-        }, 900000);
+            signOut(auth).then(() => {
+                // Opzionale: Mostra modal o alert dopo il logout
+                // Ma dato che onAuthStateChanged gestisce la UI, il logout switcha la view
+                alert("Sessione scaduta per inattività (15 min).");
+            });
+        }, SESSION_TIMEOUT);
+    };
+
+    const setupIdleListener = () => {
+        const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+        events.forEach(evt => {
+            document.addEventListener(evt, resetSessionTimer, { passive: true });
+        });
+        resetSessionTimer(); // Avvia subito
     };
 
     // LOCK LOGIC
@@ -988,11 +928,10 @@
         toggleLoading(loginBtn, false);
         if (user) {
             currentUser = user;
+            setupIdleListener(); // Start Idle Timer
+            
             document.getElementById('logout-btn').classList.remove('hidden');
             document.getElementById('notice-btn').classList.remove('hidden');
-            
-            // START HARD TIMER
-            startSessionTimer();
 
             loadNotices();
             
@@ -1062,6 +1001,7 @@
 
         } else {
             currentUser = null;
+            clearTimeout(sessionTimer); // Stop timer
             switchView('login-view');
         }
     });
