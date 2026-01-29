@@ -416,7 +416,7 @@
                 width: 100%; 
                 padding: 5px; 
                 align-content: center;
-                align-items: center; /* CENTRATURA VERTICALE SU MOBILE */
+                align-items: center; 
                 justify-content: flex-start;
                 gap: 6px;
             }
@@ -424,7 +424,7 @@
                 width: auto; 
                 min-width: 140px; 
                 max-width: 100%; 
-                margin: 0; /* Rimosso margin extra per usare gap */
+                margin: 0; 
                 flex-grow: 1; 
             }
             .card-actions { opacity: 1; position: static; margin-bottom: 4px; justify-content: flex-end; background: transparent; box-shadow: none; }
@@ -979,39 +979,61 @@
         });
     }
 
+    // --- RIEPILOGO ORE AGGIORNATO (Admin e Collaboratori) ---
     function updateWeeklySummary() {
-        if (!isAdmin) return;
+        // Rimuovo il check "if (!isAdmin) return;" perché ora è per tutti.
+        
         const container = document.getElementById('weekly-summary-grid');
         const section = document.getElementById('weekly-summary-section');
         section.classList.remove('hidden');
         container.innerHTML = "";
+
         const start = new Date(currentWeekStart);
         const end = new Date(currentWeekStart);
         end.setDate(end.getDate() + 6);
         const sStr = formatDate(start);
         const eStr = formatDate(end);
+
         const totals = {};
+
         allShiftsData.forEach(s => {
             if (s.date >= sStr && s.date <= eStr) {
                 const [h1, m1] = s.start.split(':').map(Number);
                 const [h2, m2] = s.end.split(':').map(Number);
                 let duration = (h2 + m2/60) - (h1 + m1/60);
                 if (duration < 0) duration += 24; 
+
                 const name = s.sostituto ? s.sostituto.nome : s.userName;
+                const email = s.sostituto ? s.sostituto.email : s.email;
                 const role = s.role;
-                if (!totals[name]) totals[name] = { hours: 0, role: role };
-                totals[name].hours += duration;
+
+                // Logica Filtro: Admin vede tutto. Collaboratore vede solo se stesso.
+                if (isAdmin || (currentUser && (email === currentUser.email))) {
+                    if (!totals[name]) totals[name] = { hours: 0, role: role };
+                    totals[name].hours += duration;
+                }
             }
         });
+
+        // Converti in array e ordina per nome
         const sortedTotals = Object.entries(totals).sort((a,b) => a[0].localeCompare(b[0]));
+
         if (sortedTotals.length === 0) {
             container.innerHTML = "<p style='color:#999; grid-column:1/-1; text-align:center;'>Nessun turno questa settimana.</p>";
             return;
         }
+
         sortedTotals.forEach(([name, data]) => {
             const card = document.createElement('div');
             card.className = 'summary-card';
-            card.innerHTML = `<div><div class="sum-name">${name}</div><span class="sum-role">${data.role}</span></div><div class="sum-hours">${data.hours.toFixed(1)} h</div>`;
+            // Usa toFixed(2) per decimali precisi (es. 1.25)
+            card.innerHTML = `
+                <div>
+                    <div class="sum-name">${name}</div>
+                    <span class="sum-role">${data.role}</span>
+                </div>
+                <div class="sum-hours">${data.hours.toFixed(2)} h</div>
+            `;
             container.appendChild(card);
         });
     }
